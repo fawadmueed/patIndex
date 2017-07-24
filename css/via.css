@@ -1,0 +1,91 @@
+/* VIA Rail CSS */
+
+.ui.menu .manyeta.active.item,
+.ui.manyeta.menu .active.item{
+	border-color:#050E45!important;
+	color:#050E45!important}
+
+.ui.inverted.manyeta.menu{background-color:#050E45}
+.ui.inverted.manyeta.pointing.menu .active.item:after{background-color:#050E45}
+
+i.manyeta.basic.icon{color:#050E45!important}
+i.inverted.manyeta.basic.icon{color:#050E45!important}
+
+.ui.manyeta.buttons .button,
+.ui.manyeta.button{background-color:#050E45;color:#FFF}
+
+.ui.manyeta.buttons .button:hover,
+.ui.manyeta.button:hover,
+.ui.manyeta.buttons .active.button,
+.ui.manyeta.button.active{background-color:#3E3773;color:#FFF}
+
+.ui.manyeta.buttons .button:active,
+.ui.manyeta.button:active{background-color:#2E2860;color:#FFF}
+
+.ui.manyeta.header {
+  color: #050E45 !important;
+}
+
+.ui.manyeta.dividing.header {
+  border-bottom: 3px solid #050E45;
+}
+
+.ui.inverted.manyeta.header {
+  background-color: #050E45 !important;
+  color: #FFFFFF !important;
+}
+
+i.manyeta.icon {
+  color: #050E45 !important;
+}
+
+i.inverted.manyeta.icon {
+  background-color: #050E45 !important;
+  color: #FFFFFF !important;
+}
+
+/*--- manyeta ---*/
+.ui.manyeta.labels .label,
+.ui.manyeta.label {
+  background-color: #050E45 !important;
+  border-color: #050E45 !important;
+  color: #FFFFFF !important;
+}
+.ui.labels .manyeta.label:before,
+.ui.manyeta.labels .label:before,
+.ui.manyeta.label:before {
+  background-color: #050E45 !important;
+}
+/* Hover */
+a.ui.manyeta.labels .label:hover,
+.ui.manyeta.labels a.label:hover,
+a.ui.manyeta.label:hover {
+  background-color: #3E3773 !important;
+  border-color: #3E3773 !important;
+  color: #FFFFFF !important;
+}
+.ui.labels a.manyeta.label:hover:before,
+.ui.manyeta.labels a.label:hover:before,
+a.ui.manyeta.label:hover:before {
+  background-color: #3E3773 !important;
+}
+/* Corner */
+.ui.manyeta.corner.label,
+.ui.manyeta.corner.label:hover {
+  background-color: transparent !important;
+}
+/* Ribbon */
+.ui.manyeta.ribbon.label {
+  border-color: #3E3773 !important;
+}
+
+.ui.manyeta.progress .bar {
+  background-color: #050E45;
+}
+.ui.manyeta.segment {
+  border-top: 0.2em solid #050E45;
+}
+.ui.inverted.manyeta.segment {
+  background-color: #050E45 !important;
+  color: #FFFFFF !important;
+}

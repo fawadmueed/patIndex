@@ -1,0 +1,91 @@
+/* CHUM CSS */
+
+.ui.menu .manyeta.active.item,
+.ui.manyeta.menu .active.item{
+	border-color:#ee3124!important;
+	color:#ee3124!important}
+
+.ui.inverted.manyeta.menu{background-color:#ee3124}
+.ui.inverted.manyeta.pointing.menu .active.item:after{background-color:#ee3124}
+
+i.manyeta.basic.icon{color:#ee3124!important}
+i.inverted.manyeta.basic.icon{color:#ee3124!important}
+
+.ui.manyeta.buttons .button,
+.ui.manyeta.button{background-color:#ee3124;color:#FFF}
+
+.ui.manyeta.buttons .button:hover,
+.ui.manyeta.button:hover,
+.ui.manyeta.buttons .active.button,
+.ui.manyeta.button.active{background-color:#E75859;color:#FFF}
+
+.ui.manyeta.buttons .button:active,
+.ui.manyeta.button:active{background-color:#D24B4C;color:#FFF}
+
+.ui.manyeta.header {
+  color: #ee3124 !important;
+}
+
+.ui.manyeta.dividing.header {
+  border-bottom: 3px solid #ee3124;
+}
+
+.ui.inverted.manyeta.header {
+  background-color: #ee3124 !important;
+  color: #FFFFFF !important;
+}
+
+i.manyeta.icon {
+  color: #ee3124 !important;
+}
+
+i.inverted.manyeta.icon {
+  background-color: #ee3124 !important;
+  color: #FFFFFF !important;
+}
+
+/*--- manyeta ---*/
+.ui.manyeta.labels .label,
+.ui.manyeta.label {
+  background-color: #ee3124 !important;
+  border-color: #ee3124 !important;
+  color: #FFFFFF !important;
+}
+.ui.labels .manyeta.label:before,
+.ui.manyeta.labels .label:before,
+.ui.manyeta.label:before {
+  background-color: #ee3124 !important;
+}
+/* Hover */
+a.ui.manyeta.labels .label:hover,
+.ui.manyeta.labels a.label:hover,
+a.ui.manyeta.label:hover {
+  background-color: #E75859 !important;
+  border-color: #E75859 !important;
+  color: #FFFFFF !important;
+}
+.ui.labels a.manyeta.label:hover:before,
+.ui.manyeta.labels a.label:hover:before,
+a.ui.manyeta.label:hover:before {
+  background-color: #E75859 !important;
+}
+/* Corner */
+.ui.manyeta.corner.label,
+.ui.manyeta.corner.label:hover {
+  background-color: transparent !important;
+}
+/* Ribbon */
+.ui.manyeta.ribbon.label {
+  border-color: #E75859 !important;
+}
+
+.ui.manyeta.progress .bar {
+  background-color: #ee3124;
+}
+.ui.manyeta.segment {
+  border-top: 0.2em solid #ee3124;
+}
+.ui.inverted.manyeta.segment {
+  background-color: #ee3124 !important;
+  color: #FFFFFF !important;
+}

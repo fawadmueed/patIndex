@@ -1,0 +1,357 @@
+
+
+{
+
+"Observations": { "short":"OBS", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Observations"},
+  {"type":"C", "desc":"00001 Lésion périapiale"},
+  {"type":"C", "desc":"00002 Corps étranger"},
+  {"type":"C", "desc":"00003 Dent incluse"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Observations"},
+  {"type":"C", "desc":"00011 Rotation haut gauche"},
+  {"type":"C", "desc":"00012 Rotation haut droite"},
+  {"type":"C", "desc":"00013 Rotation bas gauche"},
+  {"type":"C", "desc":"00013 Rotation bas droite"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Restauration": { "short":"REST", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Antérieure composite"},
+  {"type":"B", "desc":"23111 Classes I, V, VI"},
+  {"type":"M", "desc":"23112 Classe III"},
+  {"type":"M", "desc":"23113 Classe IV"},
+  {"type":"C", "desc":"23114 Classe IV double"},
+  {"type":"C", "desc":"23115 Tiers incisif"},
+  {"type":"C", "desc":"23118 Reconstruction complète d'une dent"} ],
+
+[ {"type":"N", "desc":"Facettes"},
+  {"type":"C", "desc":"23121 Fabriquée Lab"},
+  {"type":"C", "desc":"23122 Fabriquée à la chaise"},
+  {"type":"C", "desc":"23124 Fermeture diastème"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Prémolaire composite"},
+  {"type":"C", "desc":"23210 RPR"},
+  {"type":"S", "desc":"23211 Une surface"},
+  {"type":"S", "desc":"23212 Deux surfaces"},
+  {"type":"S", "desc":"23213 Trois surfaces"},
+  {"type":"S", "desc":"23214 Quatre surfaces"},
+  {"type":"C", "desc":"23215 Cinq surfaces"} ],
+  
+[ {"type":"N", "desc":"Molaire composite"},
+  {"type":"C", "desc":"23220 RPR"},
+  {"type":"S", "desc":"23221 Une surface"},
+  {"type":"S", "desc":"23222 Deux surfaces"},
+  {"type":"S", "desc":"23223 Trois surfaces"},
+  {"type":"S", "desc":"23224 Quatre surfaces"},
+  {"type":"C", "desc":"23225 Cinq surfaces"} ],
+
+[ {"type":"N", "desc":"Prémolaire amalgame"},
+  {"type":"N", "desc":""},
+  {"type":"S", "desc":"21211 Une surface"},
+  {"type":"S", "desc":"21212 Deux surfaces"},
+  {"type":"S", "desc":"21213 Trois surfaces"},
+  {"type":"S", "desc":"21214 Quatre surfaces"},
+  {"type":"C", "desc":"21215 Cinq surfaces"} ],
+
+[ {"type":"N", "desc":"Molaire amalgame"},
+  {"type":"N", "desc":""},
+  {"type":"S", "desc":"21221 Une surface"},
+  {"type":"S", "desc":"21222 Deux surfaces"},
+  {"type":"S", "desc":"21223 Trois surfaces"},
+  {"type":"S", "desc":"21224 Quatre surfaces"},
+  {"type":"C", "desc":"21225 Cinq surfaces"} ]
+
+]
+
+},
+
+"Endodontie": { "short":"ENDO", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Traitement de canal"},
+  {"type":"C", "desc":"33100 Endo 1 canal"},
+  {"type":"C", "desc":"33200 Endo 2 canaux"},
+  {"type":"C", "desc":"33300 Endo 3 canaux"},
+  {"type":"C", "desc":"33400 Quatre canaux"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Retraitement de canal"},
+  {"type":"C", "desc":"33110 Re-endo 1 canal"},
+  {"type":"C", "desc":"33210 Re-endo <br>2 canaux"},
+  {"type":"C", "desc":"33310 Re-endo <br>3 canaux"},
+  {"type":"C", "desc":"33410 Re-endo <br>4 canaux"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Prothèses fixes": { "short":"PPF", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Couronne individuelle"},
+  {"type":"C", "desc":"27200 Cour Porcelaine"},
+  {"type":"C", "desc":"27210 Cour Porcelaine-métal"},
+  {"type":"C", "desc":"27130 Cour Tempo acrylique"},
+  {"type":"C", "desc":"27310 Couronne 3/4"},
+  {"type":"C", "desc":"27343 Couronne sur implant"},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Corps coulé"},
+  {"type":"C", "desc":"27700 Corps coulé"},
+  {"type":"C", "desc":"27710 Corps coulé dans emp"},
+  {"type":"C", "desc":"27715 Pilier vissé implant"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Pivot pré-fabriqué"},
+  {"type":"C", "desc":"29501 Un composipost"},
+  {"type":"C", "desc":"29502 Deux composiposts"},
+  {"type":"C", "desc":"29503 Trois composiposts"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Pontique"},
+  {"type":"C", "desc":"62502 Pontique Porcelaine"},
+  {"type":"C", "desc":"62510 Pontique Porcelaine-métal"},
+  {"type":"C", "desc":"65500 Aileron par dent (Maryland)"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Pilier"},
+  {"type":"C", "desc":"67200 Pilier pont Porcelaine"},
+  {"type":"C", "desc":"67210 Pilier pont Porcelaine-métal"},
+  {"type":"C", "desc":"67443 Pilier pont sur implant"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Chirurgie": { "short":"CHIR", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Ablation sans complication"},
+  {"type":"C", "desc":"71101 Exo 1 ère dent par quad"},
+  {"type":"C", "desc":"71111 Exo toute autre dent"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Ablation chirurgicale"},
+  {"type":"C", "desc":"72100 Exo avec Lambeau et/ou Odonto ou Ostéo"},
+  {"type":"C", "desc":"72110 Exo avec Lambeau et Odonto et Ostéo"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Dent incluse"},
+  {"type":"C", "desc":"72210 Exo chir sous-muqueuse"},
+  {"type":"C", "desc":"72220 Exo chir Ondoto ou Ostéo"},
+  {"type":"C", "desc":"72230 Exo chir Odonto et Ostéo"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"72300 Exo Racines résiduelles sans complications"},
+  {"type":"C", "desc":"72310 Exo Racines résiduelles recouvertes de tissu mou"},
+  {"type":"C", "desc":"72350 Exérèse d'une dent fracturée"},
+  {"type":"C", "desc":"72410 Operculectomie"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Parodontie": { "short":"PARO", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Surfaçage radiculaire sous anesthésie"},
+  {"type":"C", "desc":"42000 Surfaçage 1ère dent d'un quadrant"},
+  {"type":"C", "desc":"42001 Dent additionnelle (même quadrant)"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Jumelages"},
+  {"type":"C", "desc":"43211 Jumelage Interproximal par lien"},
+  {"type":"C", "desc":"43212 Jumelage avec fil par dent"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Greffe gingivale"},
+  {"type":"C", "desc":"42300 Greffe ging 1ère dent"},
+  {"type":"C", "desc":"42301 Greffe ging dent adjacente"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Équilibrage occlusion"},
+  {"type":"C", "desc":"43300 Équilibrage mineur (une ou deux dents)"},
+  {"type":"C", "desc":"43310 Équilibrage majeur (bouche complète)"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Plaque occlusale"},
+  {"type":"C", "desc":"43611 Plaque occ Maxilaire"},
+  {"type":"C", "desc":"43612 Plaque occ Mandibulaire"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Prothèse complète": { "short":"PCO", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Complète, standard"},
+  {"type":"C", "desc":"51100 C /"},
+  {"type":"C", "desc":"51110 / C"},
+  {"type":"C", "desc":"51120 C / C"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Complète immédiate"},
+  {"type":"C", "desc":"51300 C /"},
+  {"type":"C", "desc":"51310 / C"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Prothèses amovibles": { "short":"PPA", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Base acrylique"},
+  {"type":"C", "desc":"52120 P /"},
+  {"type":"C", "desc":"52121 / P"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Alliage chrome-cobalt"},
+  {"type":"C", "desc":"Selles libres"},
+  {"type":"C", "desc":"52400 P /"},
+  {"type":"C", "desc":"52410 / P"},
+  {"type":"C", "desc":"52420 P / P"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Sans selles libres"},
+  {"type":"C", "desc":"52500 P /"},
+  {"type":"C", "desc":"52510 / P"},
+  {"type":"C", "desc":"52520 P / P"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Prothèses complète et partielle": { "short":"PCP", "columns":7, "rows":
+
+[
+
+[ {"type":"N", "desc":"Sans selles libres"},
+  {"type":"C", "desc":"52531 Standard"},
+  {"type":"C", "desc":"52532 Équilibrées"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Avec selles libres"},
+  {"type":"C", "desc":"52542 Standard"},
+  {"type":"C", "desc":"52543 Équilibrées"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Ajustement d'une prothèse"},
+  {"type":"C", "desc":"54250 Ajustements mineurs, maxilaire"},
+  {"type":"C", "desc":"54251 Ajustements mineurs, mandibulaire"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Réparations sans empreinte"},
+  {"type":"C", "desc":"55101 C /"},
+  {"type":"C", "desc":"55102 / C"},
+  {"type":"C", "desc":"55103 P /"},
+  {"type":"C", "desc":"55104 / P"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Réparations avec empreinte"},
+  {"type":"C", "desc":"55201 C /"},
+  {"type":"C", "desc":"55202 / C"},
+  {"type":"C", "desc":"55203 P /"},
+  {"type":"C", "desc":"55204 / P"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"N", "desc":"Ajouts de structure à un partiel"},
+  {"type":"C", "desc":"55520 P /"},
+  {"type":"C", "desc":"55530 / P"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+}
+
+}

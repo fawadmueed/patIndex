@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<head>
+
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Axxium | Sans-papier</title>
+
+  <meta name="description" content="A menu is a collection of elements showing related user actions" />
+  <meta name="keywords" content="html5, ui, library, framework, javascript" />
+
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" class="ui" href="css/dist/semantic.min.css">
+  <link rel="stylesheet" type="text/css" class="ui" href="css/axxium.css">
+
+  <script src="javascript/library/jquery.min.js"></script>
+  <script src="javascript/dist/semantic.min.js"></script>
+
+  <script>
+
+  function resetProtButtons()
+  {
+	if(curKind == 'Diagnostic')							document.getElementById("pB1").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB1").setAttribute("class","ui axxium small button");
+	if(curKind == 'Prévention')							document.getElementById("pB2").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB2").setAttribute("class","ui axxium small button");
+	if(curKind == 'Restauration')						document.getElementById("pB3").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB3").setAttribute("class","ui axxium small button");
+	if(curKind == 'Endodontie')							document.getElementById("pB4").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB4").setAttribute("class","ui axxium small button");
+	if(curKind == 'Prothèses fixes')					document.getElementById("pB5").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB5").setAttribute("class","ui axxium small button");
+	if(curKind == 'Chirurgie')							document.getElementById("pB6").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB6").setAttribute("class","ui axxium small button");
+	if(curKind == 'Parodontie')							document.getElementById("pB7").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB7").setAttribute("class","ui axxium small button");
+	if(curKind == 'Prothèses amovibles')				document.getElementById("pB8").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB8").setAttribute("class","ui axxium small button");
+	if(curKind == 'Prothèse complète')					document.getElementById("pB9").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB9").setAttribute("class","ui axxium small button");
+	if(curKind == 'Prothèses complète et partielle')	document.getElementById("pB10").setAttribute("class","ui axxium small disabled button"); else document.getElementById("pB10").setAttribute("class","ui axxium small button");
+  }
+
+  function selectProt()
+  {
+	pResp = JSON.parse(JSON.stringify(masterResp));
+	document.getElementById("totTxt").innerHTML = "";
+	displayProts("Restauration");
+	$('.modalProts.modal').modal('show');
+  }
+
+  function selectBL()
+  {
+	textS = "";
+	isBuc = true;
+	document.getElementById("butBuc").setAttribute("class","ui axxium tiny button");
+	isLab = true;
+	document.getElementById("butLab").setAttribute("class","ui axxium tiny button");
+	$('.modalSelectBL.modal').modal('show');
+  }
+
+  function selectMD()
+  {
+	textS = "";
+	isMed = true;
+	document.getElementById("butMed").setAttribute("class","ui axxium tiny button");
+	isDis = true;
+	document.getElementById("butDis").setAttribute("class","ui axxium tiny button");
+	$('.modalSelectMD.modal').modal('show');
+  }
+
+  function selectSurf()
+  {
+	textS = "";
+	isMs = true;
+	document.getElementById("butMs").setAttribute("class","ui axxium tiny button");
+	isOs = true;
+	document.getElementById("butOs").setAttribute("class","ui axxium tiny button");
+	isDs = true;
+	document.getElementById("butDs").setAttribute("class","ui axxium tiny button");
+	isBs = true;
+	document.getElementById("butBs").setAttribute("class","ui axxium tiny button");
+	isLs = true;
+	document.getElementById("butLs").setAttribute("class","ui axxium tiny button");
+	$('.modalSelectSurf.modal').modal('show');
+  }
+
+  function setBuc() { isBuc = true; document.getElementById("butBuc").setAttribute("class","ui red tiny button"); addTextS("B"); }
+  function setLab() { isLab = true; document.getElementById("butLab").setAttribute("class","ui red tiny button"); addTextS("L"); }
+  function setMed() { isMed = true; document.getElementById("butMed").setAttribute("class","ui red tiny button"); addTextS("M"); }
+  function setDis() { isDis = true; document.getElementById("butDis").setAttribute("class","ui red tiny button"); addTextS("D"); }
+  function setMs() { isMs = true; document.getElementById("butMs").setAttribute("class","ui red tiny button"); addTextS("M"); }
+  function setOs() { isOs = true; document.getElementById("butOs").setAttribute("class","ui red tiny button"); addTextS("O"); }
+  function setDs() { isDs = true; document.getElementById("butDs").setAttribute("class","ui red tiny button"); addTextS("D"); }
+  function setBs() { isBs = true; document.getElementById("butBs").setAttribute("class","ui red tiny button"); addTextS("B"); }
+  function setLs() { isLs = true; document.getElementById("butLs").setAttribute("class","ui red tiny button"); addTextS("L"); }
+
+  function addTextS(aCode)
+  {
+	textS = textS + aCode;
+  }
+
+  function closeBL()
+  {
+	$('.modalSelectBL.modal').modal('hide');
+  }
+
+  function closeMD()
+  {
+	$('.modalSelectMD.modal').modal('hide');
+  }
+
+  function closeSurf()
+  {
+	$('.modalSelectSurf.modal').modal('hide');
+  }
+
+  function textProts()
+  {
+  	  var qKeys = Object.keys(qProt);
+  	  var aBR = false;
+  	  var totTxt = "";
+  	  for (key in qKeys)
+  		{
+  			var txt = "";
+      		var ctrp = 0;
+      		var aCM = false;
+      		for (rr in qProt[qKeys[key]]["rows"])
+      			{
+    				div = document.createElement("tr");
+    				for (cc in qProt[qKeys[key]]["rows"][rr])
+    				{
+    					aType = qProt[qKeys[key]]["rows"][rr][cc].type;
+    					if (aType == "C" || aType == "B" || aType == "M" || aType == "S")
+    					{
+    						if (pResp[qKeys[key]][aType+ctrp] == "Y")
+    						{
+    							if (aCM)
+    							{
+    								if (aType == "B" || aType == "M" || aType == "S")
+    								{
+    									txt = txt + ", " + qProt[qKeys[key]]["rows"][rr][cc].desc + "(" + textS + ")";
+    								}
+    								else
+    								{
+    									txt = txt + ", " + qProt[qKeys[key]]["rows"][rr][cc].desc;
+    								}
+    							}
+    							else
+    							{
+    								if (aType == "B" || aType == "M" || aType == "S")
+    								{
+    									txt = qProt[qKeys[key]]["rows"][rr][cc].desc + "(" + textS + ")";
+    									aCM = true;
+    								}
+    								else
+    								{
+    									txt = qProt[qKeys[key]]["rows"][rr][cc].desc;
+    									aCM = true;
+    								}
+    							}
+    						}
+    					}
+    					if (aType == "T")
+    					{
+    						if (pResp[qKeys[key]][aType+ctrp].length > 0)
+    						{
+    							if (aCM)
+    							{
+    								txt = txt + ", " + qProt[qKeys[key]]["rows"][rr][cc].desc + " : " + pResp[qKeys[key]][aType+ctrp];
+    							}
+    							else
+    							{
+    								txt = qProt[qKeys[key]]["rows"][rr][cc].desc + " : " + pResp[qKeys[key]][aType+ctrp];
+    								aCM = true;
+    							}
+    						}
+    					}
+    					ctrp = ctrp + 1;
+    				}
+    			}
+    		if (txt.length > 0)
+    		{
+    			if (aBR)
+    			{
+    				totTxt = totTxt + "<br><b>" + qProt[qKeys[key]].short + " : </b>" + txt;
+    			}
+    			else
+    			{
+    				totTxt = "<b>" + qProt[qKeys[key]].short + " : </b>" + txt;
+    				aBR = true;
+    			}
+    		}
+  		}
+  		document.getElementById("totTxt").innerHTML = totTxt;
+  		$('.modalProts.modal').modal('hide');
+  }
+
+  function loadProts()
+  {
+  var xmlhttp2;
+  if (window.XMLHttpRequest)
+    {// code for IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp2=new XMLHttpRequest();
+    }
+  else
+    {// code for IE6, IE5
+    xmlhttp2=new ActiveXObject("Microsoft.XMLHTTP");
+    }
+  xmlhttp2.onreadystatechange=function()
+    {
+    if (xmlhttp2.readyState==4 && xmlhttp2.status==200)
+      {
+      //alert(xmlhttp2.responseText.length);
+      qProt = JSON.parse(xmlhttp2.responseText);
+  	  var qKeys = Object.keys(qProt);
+  	  for (key in qKeys)
+  		{
+  			masterResp[qKeys[key]] = { };
+      		var ctrp = 0;
+      		for (rr in qProt[qKeys[key]]["rows"])
+      			{
+    				div = document.createElement("tr");
+    				for (cc in qProt[qKeys[key]]["rows"][rr])
+    				{
+    					aType = qProt[qKeys[key]]["rows"][rr][cc].type;
+    					if (aType == "C" || aType == "B" || aType == "M" || aType == "S")
+    					{
+    						masterResp[qKeys[key]][aType+ctrp] = "N";
+    					}
+    					else
+    					{
+    						masterResp[qKeys[key]][aType+ctrp] = "";
+    					}
+    					ctrp = ctrp + 1;
+    				}
+    			}
+  		}
+      }
+    }
+
+  //alert("Get the protocols!");
+  xmlhttp2.open("GET","json/ramq/select2.json",true);
+  xmlhttp2.send();
+
+  }
+
+  function displayProts(aKind)
+  {
+      curKind = aKind;
+      resetProtButtons();
+      document.getElementById("protHeader").innerHTML = '<i class="treatment icon"></i>' + aKind;
+      document.getElementById("eachProtRow").innerHTML = "";
+      var ctrp = 0;
+      for (rr in qProt[aKind]["rows"])
+      	{
+    		div = document.createElement("tr");
+    		for (cc in qProt[aKind]["rows"][rr])
+    		{
+    			//<td id="C8" name="Prophylaxie" class="two column wide">Prophylaxie</td>
+    			aType = qProt[aKind]["rows"][rr][cc].type;
+    			aDesc = qProt[aKind]["rows"][rr][cc].desc;
+    			div2 = document.createElement("td");
+    			div2.setAttribute("id", aType+ctrp);
+    			div2.setAttribute("name", aDesc);
+    			div2.setAttribute("class", "two column wide");
+    			if (aType == "N" && cc == 0)
+    			{
+    				div2.innerHTML = '<h4>'+aDesc+'</h4>';
+    			}
+    			else if (aType == "T")
+    			{
+    				div2.innerHTML = aDesc + " :";
+    			}
+    			else
+    			{
+    				div2.innerHTML = aDesc;
+    			}
+    			div.appendChild(div2);
+    			ctrp = ctrp + 1;
+    		}
+    		document.getElementById("eachProtRow").appendChild(div);
+    	}
+
+	    $('#protTable tbody tr td').click(function(){
+	          curType = $(this).attr("id");
+	          curProtName = $(this).attr("name");
+	          cont = document.getElementById(curType).innerHTML;
+	          if (curType.substring(0,1) == "C" || curType.substring(0,1) == "B" || curType.substring(0,1) == "M" || curType.substring(0,1) == "S")
+	          {
+	          	if (pResp[curKind][curType] == "Y")
+	          	{
+	          		document.getElementById(curType).innerHTML = curProtName;
+	          		pResp[curKind][curType] = "N";
+	          	}
+	          	else
+	          	{
+	          		document.getElementById(curType).innerHTML = '<i class="icon checkmark"></i> <b>' + cont + '</b>';
+	          		pResp[curKind][curType] = "Y";
+	          		if (curType.substring(0,1) == "B") selectBL();
+	          		if (curType.substring(0,1) == "M") selectMD();
+	          		if (curType.substring(0,1) == "S") selectSurf();
+	          	}
+	          }
+	          if (curType.substring(0,1) == "T")
+	          {
+	          	if (pResp[curKind][curType].length > 0)
+	          	{
+	          		document.getElementById("EnoteProt").value = pResp[curKind][curType];
+	          	}
+	          	else
+	          	{
+	          		document.getElementById("EnoteProt").value = "";
+	          	}
+	          	$('.modalNoteProt.modal').modal('show');
+	          }
+      	});
+  }
+
+  </script>
+
+</head>
+<body id="example">
+
+  <div class="example">
+	<div class="ui segment">
+      <h2 class="ui header">
+   		<img id="topLogo" class="ui mini left floated image" src="images/headerimg.png">
+        <div id="topTitle" class="ui content">
+        	Test de sélection
+        </div>
+        <br>
+      </h2>
+    </div>
+
+<div class="container">
+
+    <div class="ui segment">
+		<div class="ui axxium small button" onclick="selectProt();">Ouvrir</div>
+    </div>
+
+    <div id="totTxt" class="ui segment">
+
+    </div>
+
+</div>
+
+	<div class="ui modalProts fullscreen long modal">
+	  <i class="close icon"></i>
+	  <div id="protHeader" class="header">
+	    <i class="treatment icon"></i>Protocoles
+	  </div>
+	  <div class="modProts content">
+    	<div class="ui axxium form segment">
+    		<div id="pB1" class="ui axxium small button" onclick="displayProts('Diagnostic');">DIAGN</div>
+    		<div id="pB2" class="ui axxium small button" onclick="displayProts('Prévention');">PRÉV</div>
+    		<div id="pB3" class="ui axxium small button" onclick="displayProts('Restauration');">REST</div>
+    		<div id="pB4" class="ui axxium small button" onclick="displayProts('Endodontie');">ENDO</div>
+    		<div id="pB5" class="ui axxium small button" onclick="displayProts('Prothèses fixes');">PPF</div>
+    		<div id="pB6" class="ui axxium small button" onclick="displayProts('Chirurgie');">CHIR</div>
+    		<div id="pB7" class="ui axxium small button" onclick="displayProts('Parodontie');">PARO</div>
+    		<div id="pB8" class="ui axxium small button" onclick="displayProts('Prothèses amovibles');">PPA</div>
+    		<div id="pB9" class="ui axxium small button" onclick="displayProts('Prothèse complète');">PCO</div>
+    		<div id="pB10" class="ui axxium small button" onclick="displayProts('Prothèses complète et partielle');">PCP</div>
+    		<table id="protTable" class="ui celled table">
+			  <tbody id="eachProtRow">
+			  </tbody>
+			</table>
+			<div class="ui axxium small button" onclick="textProts();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalNoteProt modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Notes et commentaires
+	  </div>
+	  <div class="modNoteProt content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez une note ou un commentaire</label>
+    	      <input id="EnoteProt" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelectSurf modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection des surfaces
+	  </div>
+	  <div class="modSelectSurf content">
+    	<div class="ui axxium form segment">
+	  			<div class="ui axxium tiny button" onclick='setMs();' id="butMs"><font size=5>M</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setOs();' id="butOs"><font size=5>O</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setDs();' id="butDs"><font size=5>D</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setBs();' id="butBs"><font size=5>B</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setLs();' id="butLs"><font size=5>L</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeSurf();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelectMD modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection médiale ou distale
+	  </div>
+	  <div class="modSelectMD content">
+    	<div class="ui axxium form segment">
+	  			<div class="ui axxium tiny button" onclick='setMed();' id="butMed"><font size=5>M</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setDis();' id="butDis"><font size=5>D</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeMD();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelectBL modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection buccale ou labiale
+	  </div>
+	  <div class="modSelectBL content">
+    	<div class="ui axxium form segment">
+	  			<div class="ui axxium tiny button" onclick='setBuc();' id="butBuc"><font size=5>B</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setLab();' id="butLab"><font size=5>L</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeBL();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<script>
+
+	$('.modNoteProt.content .ui.form')
+		    .form({
+		        just: {
+		          identifier  : 'Enote',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Entrez une note ou un commentaire'
+		            }
+		          ]
+		        }
+		      }, { inline : true,
+        			onSuccess : function() {
+            		//alert(curType);
+            		pResp[curKind][curType] = document.getElementById("EnoteProt").value;
+            		document.getElementById(curType).innerHTML = '<i class="icon checkmark"></i> <b>' + curProtName + " : " + document.getElementById("EnoteProt").value + '</b>'
+            		$('.modalNoteProt.modal').modal('hide');
+        } })
+    ;
+
+  var curKind = "";
+  var curType = "";
+  var curProtName = "";
+  var pResp = { };
+  var masterResp = { };
+  var textS = "";
+
+  $('document').ready(function(){
+
+		$('.modalProts.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+		;
+		$('.modalNoteProt.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+		;
+		$('.modalSelectBL.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+		;
+		$('.modalSelectMD.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+		;
+		$('.modalSelectSurf.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+		;
+		loadProts();
+
+  });
+
+  </script>
+
+</body>
+</html>

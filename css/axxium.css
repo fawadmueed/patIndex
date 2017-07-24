@@ -1,0 +1,93 @@
+/* AXXIUM CSS */
+
+canvas.jSignature { height: 500px; }
+
+.ui.menu .axxium.active.item,
+.ui.axxium.menu .active.item{
+	border-color:#008883!important;
+	color:#FFFFFF!important}
+
+.ui.inverted.axxium.menu{background-color:#008883}
+.ui.inverted.axxium.pointing.menu .active.item:after{background-color:#008883}
+
+i.axxium.basic.icon{color:#008883!important}
+i.inverted.axxium.basic.icon{color:#008883!important}
+
+.ui.axxium.buttons .button,
+.ui.axxium.button{background-color:#008883;color:#FFF}
+
+.ui.axxium.buttons .button:hover,
+.ui.axxium.button:hover,
+.ui.axxium.buttons .active.button,
+.ui.axxium.button.active{background-color:#3E3773;color:#FFF}
+
+.ui.axxium.buttons .button:active,
+.ui.axxium.button:active{background-color:#2E2860;color:#FFF}
+
+.ui.axxium.header {
+  color: #008883 !important;
+}
+
+.ui.axxium.dividing.header {
+  border-bottom: 3px solid #008883;
+}
+
+.ui.inverted.axxium.header {
+  background-color: #008883 !important;
+  color: #FFFFFF !important;
+}
+
+i.axxium.icon {
+  color: #008883 !important;
+}
+
+i.inverted.axxium.icon {
+  background-color: #008883 !important;
+  color: #FFFFFF !important;
+}
+
+/*--- axxium ---*/
+.ui.axxium.labels .label,
+.ui.axxium.label {
+  background-color: #008883 !important;
+  border-color: #008883 !important;
+  color: #FFFFFF !important;
+}
+.ui.labels .axxium.label:before,
+.ui.axxium.labels .label:before,
+.ui.axxium.label:before {
+  background-color: #008883 !important;
+}
+/* Hover */
+a.ui.axxium.labels .label:hover,
+.ui.axxium.labels a.label:hover,
+a.ui.axxium.label:hover {
+  background-color: #3E3773 !important;
+  border-color: #3E3773 !important;
+  color: #FFFFFF !important;
+}
+.ui.labels a.axxium.label:hover:before,
+.ui.axxium.labels a.label:hover:before,
+a.ui.axxium.label:hover:before {
+  background-color: #3E3773 !important;
+}
+/* Corner */
+.ui.axxium.corner.label,
+.ui.axxium.corner.label:hover {
+  background-color: transparent !important;
+}
+/* Ribbon */
+.ui.axxium.ribbon.label {
+  border-color: #3E3773 !important;
+}
+
+.ui.axxium.progress .bar {
+  background-color: #008883;
+}
+.ui.axxium.segment {
+  border-top: 0.2em solid #008883;
+}
+.ui.inverted.axxium.segment {
+  background-color: #008883 !important;
+  color: #FFFFFF !important;
+}

@@ -1,0 +1,2255 @@
+
+<!DOCTYPE html>
+<head>
+
+  <!-- Standard Meta -->
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Axxium | Sans-papier</title>
+
+  <meta name="description" content="A menu is a collection of elements showing related user actions" />
+  <meta name="keywords" content="html5, ui, library, framework, javascript" />
+
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" type="text/css" class="ui" href="css/dist/semantic.min.css">
+  <link rel="stylesheet" type="text/css" class="ui" href="css/axxium.css">
+
+  <script src="javascript/library/jquery.min.js"></script>
+  <script src="javascript/library/tablesort.js"></script>
+  <script src="javascript/dist/semantic.min.js"></script>
+
+  <script src="javascript/axxium/patients22.js"></script>
+  <script src="javascript/axxium/antecedents20.js"></script>
+  <script src="javascript/axxium/questionnaire17.js"></script>
+  <script src="javascript/axxium/examens20.js"></script>
+  <script src="javascript/axxium/plans17.js"></script>
+  <script src="javascript/axxium/ententes17.js"></script>
+  <script src="javascript/axxium/traitements20.js"></script>
+  <script src="javascript/axxium/ordonnances17.js"></script>
+  <script src="javascript/axxium/documents18.js"></script>
+  <script src="javascript/axxium/odonto21.js"></script>
+  <script src="javascript/axxium/paro20.js"></script>
+  <script src="javascript/axxium/labos22.js"></script>
+  <script src="javascript/jSignature.min.js"></script>
+  <script src="javascript/pdf/pdf.js"></script>
+  <script src="javascript/pdf/jspdf.min.js"></script>
+
+  <script src="javascript/tables/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.11/js/dataTables.semanticui.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/dataTables.semanticui.min.css">
+
+  <script>
+
+  function getLang()
+  {
+    var regexS = "[\\?&]lang=([^&#]*)";
+    var regex = new RegExp( regexS );
+    var results = regex.exec( window.location.href );
+    if( results == null )
+      return "fr";
+    else
+      return results[1];
+  }
+
+  function keyEntryPIN(aNum)
+  {
+    //alert(aNum);
+    if (aNum == -2)
+    {
+      	keyNumPIN = "";
+    }
+    else
+    {
+    	if (aNum == -1)
+    	{
+  			if (keyNumPIN.length > 0) keyNumPIN = keyNumPIN.substr(0,keyNumPIN.length-1);
+    	}
+    	else
+    	{
+  			keyNumPIN = keyNumPIN + aNum;
+    	}
+    }
+  }
+
+  function getPIN()
+  {
+  	keyNumPIN = "";
+  	$('.modalPIN.modal')
+	  .modal({
+	    closable  : false,
+	    onDeny    : function(){
+	      return false;
+	    }
+	  })
+	  .modal('show')
+  }
+
+  function checkPIN()
+  {
+	if (keyNumPIN.length != 4)
+	{
+		alert("Le code numérique doit compter 4 chiffres");
+		keyNumPIN = "";
+	}
+	else
+	{
+        $.get("allScriptsv1.py?tx=getJSONsub&sub=signatures&code=S_"+keyNumPIN+"&rand="+Math.random(), function(data, status){
+            	if (data["code"])
+            	{
+            		//alert("Bonjour "+data["name"]);
+            		$('.modalPIN.modal').modal('hide');
+            		curDentist = data["name"];
+            		curInitials = data["init"];
+            		curPrat = data["prat"];
+            		loadPAT();
+            	}
+            	else
+            	{
+            		alert("Le code numérique est inconnu");
+            	}
+        });
+	}
+  }
+
+  </script>
+
+</head>
+<body id="example">
+
+  <div class="example">
+	<div class="ui segment">
+      <h2 class="ui header">
+   		<img id="topLogo" class="ui tiny left floated image" src="images/axxium.png">
+        <div id="topTitle" class="ui content">
+          <h2 id="patName">IN&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="reOpenSearch();">Changer de patient</div></h2>
+        </div>
+        <br>
+      </h2>
+    </div>
+  	  <div id="loadingText" class="ui active inverted dimmer">
+  	    <div class="ui text loader">Chargement initial des données...</div>
+  	  </div>
+
+<div class="container">
+
+    <div class="ui top attached tabular menu">
+		<div class="active item" data-tab="patient"><i class="user icon"></i>Patient</div>
+		<div class="item" data-tab="documents"><i class="file image outline icon"></i>Docs</div>
+		<div class="item" data-tab="antecedents"><i class="heartbeat icon"></i>Hist</div>
+		<div class="item" data-tab="examens"><i class="doctor icon"></i>Exam</div>
+		<div class="item" data-tab="odontos"><i class="crosshairs icon"></i>Odon</div>
+		<div class="item" data-tab="plans"><i class="list icon"></i>Plan RDV</div>
+		<div class="item" data-tab="traitements"><i class="treatment icon"></i>Traits</div>
+		<div class="item" data-tab="ordonnances"><i class="lab icon"></i>Rx</div>
+		<div class="item" data-tab="paros"><i class="crosshairs icon"></i>Paro</div>
+		<div class="item" data-tab="ententes"><i class="thumbs up icon"></i>Entente</div>
+    </div>
+    	<div class="ui divider"></div>
+    	<div class="ui content" id="updateAvail">
+    	</div>
+
+     <div class="ui bottom attached active tab segment" data-tab="patient">
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="six wide column">
+     			<img id="patPhoto" class="ui fluid rounded image" src="json/images/square-image.png">
+     			<br><label>Changer la photo: <input type="file" accept="image/*" id="photoCapture" capture="camera" onchange="uploadPhoto()"></label>
+    	    </div>
+    	    <div class="column">
+    			<div class="ui axxium form segment">
+    			  <div class="two fields">
+    			    <div class="field">
+    			      <label>Nom du patient</label>
+    			      <input id="Elast" readonly="" type="text">
+    			    </div>
+    			    <div class="field">
+    			      <label>Prénom du patient</label>
+    			      <input id="Efirst" readonly="" type="text">
+    			    </div>
+    			  </div>
+    			  <div class="three fields">
+    			    <div class="field">
+    			      <label>Numéro de dossier</label>
+    			      <input id="EID" readonly="" type="text">
+    			    </div>
+    			    <div class="field">
+    			      <label>NAM</label>
+    			      <input id="ENAM" readonly="" type="text">
+    			    </div>
+    			    <div class="field">
+    			      <label>Date de naissance</label>
+    			      <input id="Ebirth" readonly="" type="text">
+    			    </div>
+    			  </div>
+    			    <div class="field">
+    			      <label>Alerte médicale</label>
+    			      <textarea id="Ealert" rows="2" readonly=""></textarea>
+    			    </div>
+    			    <div class="field">
+    			      <label>Suivi médical</label>
+    			      <textarea id="Esuivi" rows="2" readonly=""></textarea>
+    			    </div>
+    			    <div class="field">
+    			      <label>Dernier laboratoire</label>
+    			  		<div class="four fields">
+    			  		  <div class="field">
+    			  		    <input id="Elabo01" readonly="" type="text">
+    			  		  </div>
+    			  		  <div class="field">
+    			  		    <input id="Elabo02" readonly="" type="text">
+    			  		  </div>
+    			  		  <div class="field">
+    			  		    <input id="Elabo03" readonly="" type="text">
+    			  		  </div>
+    			  		  <div class="field">
+    			  		    <input id="Elabo04" readonly="" type="text">
+    			  		  </div>
+    			  		</div>
+    			    </div>
+		    	</div>
+    	    </div>
+    	  </div>
+    	</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="antecedents">
+    	<div class="ui one column grid">
+    	  <div class="row">
+    	    <div class="column">
+			    <table id="antList" class="ui axxium striped compact table segment">
+			      <thead>
+			        <th class="one wide">ID</th>
+			        <th class="four wide">Question</th>
+			        <th class="four wide">Réponse</th>
+			        <th class="five wide">Notes cliniques</th>
+			        <th class="two wide">Ajouter</th>
+			      </thead>
+			      <tbody id="eachAnt">
+			      </tbody>
+    			</table>
+    	   	</div>
+    	  </div>
+    	</div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowANT0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowANT1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowANT0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowANT1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="examens">
+    	<div class="ui one column grid">
+    	  <div class="row">
+    	    <div class="column">
+			    <table id="exaList" class="ui axxium striped compact table segment">
+			      <thead>
+			        <th class="one wide">ID</th>
+			        <th class="four wide">Question</th>
+			        <th class="four wide">Réponse</th>
+			        <th class="five wide">Notes cliniques</th>
+			        <th class="two wide">Ajouter</th>
+			      </thead>
+			      <tbody id="eachExa">
+			      </tbody>
+    			</table>
+    	   	</div>
+    	  </div>
+    	</div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowEXA0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowEXA1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowEXA0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowEXA1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="paros">
+    	<div class="ui one column grid">
+	          <div class="ten wide column">
+					<canvas id="paro" width="600" height="395" style="border:1px solid #c3c3c3;">
+								Your browser does not support the HTML5 canvas tag.
+					</canvas>
+	          </div>
+    	</div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowPAR0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowPAR1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowPAR0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowPAR1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="plans">
+    	<div class="ui one column grid">
+    	  <div class="row">
+    	    <div class="column">
+			    <table id="planList" class="ui axxium sortable striped compact table segment">
+			      <thead>
+			      	<th class="one wide"><i class="remove icon"></i></th>
+			        <th class="one wide">Code</th>
+			        <th class="one wide">Dent</th>
+			        <th class="one wide">Surf.</th>
+			        <th class="four wide">Description</th>
+			        <th class="one wide">Mod.</th>
+			        <th class="one wide">Unités</th>
+			        <th class="one wide">Prix</th>
+			        <th class="five wide">Rendez-vous</th>
+			      </thead>
+			      <tbody id="eachPlan">
+			      </tbody>
+    			</table>
+    	   	</div>
+    	  </div>
+    	</div>
+		<div class="ui segment">
+    	  <h3 class="ui header">
+		  <div id="delPLA" class="ui axxium tiny button" onclick='delPLA();'>Supprimer les traitements</div>
+   			&nbsp;&nbsp;Total du plan de traitement :
+    	    <div class="ui content" id="totPlan">
+    	    </div>
+    	  </h3>
+    	</div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowPLA0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowPLA1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowPLA0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowPLA1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="ententes">
+    	<div class="ui one column grid">
+    	  <div class="row">
+    	    <div class="column">
+			    <table id="entList" class="ui axxium sortable striped compact table segment">
+			      <thead>
+			      	<th class="one wide"><i class="remove icon"></i></th>
+			        <th class="one wide">Versement</th>
+			        <th class="one wide">Date</th>
+			        <th class="one wide">Montant</th>
+			        <th class="six wide">Note</th>
+			        <th class="two wide">Modifier</th>
+			      </thead>
+			      <tbody id="eachEnt">
+			      </tbody>
+    			</table>
+    	   	</div>
+    	  </div>
+    	</div>
+		<div class="ui segment">
+    	  <h3 class="ui header">
+		  <div id="delRDV" class="ui axxium tiny button" onclick='delRDV();'>Supprimer les versements</div>
+		  <div id="addRDV" class="ui axxium tiny button" onclick='addRDV();'>Ajouter un versement</div>
+   			&nbsp;&nbsp;Total de l'entente :
+    	    <div class="ui content" id="totEnt">
+    	    </div>
+    	  </h3>
+    	</div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowENT0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowENT1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowENT0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowENT1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="traitements">
+    	<div class="ui one column grid">
+    	  <div class="row">
+    	    <div class="column">
+			    <table id="traitList" class="ui axxium striped compact table segment">
+			      <thead>
+			      	<th class="one wide"><i class="remove icon"></i></th>
+			        <th class="one wide">Code</th>
+			        <th class="one wide">Dent</th>
+			        <th class="one wide">Surf.</th>
+			        <th class="ten wide">Description / Protocole</th>
+			        <th class="two wide">Modifier</th>
+			      </thead>
+			      <tbody id="eachTrait">
+			      </tbody>
+    			</table>
+    	   	</div>
+    	  </div>
+    	</div>
+		<div class="ui segment">
+    	  <h3 class="ui header">
+		  <div id="delTrait" class="ui axxium tiny button" onclick='delTrait();'>Supprimer les traitements</div>
+		  <div id="addTrait" class="ui axxium tiny button" onclick='addTrait();'>Ajouter un ou des traitements</div>
+    	  </h3>
+    	</div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowTRA0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowTRA1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowTRA0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowTRA1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="ordonnances">
+    	<div class="ui one column grid">
+    	  <div class="row">
+    	    <div class="column">
+			    <table id="ordList" class="ui axxium sortable striped compact table segment">
+			      <thead>
+			      	<th class="one wide"><i class="remove icon"></i></th>
+			        <th class="four wide">Médicament</th>
+			        <th class="one wide">Dose</th>
+			        <th class="one wide">Qté</th>
+			        <th class="one wide">Fréq</th>
+			        <th class="four wide">Note</th>
+			        <th class="two wide">Modifier</th>
+			      </thead>
+			      <tbody id="eachOrd">
+			      </tbody>
+    			</table>
+    	   	</div>
+    	  </div>
+    	</div>
+		<div class="ui segment">
+    	  <h3 class="ui header">
+		  <div id="delMED" class="ui axxium tiny button" onclick='delMED();'>Supprimer les médicaments</div>
+		  <div id="addMED" class="ui axxium tiny button" onclick='addMED();'>Ajouter un médicament</div>
+    	  </h3>
+    	</div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowORD0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowORD1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowORD0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowORD1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+     <div class="ui bottom attached tab segment" data-tab="documents">
+    	<div class="ui one column grid">
+    	  <div class="row">
+    	    <div class="column">
+			    <canvas id="pdf-canvas" style="border:1px solid black;"/>
+    	   	</div>
+    	  </div>
+    	</div>
+    	<div class="ui segment" id="noDocs"></div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowDOC0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowDOC1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowDOC0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowDOC1"></label>
+   			</div>
+   		  </div>
+   		</div>
+    </div>
+
+	<div class="ui bottom attached tab segment" data-tab="odontos">
+	      <div class="ui grid">
+	          <div class="sixteen wide column">
+					<canvas id="odonto" width="600" height="395" style="border:1px solid #c3c3c3;">
+								Your browser does not support the HTML5 canvas tag.
+					</canvas>
+	          </div>
+	     </div>
+		 <br>
+			<div class="ui segment">
+    		  <h3 class="ui header">
+    			  <div id="delODO" class="ui axxium tiny button" onclick='delODO();'>Supprimer les traitements</div>
+    		  </h3>
+    		</div>
+	     <div class="ui grid">
+	        <div class="sixteen wide column">
+	          <div class="ui top attached tabular menu">
+			    <div class="active item" data-tab="eb">En bouche</div>
+			    <div class="item" data-tab="af">À faire</div>
+			    <div class="item" data-tab="as">À surveiller</div>
+			  </div>
+			  <div class="ui bottom attached active tab segment" data-tab="eb">
+	          	<table class="ui compact table">
+	  				<thead>
+	  				  <tr>
+	  				  	<th class="one wide"><i class="remove icon"></i></th>
+	  					<th class="two wide"><h4>Code</h4></th>
+	  				    <th class="one wide"><h4>Dent</h4></th>
+	  					<th class="two wide"><h4>Surface</h4></th>
+	  					<th class="five wide"><h4>Description</h4></th>
+	  					<th class="five wide"><h4>Note ou commentaire</h4></th>
+	  				  </tr>
+	  				</thead>
+	  				<tbody id="ebList">
+	  				</tbody>
+				</table>
+			  </div>
+			  <div class="ui bottom attached tab segment" data-tab="af">
+	          	<table class="ui compact table">
+	  				<thead>
+	  				  <tr>
+	  				  	<th class="one wide"><i class="remove icon"></i></th>
+	  					<th class="two wide"><h4>Code</h4></th>
+	  				    <th class="one wide"><h4>Dent</h4></th>
+	  					<th class="two wide"><h4>Surface</h4></th>
+	  					<th class="five wide"><h4>Description</h4></th>
+	  					<th class="five wide"><h4>Note ou commentaire</h4></th>
+	  				  </tr>
+	  				</thead>
+	  				<tbody id="afList">
+	  				</tbody>
+				</table>
+			  </div>
+			  <div class="ui bottom attached tab segment" data-tab="as">
+	          	<table class="ui compact table">
+	  				<thead>
+	  				  <tr>
+	  				  	<th class="one wide"><i class="remove icon"></i></th>
+	  					<th class="two wide"><h4>Code</h4></th>
+	  				    <th class="one wide"><h4>Dent</h4></th>
+	  					<th class="two wide"><h4>Surface</h4></th>
+	  					<th class="five wide"><h4>Description</h4></th>
+	  					<th class="five wide"><h4>Note ou commentaire</h4></th>
+	  				  </tr>
+	  				</thead>
+	  				<tbody id="asList">
+	  				</tbody>
+				</table>
+			  </div>
+	     	</div>
+	     </div>
+    	<div class="ui two column grid">
+    	  <div class="row">
+    	    <div class="four wide column">
+   				<img id="sigBelowODO0" class="ui left floated medium image">
+   			</div>
+    	    <div class="four wide column">
+   				<img id="sigBelowODO1" class="ui left floated medium image">
+   			</div>
+   		  </div>
+    	  <div class="row">
+    	    <div class="four wide column">
+    	    	<label id="dateBelowODO0"></label>
+   			</div>
+    	    <div class="four wide column">
+    	    	<label id="dateBelowODO1"></label>
+   			</div>
+   		  </div>
+   		</div>
+   </div>
+
+</div>
+
+	<div class="ui modalSign0 modal">
+	  <i class="close icon"></i>
+	  <div class="header" id="signHeader0">
+	    <i class="write icon"></i>Signature
+	  </div>
+	  <div class="modSign0 content">
+    	<div class="ui axxium form segment">
+    	  <div id="signature0"></div>
+	      <div class="ui axxium submit button" onclick="saveSign();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSign1 modal">
+	  <i class="close icon"></i>
+	  <div class="header" id="signHeader1">
+	    <i class="write icon"></i>Signature
+	  </div>
+	  <div class="modSign1 content">
+	  	<div class="ui grid">
+	  		<div class="ten wide column">
+    		  <div id="signature1"></div>
+	  		</div>
+	  		<div class="one wide column">
+	  		</div>
+	  		<div class="five wide column">
+	  			<div class="modNumP content">
+  					<div class="ui axxium small button" onclick='keyEntryS(1);'><font size=6>1</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(2);'><font size=6>2</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(3);'><font size=6>3</font></div>
+  					<br><br>
+  					<div class="ui axxium small button" onclick='keyEntryS(4);'><font size=6>4</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(5);'><font size=6>5</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(6);'><font size=6>6</font></div>
+  					<br><br>
+  					<div class="ui axxium small button" onclick='keyEntryS(7);'><font size=6>7</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(8);'><font size=6>8</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(9);'><font size=6>9</font></div>
+  					<br><br>
+  					<div class="ui axxium small button" onclick='keyEntryS(-1);'><font size=6><</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(0);'><font size=6>0</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryS(-2);'><font size=6><<</font></div>
+  					<br><br>
+	  	    		<div class="ui axxium submit button" onclick="saveSign();">Valider</div>
+	  			</div>
+	  		</div>
+    	  </div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalAnt modal">
+	  <div class="ui header" id="antHeader">
+	    <i class="write icon"></i>Questionnaire
+	  </div>
+	  <div class="modAnt content">
+				<div id="qChoice" class="content">
+					<h3 id="question" class="ui header"></h3>
+    			</div>
+				<div id="errMsg" class="content">
+					<h3 id="errMsgTxt" class="ui red header"></h3>
+    			</div>
+  				<div id="nextButtonP" class="ui right floated segment">
+  					<div id="buttonTxtP" class="ui axxium tiny button" onclick="goNext();">
+  						Suivant
+  					</div>
+  				</div>
+					<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	  </div>
+	</div>
+
+	<div class="ui modalSearch modal">
+	  <div class="header">
+	    <i class="user icon"></i>Rechercher un patient
+	  </div>
+	  <div class="modSearch content">
+    	<div class="ui axxium form segment">
+    		<div class="ui one column grid">
+    		  <div class="row">
+    		    <div class="column">
+    		    	<font size=2>
+					    <table id="patList" class="ui celled table" cellspacing="0" width="100%">
+					      <thead>
+					        <th>Nom</th>
+					        <th>Prénom</th>
+					        <th>Numéro</th>
+					        <th>NAM</th>
+					        <th>Date de naissance</th>
+					      </thead>
+					      <tbody id="eachPat">
+					      </tbody>
+    					</table>
+    				</font>
+    		   	</div>
+    		  </div>
+    		  <div class="row">
+    		    <div class="six wide column">
+			    	    <div class="field">
+			    	      <label>Fusion nouveau patient</label>
+			    	      <input id="axxNumber" type="text" value="">
+			    	    </div>
+    		   	</div>
+    		    <div class="six wide column">
+			    	    <br><div id="addVisionR" class="ui axxium tiny button" onclick='getAxxium();'>Rechercher dans Vision-R</div>
+    		   	</div>
+    		  </div>
+
+    		</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalLabos modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Laboratoires
+	  </div>
+	  <div class="modLabos content">
+    	<div class="ui axxium form segment">
+    		<div class="ui one column grid">
+    		  <div class="row">
+    		    <div class="column">
+    		    	<font size=2>
+					    <table id="labList" class="ui celled table" cellspacing="0" width="100%">
+					      <thead>
+					        <th>Numéro</th>
+					        <th>Nom, prénom</th>
+					        <th>Nom du labo</th>
+					        <th>Date envoyé</th>
+					        <th>Date retour</th>
+					        <th>Date et heure RDV</th>
+					        <th>Note</th>
+					        <th>Reçu</th>
+					      </thead>
+					      <tbody id="eachLab">
+					      </tbody>
+    					</table>
+    				</font>
+    		   	</div>
+    		  </div>
+    		</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalNumP modal">
+	  <i class="close icon"></i>
+  	  <div class="ui segment">
+	  <div class="ui grid">
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="five wide column">
+	  		<div class="modNumP content">
+  				<div class="ui manyeta small button" onclick='keyEntryP(1);'><font size=90>1</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(2);'><font size=90>2</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(3);'><font size=90>3</font></div>
+  				<br><br>
+  				<div class="ui manyeta small button" onclick='keyEntryP(4);'><font size=90>4</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(5);'><font size=90>5</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(6);'><font size=90>6</font></div>
+  				<br><br>
+  				<div class="ui manyeta small button" onclick='keyEntryP(7);'><font size=90>7</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(8);'><font size=90>8</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(9);'><font size=90>9</font></div>
+  				<br><br>
+  				<div class="ui manyeta small button" onclick='keyEntryP(-1);'><font size=90><</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(0);'><font size=90>0</font></div>
+  				<div class="ui manyeta small button" onclick='keyEntryP(-2);'><font size=90>.</font></div>
+  				<br><br>
+	  		  	<div id="acceptTxtP" class="ui button" onclick='changeValP();'>Accepter</div>
+	  		  	<div id="clearTxtP" class="ui button" onclick='clearValP();'>Effacer</div>
+	  		</div>
+	  	</div>
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="two wide column">
+	  		<div id="keyDisplayP" class="ui header"><font size=120>&nbsp;</font></div>
+	  		<div id="unitsP" class="ui small header"></div>
+	  		<div id="validationErrorP" class="ui small red header"></div>
+	  	</div>
+	  </div>
+	  </div>
+	</div>
+
+	<div class="ui modalLabo modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Ajouter / modifier un suivi de laboratoire
+	  </div>
+	  <div class="modLabo content">
+    	<div class="ui axxium form segment">
+		  <div class="two fields">
+    	    <div class="field">
+    	      <label>Numéro</label>
+    	      <input id="EnumL" type="text" readonly="" value="">
+    	    </div>
+    	    <div class="field">
+    	      <label>Nom, prénom</label>
+    	      <input id="EnompreL" type="text" readonly="" value="">
+    	    </div>
+    	  </div>
+		  <div class="three fields">
+    	    <div class="field">
+    	      <label>Nom du labo</label>
+    	      <input id="ElaboL" type="text" value="">
+    	    </div>
+    	    <div class="field">
+    	      <label>Date envoyé</label>
+    	      <input id="EenvoyeL" type="text" value="">
+    	    </div>
+    	    <div class="field">
+    	      <label>Date retour</label>
+    	      <input id="EretourL" type="text" value="">
+    	    </div>
+    	  </div>
+		  <div class="three fields">
+    	    <div class="field">
+    	      <label>Date et heure RDV</label>
+    	      <input id="ErdvL" type="text" value="">
+    	    </div>
+    	    <div class="field">
+    	      <label>Note</label>
+    	      <input id="EnoteL" type="text" value="">
+    	    </div>
+    	    <div class="field">
+    	      <label>Reçu</label>
+    	      <input id="ErecuL" type="text" value="">
+    	    </div>
+    	  </div>
+	      <div class="ui axxium button" onclick="newLAB();">Ajouter un laboratoire</div>
+		  <div id="backLAB" class="ui axxium button" onclick='backLAB();'>Précédent</div>
+		  <div id="forLAB" class="ui axxium button" onclick='forLAB();'>Suivant</div>
+	      <div class="ui axxium button" onclick="saveLAB();">Valider</div>
+	      <div class="ui axxium button" onclick="closeLAB();">Fermer</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSuivi modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Ajouter / modifier un suivi médical
+	  </div>
+	  <div class="modSuivi content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez un suivi médical</label>
+    	      <input id="EsuiviM" type="text">
+    	    </div>
+	      <div class="ui axxium button" onclick="modifySuivi();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalAlert modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Ajouter / modifier une alerte médicale
+	  </div>
+	  <div class="modAlert content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez une alerte médicale</label>
+    	      <input id="EalertM" type="text">
+    	    </div>
+	      <div class="ui axxium button" onclick="modifyAlert();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalDoc modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Ajouter un document
+	  </div>
+	  <div class="modDoc content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Choisir un fichier</label>
+    	      <input id="Efile" type="file">
+    	    </div>
+    	    <div class="field">
+    	      <label>Entrez un commentaire</label>
+    	      <input id="Ecomm" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalCorr modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Correction d'un traitement
+	  </div>
+	  <div class="modCorr content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez une correction</label>
+    	      <input id="Ecorr" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalNote modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Notes et corrections
+	  </div>
+	  <div class="modNote content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez une note ou une correction</label>
+    	      <input id="Enote" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalNote2 modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Notes et corrections
+	  </div>
+	  <div class="modNote2 content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez une note ou une correction</label>
+    	      <input id="Enote2" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalRep2 modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Réponse
+	  </div>
+	  <div class="modRep2 content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez une réponse</label>
+    	      <input id="Erep2" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalMontant modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Modifier un versement
+	  </div>
+	  <div class="modMontant content">
+    	<div class="ui axxium form segment">
+    	  <div class="two fields">
+    	    <div class="field">
+    	      <label>Date du versement</label>
+    	      <input id="EdateV" type="text">
+    	    </div>
+    	    <div class="field">
+    	      <label>Entrez un montant</label>
+    	      <input id="Emontant" type="text">
+    	    </div>
+    	  </div>
+    	    <div class="field">
+    	      <label>Commentaires</label>
+    	      <input id="EnoteV" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalMed modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Ajouter / modifier un médicament
+	  </div>
+	  <div class="modMed content">
+    	<div class="ui axxium form segment">
+    	  <div class="two fields">
+    	    <div class="field">
+    	      <label>Médicament</label>
+    	      <input id="EmedR" type="text">
+    	    </div>
+    	    <div class="field">
+    	      <label>Dose</label>
+    	      <input id="EdoseR" type="text">
+    	    </div>
+    	  </div>
+    	  <div class="two fields">
+    	    <div class="field">
+    	      <label>Quantité</label>
+    	      <input id="EqtyR" type="text">
+    	    </div>
+    	    <div class="field">
+    	      <label>Fréquence</label>
+    	      <input id="EfreqR" type="text">
+    	    </div>
+    	  </div>
+    	    <div class="field">
+    	      <label>Note</label>
+    	      <input id="EnoteR" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalAxxium modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Dossier patient de Vision-R
+	  </div>
+	  <div class="modAxxium content">
+    	<div class="ui axxium form segment">
+    	  <div class="two fields">
+    			    <div class="field">
+    			      <label>Nom du patient</label>
+    			      <input id="ElastA" readonly="" type="text">
+    			    </div>
+    			    <div class="field">
+    			      <label>Prénom du patient</label>
+    			      <input id="EfirstA" readonly="" type="text">
+    			    </div>
+    	  </div>
+    	  <div class="three fields">
+    			    <div class="field">
+    			      <label>Numéro de dossier</label>
+    			      <input id="EIDA" readonly="" type="text">
+    			    </div>
+    			    <div class="field">
+    			      <label>NAM</label>
+    			      <input id="ENAMA" readonly="" type="text">
+    			    </div>
+    			    <div class="field">
+    			      <label>Date de naissance</label>
+    			      <input id="EbirthA" readonly="" type="text">
+    			    </div>
+    	  </div>
+	      <div class="ui axxium submit button" onclick="addAxxium();">Ajouter</div>
+	      <div class="ui axxium cancel button" onclick="cancelAxxium();">Cancel</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalOne modal">
+	  <br><br>
+	  <div class="ui grid">
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="eight wide column">
+			<br>
+	  		<div class="field">
+	  			<font size=6><textarea rows="2" cols="38" readonly="" id="text42"></textarea></font>
+	  		</div>
+	  	</div>
+	  </div>
+	  <div class="ui grid">
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="two wide column">
+					<div id="theTooth1" class="field">
+					  <font size=5></font>
+					</div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='setM();' id="butM"><font size=5>M</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='setL();' id="butL"><font size=5>L</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='setD();' id="butD"><font size=5>D</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='setB();' id="butB"><font size=5>B</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='setO();' id="butO"><font size=5>O</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='set6();' id="butS" style:"visibility:hidden"><font size=5>6</font></div>
+	  	</div>
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="five wide column">
+  <div class="ui search">
+    <div class="ui icon input">
+      <input class="prompt" type="text" placeholder="Rechercher..." id="searchField">
+      <i class="search icon"></i>
+    </div>
+    <div class="results"></div>
+  </div>
+  				<br><br>
+	  			<div class="ui axxium large fluid button" onclick='setAmal();' id="butAmal"><font size=5>Amalgame</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='setComp();' id="butComp"><font size=5>Composite</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='set1();' id="butOr"><font size=5>Examen complet</font></div>
+  				<br>
+	  			<div class="ui axxium large fluid button" onclick='set2();' id="butRes"><font size=5>Examen de rappel</font></div>
+  				<br>
+	  		<div class="field">
+	  			<label><h3>Commentaires</h3></label>
+    	    	<font size=6><input id="EnoteT" type="text"></font>
+	  		</div>
+  				<br>
+	  	</div>
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="six wide column">
+	  		<div class="modNum content">
+  				<div class="ui axxium large button" onclick='keyEntry(1);'><font size=8>1</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(2);'><font size=8>2</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(3);'><font size=8>3</font></div>
+  				<br><br>
+  				<div class="ui axxium large button" onclick='keyEntry(4);'><font size=8>4</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(5);'><font size=8>5</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(6);'><font size=8>6</font></div>
+  				<br><br>
+  				<div class="ui axxium large button" onclick='keyEntry(7);'><font size=8>7</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(8);'><font size=8>8</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(9);'><font size=8>9</font></div>
+  				<br><br>
+  				<div class="ui axxium large button" onclick='keyEntry(-1);'><font size=8><</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(0);'><font size=8>0</font></div>
+  				<div class="ui axxium large button" onclick='keyEntry(-2);'><font size=8>c</font></div>
+  				<br><br>
+	  		  	<div id="existTxt" class="ui axxium large button" onclick='acceptVal1(0);'><font size=5>EB</font></div>
+	  		  	<div id="todoTxt" class="ui axxium large button" onclick='acceptVal1(1);'><font size=5>AF</font></div>
+	  		  	<div id="doneTxt" class="ui axxium large button" onclick='acceptVal1(2);'><font size=5>AS</font></div>
+  				<br><br>
+	  		</div>
+	  	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelo fullscreen long modal">
+	  <i class="close icon"></i>
+	  <div id="seloHeader" class="header">
+	    <i class="treatment icon"></i>Odontogramme
+	  </div>
+	  <div class="modSelo content">
+    	<div class="ui axxium form segment">
+    		<div id="oB0" class="ui axxium small button" onclick="displaySelo('Observations');">OBS</div>
+    		<div id="oB1" class="ui axxium small button" onclick="displaySelo('Restauration');">REST</div>
+    		<div id="oB2" class="ui axxium small button" onclick="displaySelo('Endodontie');">ENDO</div>
+    		<div id="oB3" class="ui axxium small button" onclick="displaySelo('Prothèses fixes');">PPF</div>
+    		<div id="oB4" class="ui axxium small button" onclick="displaySelo('Chirurgie');">CHIR</div>
+    		<div id="oB5" class="ui axxium small button" onclick="displaySelo('Parodontie');">PARO</div>
+    		<div id="oB6" class="ui axxium small button" onclick="displaySelo('Prothèses amovibles');">PPA</div>
+    		<div id="oB7" class="ui axxium small button" onclick="displaySelo('Prothèse complète');">PCO</div>
+    		<div id="oB8" class="ui axxium small button" onclick="displaySelo('Prothèses complète et partielle');">PCP</div>
+    		<table id="seloTable" class="ui celled table">
+			  <tbody id="eachSeloRow">
+			  </tbody>
+			</table>
+    	    <div class="field">
+    	      <label>Note ou commentaire</label>
+    	      <input id="EnoteSelo" type="text">
+    	    </div>
+			<div class="ui axxium small button" onclick="acceptSeloEB();">En bouche</div>
+			<div class="ui axxium small button" onclick="acceptSeloAF();">À faire</div>
+			<div class="ui axxium small button" onclick="acceptSeloAS();">À surveiller</div>
+			<div class="ui axxium small button" onclick="cancelSelo();">Cancel</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalProts fullscreen long modal">
+	  <i class="close icon"></i>
+	  <div id="protHeader" class="header">
+	    <i class="treatment icon"></i>Protocoles
+	  </div>
+	  <div class="modProts content">
+    	<div class="ui axxium form segment">
+    		<div id="pB1" class="ui axxium small button" onclick="displayProts('Diagnostic');">DIAGN</div>
+    		<div id="pB2" class="ui axxium small button" onclick="displayProts('Prévention');">PRÉV</div>
+    		<div id="pB3" class="ui axxium small button" onclick="displayProts('Anesthésie');">ANESTH</div>
+    		<div id="pB4" class="ui axxium small button" onclick="displayProts('Endodontie');">ENDO</div>
+    		<div id="pB5" class="ui axxium small button" onclick="displayProts('Occlusion');">D.O</div>
+    		<div id="pB6" class="ui axxium small button" onclick="displayProts('Chirurgie');">CHIR</div>
+    		<div id="pB7" class="ui axxium small button" onclick="displayProts('Parodontie');">PARO</div>
+    		<div id="pB8" class="ui axxium small button" onclick="displayProts('Orthodontie');">ORTHO</div>
+    		<div id="pB9" class="ui axxium small button" onclick="displayProts('Prothèses amovibles');">PPA</div>
+    		<div id="pB10" class="ui axxium small button" onclick="displayProts('Prothèses fixes');">PPF</div>
+    		<div id="pB11" class="ui axxium small button" onclick="displayProts('Implant');">IMPLANT</div>
+    		<table id="protTable" class="ui celled table">
+			  <tbody id="eachProtRow">
+			  </tbody>
+			</table>
+			<div class="ui axxium small button" onclick="acceptProts();">Valider</div>
+			<div class="ui axxium small button" onclick="cancelProts();">Cancel</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalNoteProt modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Notes et commentaires
+	  </div>
+	  <div class="modNoteProt content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Entrez une note ou un commentaire</label>
+    	      <input id="EnoteProt" type="text">
+    	    </div>
+	      <div class="ui axxium submit button">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelect fullscreen long modal">
+	  <i class="close icon"></i>
+	  <div id="selectHeader" class="header">
+	    <i class="treatment icon"></i>Traitements
+	  </div>
+	  <div class="modSelect content">
+    	<div class="ui axxium form segment">
+    		<div id="sB1" class="ui axxium small button" onclick="displaySelect('Diagnostic');">DIAGN</div>
+    		<div id="sB2" class="ui axxium small button" onclick="displaySelect('Prévention');">PRÉV</div>
+    		<div id="sB3" class="ui axxium small button" onclick="displaySelect('Restauration');">REST</div>
+    		<div id="sB4" class="ui axxium small button" onclick="displaySelect('Endodontie');">ENDO</div>
+    		<div id="sB5" class="ui axxium small button" onclick="displaySelect('Prothèses fixes');">PPF</div>
+    		<div id="sB6" class="ui axxium small button" onclick="displaySelect('Chirurgie');">CHIR</div>
+    		<div id="sB7" class="ui axxium small button" onclick="displaySelect('Parodontie');">PARO</div>
+    		<div id="sB8" class="ui axxium small button" onclick="displaySelect('Prothèses amovibles');">PPA</div>
+    		<div id="sB9" class="ui axxium small button" onclick="displaySelect('Prothèse complète');">PCO</div>
+    		<div id="sB10" class="ui axxium small button" onclick="displaySelect('Prothèses complète et partielle');">PCP</div>
+    		<table id="selectTable" class="ui celled table">
+			  <tbody id="eachSelectRow">
+			  </tbody>
+			</table>
+			<div class="ui axxium small button" onclick="selectTraits();">Valider</div>
+			<div class="ui axxium small button" onclick="cancelTraits();">Cancel</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelectSurf modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection des surfaces
+	  </div>
+	  <div class="modSelectSurf content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Dent</label>
+    	      <input id="toothSurf" type="text">
+    	    </div>
+				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setMs();' id="butMs"><font size=5>M</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setOs();' id="butOs"><font size=5>O</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setDs();' id="butDs"><font size=5>D</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setBs();' id="butBs"><font size=5>B</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setLs();' id="butLs"><font size=5>L</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeSurf();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelectMD modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection médiale ou distale
+	  </div>
+	  <div class="modSelectMD content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Dent</label>
+    	      <input id="toothMD" type="text">
+    	    </div>
+				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setMed();' id="butMed"><font size=5>M</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setDis();' id="butDis"><font size=5>D</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeMD();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelectBL modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection buccale ou labiale
+	  </div>
+	  <div class="modSelectBL content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Dent</label>
+    	      <input id="toothBL" type="text">
+    	    </div>
+				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setBuc();' id="butBuc"><font size=5>B</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setLab();' id="butLab"><font size=5>L</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeBL();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSelectDent modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection de la dent
+	  </div>
+	  <div class="modSelectDent content">
+    	<div class="ui axxium form segment">
+    	    <div class="field">
+    	      <label>Dent</label>
+    	      <input id="toothDent" type="text">
+    	    </div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeDent();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSeloSurf modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection des surfaces
+	  </div>
+	  <div class="modSeloSurf content">
+    	<div class="ui axxium form segment">
+	  			<div class="ui axxium tiny button" onclick='setMsO();' id="butMsO"><font size=5>M</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setOsO();' id="butOsO"><font size=5>O</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setDsO();' id="butDsO"><font size=5>D</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setBsO();' id="butBsO"><font size=5>B</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setLsO();' id="butLsO"><font size=5>L</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeSurfO();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSeloMD modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection médiale ou distale
+	  </div>
+	  <div class="modSeloMD content">
+    	<div class="ui axxium form segment">
+	  			<div class="ui axxium tiny button" onclick='setMedO();' id="butMedO"><font size=5>M</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setDisO();' id="butDisO"><font size=5>D</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeMDO();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalSeloBL modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Sélection buccale ou labiale
+	  </div>
+	  <div class="modSeloBL content">
+    	<div class="ui axxium form segment">
+	  			<div class="ui axxium tiny button" onclick='setBucO();' id="butBucO"><font size=5>B</font></div>
+  				&nbsp;&nbsp;&nbsp;
+	  			<div class="ui axxium tiny button" onclick='setLabO();' id="butLabO"><font size=5>L</font></div>
+	  			<br><br>
+	      <div class="ui axxium tiny button" onclick="closeBLO();">Valider</div>
+    	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalParo modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Mesures parodontiques
+	  </div>
+	  <br>
+	  <div class="ui grid">
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="ten wide column">
+			<div id="theToothP" class="field">
+		  		<font size=5></font>
+			</div>
+	  	</div>
+	  </div>
+  	  <br>
+	  <div class="ui grid">
+	  	<div class="one wide column">
+	  	</div>
+	  	<div class="four wide column">
+	  		<div class="modNumP content">
+  				<div id="pB117" class="ui axxium tiny button" onclick='keyEntryP(1,1,7);'><font size=5>7</font></div>&nbsp;
+  				<div id="pB127" class="ui axxium tiny button" onclick='keyEntryP(1,2,7);'><font size=5>7</font></div>&nbsp;
+  				<div id="pB137" class="ui axxium tiny button" onclick='keyEntryP(1,3,7);'><font size=5>7</font></div>
+  				<br><br>
+  				<div id="pB116" class="ui axxium tiny button" onclick='keyEntryP(1,1,6);'><font size=5>6</font></div>&nbsp;
+  				<div id="pB126" class="ui axxium tiny button" onclick='keyEntryP(1,2,6);'><font size=5>6</font></div>&nbsp;
+  				<div id="pB136" class="ui axxium tiny button" onclick='keyEntryP(1,3,6);'><font size=5>6</font></div>
+  				<br><br>
+  				<div id="pB115" class="ui axxium tiny button" onclick='keyEntryP(1,1,5);'><font size=5>5</font></div>&nbsp;
+  				<div id="pB125" class="ui axxium tiny button" onclick='keyEntryP(1,2,5);'><font size=5>5</font></div>&nbsp;
+  				<div id="pB135" class="ui axxium tiny button" onclick='keyEntryP(1,3,5);'><font size=5>5</font></div>
+  				<br><br>
+  				<div id="pB114" class="ui axxium tiny button" onclick='keyEntryP(1,1,4);'><font size=5>4</font></div>&nbsp;
+  				<div id="pB124" class="ui axxium tiny button" onclick='keyEntryP(1,2,4);'><font size=5>4</font></div>&nbsp;
+  				<div id="pB134" class="ui axxium tiny button" onclick='keyEntryP(1,3,4);'><font size=5>4</font></div>
+  				<br><br>
+  				<div id="pB113" class="ui axxium tiny button" onclick='keyEntryP(1,1,3);'><font size=5>3</font></div>&nbsp;
+  				<div id="pB123" class="ui axxium tiny button" onclick='keyEntryP(1,2,3);'><font size=5>3</font></div>&nbsp;
+  				<div id="pB133" class="ui axxium tiny button" onclick='keyEntryP(1,3,3);'><font size=5>3</font></div>
+  				<br><br>
+  				<div id="pB112" class="ui axxium tiny button" onclick='keyEntryP(1,1,2);'><font size=5>2</font></div>&nbsp;
+  				<div id="pB122" class="ui axxium tiny button" onclick='keyEntryP(1,2,2);'><font size=5>2</font></div>&nbsp;
+  				<div id="pB132" class="ui axxium tiny button" onclick='keyEntryP(1,3,2);'><font size=5>2</font></div>
+  				<br><br>
+  				<div id="pB111" class="ui axxium tiny button" onclick='keyEntryP(1,1,1);'><font size=5>1</font></div>&nbsp;
+  				<div id="pB121" class="ui axxium tiny button" onclick='keyEntryP(1,2,1);'><font size=5>1</font></div>&nbsp;
+  				<div id="pB131" class="ui axxium tiny button" onclick='keyEntryP(1,3,1);'><font size=5>1</font></div>
+  				<br><br>
+  				<div id="pB110" class="ui axxium tiny button" onclick='keyEntryP(1,1,0);'><font size=5>0</font></div>&nbsp;
+  				<div id="pB120" class="ui axxium tiny button" onclick='keyEntryP(1,2,0);'><font size=5>0</font></div>&nbsp;
+  				<div id="pB130" class="ui axxium tiny button" onclick='keyEntryP(1,3,0);'><font size=5>0</font></div>
+  				<br><br>
+	  		</div>
+	  	</div>
+	  	<div class="two wide column">
+	  	</div>
+	  	<div class="four wide column">
+	  		<div class="modNumR content">
+  				<div id="pB217" class="ui axxium tiny button" onclick='keyEntryP(2,1,7);'><font size=5>7</font></div>&nbsp;
+  				<div id="pB227" class="ui axxium tiny button" onclick='keyEntryP(2,2,7);'><font size=5>7</font></div>&nbsp;
+  				<div id="pB237" class="ui axxium tiny button" onclick='keyEntryP(2,3,7);'><font size=5>7</font></div>
+  				<br><br>
+  				<div id="pB216" class="ui axxium tiny button" onclick='keyEntryP(2,1,6);'><font size=5>6</font></div>&nbsp;
+  				<div id="pB226" class="ui axxium tiny button" onclick='keyEntryP(2,2,6);'><font size=5>6</font></div>&nbsp;
+  				<div id="pB236" class="ui axxium tiny button" onclick='keyEntryP(2,3,6);'><font size=5>6</font></div>
+  				<br><br>
+  				<div id="pB215" class="ui axxium tiny button" onclick='keyEntryP(2,1,5);'><font size=5>5</font></div>&nbsp;
+  				<div id="pB225" class="ui axxium tiny button" onclick='keyEntryP(2,2,5);'><font size=5>5</font></div>&nbsp;
+  				<div id="pB235" class="ui axxium tiny button" onclick='keyEntryP(2,3,5);'><font size=5>5</font></div>
+  				<br><br>
+  				<div id="pB214" class="ui axxium tiny button" onclick='keyEntryP(2,1,4);'><font size=5>4</font></div>&nbsp;
+  				<div id="pB224" class="ui axxium tiny button" onclick='keyEntryP(2,2,4);'><font size=5>4</font></div>&nbsp;
+  				<div id="pB234" class="ui axxium tiny button" onclick='keyEntryP(2,3,4);'><font size=5>4</font></div>
+  				<br><br>
+  				<div id="pB213" class="ui axxium tiny button" onclick='keyEntryP(2,1,3);'><font size=5>3</font></div>&nbsp;
+  				<div id="pB223" class="ui axxium tiny button" onclick='keyEntryP(2,2,3);'><font size=5>3</font></div>&nbsp;
+  				<div id="pB233" class="ui axxium tiny button" onclick='keyEntryP(2,3,3);'><font size=5>3</font></div>
+  				<br><br>
+  				<div id="pB212" class="ui axxium tiny button" onclick='keyEntryP(2,1,2);'><font size=5>2</font></div>&nbsp;
+  				<div id="pB222" class="ui axxium tiny button" onclick='keyEntryP(2,2,2);'><font size=5>2</font></div>&nbsp;
+  				<div id="pB232" class="ui axxium tiny button" onclick='keyEntryP(2,3,2);'><font size=5>2</font></div>
+  				<br><br>
+  				<div id="pB211" class="ui axxium tiny button" onclick='keyEntryP(2,1,1);'><font size=5>1</font></div>&nbsp;
+  				<div id="pB221" class="ui axxium tiny button" onclick='keyEntryP(2,2,1);'><font size=5>1</font></div>&nbsp;
+  				<div id="pB231" class="ui axxium tiny button" onclick='keyEntryP(2,3,1);'><font size=5>1</font></div>
+  				<br><br>
+  				<div id="pB210" class="ui axxium tiny button" onclick='keyEntryP(2,1,0);'><font size=5>0</font></div>&nbsp;
+  				<div id="pB220" class="ui axxium tiny button" onclick='keyEntryP(2,2,0);'><font size=5>0</font></div>&nbsp;
+  				<div id="pB230" class="ui axxium tiny button" onclick='keyEntryP(2,3,0);'><font size=5>0</font></div>
+  				<br><br>
+	  		</div>
+	  	</div>
+	  	<div class="two wide column">
+	  	</div>
+	  	<div class="two wide column">
+	  		<div class="modNumM content">
+  				<div id="pB312" class="ui axxium tiny button" onclick='keyEntryP(3,1,2);'><font size=5>2</font></div>
+  				<br><br>
+  				<div id="pB311" class="ui axxium tiny button" onclick='keyEntryP(3,1,1);'><font size=5>1</font></div>
+  				<br><br>
+  				<div id="pB310" class="ui axxium tiny button" onclick='keyEntryP(3,1,0);'><font size=5>0</font></div>
+  				<br><br>
+	  		</div>
+	  	</div>
+	  	<div class="one wide column">
+	  	</div>
+	  </div>
+	  <div class="ui grid">
+	  	<div class="thirteen wide column">
+	  	</div>
+	  	<div class="three wide column">
+	  		<div class="ui axxium small float right button" onclick="setParo();">Valider</div>
+	  		<div class="ui axxium small float right button" onclick="cancelParo();">Cancel</div>
+  			<br><br>
+	  	</div>
+	  </div>
+	</div>
+
+	<div class="ui modalPIN modal">
+	  <i class="close icon"></i>
+	  <div class="header">
+	    <i class="user icon"></i>Entrez votre code d'accès
+	  </div>
+	  <div class="modPIN content">
+	  	<div class="ui grid">
+	  		<div class="ten wide column">
+    		  <div id="signaturePad"></div>
+	  		</div>
+	  		<div class="one wide column">
+	  		</div>
+	  		<div class="five wide column">
+	  			<div class="modNumP content">
+  					<div class="ui axxium small button" onclick='keyEntryPIN(1);'><font size=6>1</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(2);'><font size=6>2</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(3);'><font size=6>3</font></div>
+  					<br><br>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(4);'><font size=6>4</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(5);'><font size=6>5</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(6);'><font size=6>6</font></div>
+  					<br><br>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(7);'><font size=6>7</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(8);'><font size=6>8</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(9);'><font size=6>9</font></div>
+  					<br><br>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(-1);'><font size=6><</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(0);'><font size=6>0</font></div>
+  					<div class="ui axxium small button" onclick='keyEntryPIN(-2);'><font size=6><<</font></div>
+  					<br><br>
+	  	    		<div id="saveSign" class="ui axxium tiny button" onclick='checkPIN();'><font size=5>Valider</font></div>
+	  			</div>
+	  		</div>
+    	  </div>
+	  </div>
+	</div>
+
+	<script>
+
+	$('.modNoteProt.content .ui.form')
+		    .form({
+		    fields : {
+		        just: {
+		          identifier  : 'Enote',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Entrez une note ou un commentaire'
+		            }
+		          ]
+		        }
+		      }, onSuccess : function() {
+            		//alert(curType);
+            		pResp[curKind][curType] = document.getElementById("EnoteProt").value;
+            		document.getElementById(curType).innerHTML = '<i class="icon checkmark"></i> <b>' + curProtName + " : " + document.getElementById("EnoteProt").value + '</b>'
+            		$('.modalNoteProt.modal').modal('hide');
+        		}
+        	});
+
+	function modLabo()
+	{
+		$('.modalLabo.modal').modal('show');
+	}
+
+	function modifyLabo()
+	{
+        			patLabo = { };
+  					patLabo["id"] = qPAT.patients[curLabo].id;
+  					patLabo["first"] = qPAT.patients[curLabo].first;
+  					patLabo["last"] = qPAT.patients[curLabo].last;
+  					patLabo["NAM"] = qPAT.patients[curLabo].NAM;
+  					patLabo["birth"] = qPAT.patients[curLabo].birth;
+  					if (qPAT.patients[curLabo].alert) patLabo["alert"] = qPAT.patients[curLabo].alert;
+  					if (qPAT.patients[curLabo].alertD) patLabo["alertD"] = qPAT.patients[curLabo].alertD;
+  					if (qPAT.patients[curLabo].suivi) patLabo["suivi"] = qPAT.patients[curLabo].suivi;
+  					if (qPAT.patients[curLabo].suiviD) patLabo["suiviD"] = qPAT.patients[curLabo].suiviD;
+        			patLabo["labo"] = document.getElementById("EsuiviL").value;
+  					var d = new Date();
+  					var ddj = d.getFullYear() + '/' + twoDigits(d.getMonth() + 1) + '/' + twoDigits(d.getDate());
+        			patLabo["laboD"] = ddj;
+  					qFilePat = qPAT.patients[curLabo].file;
+        			//alert("modSuivi: "+qFilePat);
+        			$.post("allScriptsv1.py", {tx: "uploadJSONsub", sub: "patients", name: qFilePat, json: JSON.stringify(patLabo)}, function(result){
+            			//alert("Le patient a été enregistré. "+curLabo);
+  						//Centre dentaire Sirois<br>100001 - Claude Arsenault, 1946-07-12&nbsp;&nbsp;&nbsp;&nbsp;
+  						var topPat = curInitials+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="reOpenSearch();">Changer de patient</div>&nbsp;&nbsp;&nbsp;'+patLabo["id"]+' - '+curName+', '+birth+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="window.print();">Imprimer</div>&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="location.reload();">Déconnexion</div>';
+  						//alert(curPatRow);
+  						qPAT.patients[curPatRow].labo = document.getElementById("EsuiviL").value;
+  						qPAT.patients[curPatRow].laboD = ddj;
+            			document.getElementById("Elabo").value = qPAT.patients[curPatRow].laboD + " " + qPAT.patients[curPatRow].labo;
+  						document.getElementById("patName").innerHTML = topPat;
+        			});
+            		$('.modalLabo.modal').modal('hide');
+    }
+
+	function modSuivi()
+	{
+		document.getElementById("EsuiviM").value = "";
+  		var cPat = 0;
+  		for (pat in qPAT.patients)
+  		{
+  			if (curPatient == qPAT.patients[pat].id) curSuivi = pat;
+  		}
+  		if (qPAT.patients[curSuivi].suivi)
+  		{
+  			document.getElementById("EsuiviM").value = qPAT.patients[curSuivi].suivi;
+  		}
+		$('.modalSuivi.modal').modal('show');
+	}
+
+	function modifySuivi()
+	{
+        			patSuivi = { };
+  					patSuivi["id"] = qPAT.patients[curSuivi].id;
+  					patSuivi["first"] = qPAT.patients[curSuivi].first;
+  					patSuivi["last"] = qPAT.patients[curSuivi].last;
+  					patSuivi["NAM"] = qPAT.patients[curSuivi].NAM;
+  					patSuivi["birth"] = qPAT.patients[curSuivi].birth;
+  					if (qPAT.patients[curSuivi].alert) patSuivi["alert"] = qPAT.patients[curSuivi].alert;
+  					if (qPAT.patients[curSuivi].alertD) patSuivi["alertD"] = qPAT.patients[curSuivi].alertD;
+        			patSuivi["suivi"] = document.getElementById("EsuiviM").value;
+  					var d = new Date();
+  					var ddj = d.getFullYear() + '/' + twoDigits(d.getMonth() + 1) + '/' + twoDigits(d.getDate());
+        			patSuivi["suiviD"] = ddj;
+  					if (qPAT.patients[curSuivi].labo) patSuivi["labo"] = qPAT.patients[curSuivi].labo;
+  					if (qPAT.patients[curSuivi].laboD) patSuivi["laboD"] = qPAT.patients[curSuivi].laboD;
+  					qFilePat = qPAT.patients[curSuivi].file;
+        			//alert("modSuivi: "+qFilePat);
+        			$.post("allScriptsv1.py", {tx: "uploadJSONsub", sub: "patients", name: qFilePat, json: JSON.stringify(patSuivi)}, function(result){
+            			//alert("Le patient a été enregistré. "+curSuivi);
+  						//Centre dentaire Sirois<br>100001 - Claude Arsenault, 1946-07-12&nbsp;&nbsp;&nbsp;&nbsp;
+  						var topPat = curInitials+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="reOpenSearch();">Changer de patient</div>&nbsp;&nbsp;&nbsp;'+patSuivi["id"]+' - '+curName+', '+birth+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="window.print();">Imprimer</div>&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="location.reload();">Déconnexion</div>';
+  						//alert(curPatRow);
+  						qPAT.patients[curPatRow].suivi = document.getElementById("EsuiviM").value;
+  						qPAT.patients[curPatRow].suiviD = ddj;
+            			document.getElementById("Esuivi").value = qPAT.patients[curPatRow].suiviD + " " + qPAT.patients[curPatRow].suivi;
+  						document.getElementById("patName").innerHTML = topPat;
+        			});
+            		$('.modalSuivi.modal').modal('hide');
+    }
+
+	function modAlert()
+	{
+		document.getElementById("EalertM").value = "";
+  		var cPat = 0;
+  		for (pat in qPAT.patients)
+  		{
+  			if (curPatient == qPAT.patients[pat].id) curAlert = pat;
+  		}
+  		if (qPAT.patients[curAlert].alert)
+  		{
+  			document.getElementById("EalertM").value = qPAT.patients[curAlert].alert;
+  		}
+		$('.modalAlert.modal').modal('show');
+	}
+
+	function modifyAlert()
+	{
+        			patAlert = { };
+  					patAlert["id"] = qPAT.patients[curAlert].id;
+  					patAlert["first"] = qPAT.patients[curAlert].first;
+  					patAlert["last"] = qPAT.patients[curAlert].last;
+  					patAlert["NAM"] = qPAT.patients[curAlert].NAM;
+  					patAlert["birth"] = qPAT.patients[curAlert].birth;
+        			patAlert["alert"] = document.getElementById("EalertM").value;
+  					var d = new Date();
+  					var ddj = d.getFullYear() + '/' + twoDigits(d.getMonth() + 1) + '/' + twoDigits(d.getDate());
+        			patAlert["alertD"] = ddj;
+  					if (qPAT.patients[curAlert].suivi) patAlert["suivi"] = qPAT.patients[curAlert].suivi;
+  					if (qPAT.patients[curAlert].suiviD) patAlert["suiviD"] = qPAT.patients[curAlert].suiviD;
+  					if (qPAT.patients[curAlert].labo) patAlert["labo"] = qPAT.patients[curAlert].labo;
+  					if (qPAT.patients[curAlert].laboD) patAlert["laboD"] = qPAT.patients[curAlert].laboD;
+  					qFilePat = qPAT.patients[curAlert].file;
+        			//alert("modAlert: "+qFilePat);
+        			$.post("allScriptsv1.py", {tx: "uploadJSONsub", sub: "patients", name: qFilePat, json: JSON.stringify(patAlert)}, function(result){
+            			//alert("Le patient a été enregistré. "+curAlert);
+  						//Centre dentaire Sirois<br>100001 - Claude Arsenault, 1946-07-12&nbsp;&nbsp;&nbsp;&nbsp;
+  						var topPat = curInitials+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="reOpenSearch();">Changer de patient</div>&nbsp;&nbsp;&nbsp;'+patAlert["id"]+' - '+curName+', '+birth+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="window.print();">Imprimer</div>&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="location.reload();">Déconnexion</div>';
+  						//alert(curPatRow);
+  						qPAT.patients[curPatRow].alert = document.getElementById("EalertM").value;
+  						qPAT.patients[curPatRow].alertD = ddj;
+  						if (document.getElementById("Ealert").value.length > 0)
+  						{
+  							topPat = topPat + '<br><i class="red first aid icon"></i>&nbsp;&nbsp;Alerte : ' + qPAT.patients[curPatRow].alertD + " " + qPAT.patients[curPatRow].alert;
+  						}
+            			document.getElementById("Ealert").value = qPAT.patients[curPatRow].alertD + " " + qPAT.patients[curPatRow].alert;
+  						document.getElementById("patName").innerHTML = topPat;
+        			});
+            		$('.modalAlert.modal').modal('hide');
+    }
+
+	function addDoc(aNum)
+	{
+		document.getElementById("Ecomm").value = "";
+		document.getElementById("Efile").value = "";
+		$('.modalDoc.modal').modal('show');
+	}
+
+	$('.modDoc.content .ui.form')
+		    .form({
+		    fields : {
+		        dFile: {
+		          identifier  : 'Efile',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Choisir un fichier à ajouter'
+		            }
+		          ]
+		        },
+		        dComm: {
+					identifier  : 'Ecomm',
+					rules: [
+					  {
+					    type   : 'empty',
+						prompt : 'Entrez un commentaire'
+					  }
+				   ]
+		        }
+		      }, onSuccess : function() {
+            		alert(document.getElementById("Efile").value);
+            		uploadDOC(document.getElementById("Efile").value);
+            		$('.modalDoc.modal').modal('hide');
+        		}
+        	});
+
+	$('.modCorr.content .ui.form')
+		    .form({
+		    fields : {
+		        just: {
+		          identifier  : 'Ecorr',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Entrez une correction'
+		            }
+		          ]
+		        }
+		      }, onSuccess : function() {
+            		//alert(modalCorr);
+            		qTRA.done[modalCorr]["corr"] = document.getElementById("Ecorr").value;
+            		document.getElementById("dTRA"+modalCorr).innerHTML = document.getElementById("dTRA"+modalCorr).innerHTML + "<br>" + document.getElementById("Ecorr").value;
+            		uploadTRA(qFileTrait);
+            		$('.modalCorr.modal').modal('hide');
+        		}
+        	});
+
+	function addNotes(aNum)
+	{
+		modalNum = aNum;
+        //alert(modalNum);
+		document.getElementById("Enote").value = "";
+		$('.modalNote.modal').modal('show');
+	}
+
+	$('.modNote.content .ui.form')
+		    .form({
+		    fields : {
+		        just: {
+		          identifier  : 'Enote',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Entrez une note ou une correction'
+		            }
+		          ]
+		        }
+		      }, onSuccess : function() {
+            		//alert(modalNum);
+            		if (qJSON[modalNum].qEdits.length > 0)
+            			{
+            				qJSON[modalNum].qEdits = qJSON[modalNum].qEdits + "<br>" + document.getElementById("Enote").value;
+            			}
+            		else
+            			{
+            				qJSON[modalNum].qEdits = document.getElementById("Enote").value;
+            			}
+            		document.getElementById("n"+modalNum).innerHTML = qJSON[modalNum].qEdits;
+            		uploadANT(qFile);
+            		$('.modalNote.modal').modal('hide');
+        		}
+        	});
+
+	function addNotes2(aNum)
+	{
+		modalNum2 = aNum;
+        //alert(modalNum2);
+		document.getElementById("Enote2").value = "";
+		$('.modalNote2.modal').modal('show');
+	}
+
+	$('.modNote2.content .ui.form')
+		    .form({
+		    fields : {
+		        just: {
+		          identifier  : 'Enote2',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Entrez une note ou une correction'
+		            }
+		          ]
+		        }
+		      }, onSuccess : function() {
+            		//alert(modalNum2);
+            		if (qEXA[modalNum2].qEdits.length > 0)
+            			{
+            				qEXA[modalNum2].qEdits = qEXA[modalNum2].qEdits + "<br>" + document.getElementById("Enote2").value;
+            			}
+            		else
+            			{
+            				qEXA[modalNum2].qEdits = document.getElementById("Enote2").value;
+            			}
+            		document.getElementById("m"+modalNum2).innerHTML = qEXA[modalNum2].qEdits;
+            		uploadEXA(qFileExa);
+            		$('.modalNote2.modal').modal('hide');
+        		}
+        	});
+
+	function addRep2(aNum)
+	{
+		modalRep2 = aNum;
+        //alert(modalRep2);
+		document.getElementById("Erep2").value = "";
+		$('.modalRep2.modal').modal('show');
+	}
+
+	$('.modRep2.content .ui.form')
+		    .form({
+		    fields : {
+		        just: {
+		          identifier  : 'Erep2',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Entrez une réponse'
+		            }
+		          ]
+		        }
+		      }, onSuccess : function() {
+            		//alert(modalRep2);
+            		document.getElementById("r"+modalRep2).setAttribute("class", "ui axxium large right floated");
+            		document.getElementById("r"+modalRep2).setAttribute("onclick", "");
+            		document.getElementById("r"+modalRep2).innerHTML = "<b>" + document.getElementById("Erep2").value + "</b>"  + '<div id="r'+extIDexa+'" class="ui axxium large right floated button" onclick="addRep2(\''+extIDexa+'\');">Réponse</div></td>';
+            		if (qEXA[modalRep2].qEdits.length > 0)
+            			{
+            				qEXA[modalRep2].qEdits = qEXA[modalNum2].qEdits + "<br>" + document.getElementById("Erep2").value;
+            			}
+            		else
+            			{
+            				qEXA[modalRep2].qEdits = document.getElementById("Erep2").value;
+            			}
+            		uploadEXA(qFileExa);
+            		$('.modalRep2.modal').modal('hide');
+        		}
+        	});
+
+	$('.modMontant.content .ui.form')
+		    .form({
+		    fields : {
+		        montV: {
+		          identifier  : 'Emontant',
+		          rules: [
+		            {
+		              type   : 'number',
+		              prompt : 'Entrez un montant'
+		            }
+		          ]
+		        },
+		        dateV: {
+					identifier  : 'EdateV',
+					rules: [
+					  {
+					    type   : 'empty',
+						prompt : 'Entrez une date'
+					  }
+				   ]
+		        }
+		      }, onSuccess : function() {
+            		//alert(modalMontant);
+            		document.getElementById("wd"+modalMontant).innerHTML = document.getElementById("EdateV").value;
+            		qENT.pay[modalMontant]["date"] = document.getElementById("EdateV").value;
+            		document.getElementById("wm"+modalMontant).innerHTML = document.getElementById("Emontant").value;
+            		qENT.pay[modalMontant]["montant"] = parseInt(document.getElementById("Emontant").value);
+            		document.getElementById("wn"+modalMontant).innerHTML = document.getElementById("EnoteV").value;
+            		qENT.pay[modalMontant]["note"] = document.getElementById("EnoteV").value;
+  					uploadENT(qFileEnt);
+      				document.getElementById("totEnt").innerHTML = "";
+      				totEnt = 0;
+      				for (tt in qENT.pay)
+      					{
+    						totEnt = totEnt + qENT.pay[tt]["montant"];
+    					}
+      				document.getElementById("totEnt").innerHTML = totEnt+" $";
+            		$('.modalMontant.modal').modal('hide');
+        		}
+        	});
+
+	$('.modMed.content .ui.form')
+		    .form({
+		    fields : {
+		        medR: {
+		          identifier  : 'EmedR',
+		          rules: [
+		            {
+		              type   : 'empty',
+		              prompt : 'Entrez un médicament'
+		            }
+		          ]
+		        },
+		        doseR: {
+					identifier  : 'EdoseR',
+					rules: [
+					  {
+					    type   : 'empty',
+						prompt : 'Entrez une dose'
+					  }
+				   ]
+		        },
+		        qtyR: {
+					identifier  : 'EqtyR',
+					rules: [
+					  {
+					    type   : 'empty',
+						prompt : 'Entrez une quantité'
+					  }
+				   ]
+		        },
+		        freqR: {
+					identifier  : 'EfreqR',
+					rules: [
+					  {
+					    type   : 'empty',
+						prompt : 'Entrez une fréquence'
+					  }
+				   ]
+		        }
+		      }, onSuccess : function() {
+            		//alert(modalMontant);
+            		if (modalMedAdd)
+            		{
+    					div = document.createElement("tr");
+    					div.setAttribute("id", "ORD"+modalMed);
+    					div.innerHTML = '<td><h4><input id="xORD'+modalMed+'" type="checkbox" tabindex="'+modalMed+'" class="hidden"></h4></td><td id="rm'+modalMed+'"><h4></h4></td><td id="rd'+modalMed+'"><h4></h4></td><td id="rq'+modalMed+'"><h4></h4></td><td id="rf'+modalMed+'"><h4></h4></td><td id="rn'+modalMed+'"><h4></h4></td><td><h4><div class="ui axxium tiny button" onclick="modMed('+modalMed+');">Modifier</div></h4></td>';
+    					document.getElementById("eachOrd").appendChild(div);
+            		}
+            		document.getElementById("rm"+modalMed).innerHTML = document.getElementById("EmedR").value;
+            		qORD.meds[modalMed]["med"] = document.getElementById("EmedR").value;
+            		document.getElementById("rd"+modalMed).innerHTML = document.getElementById("EdoseR").value;
+            		qORD.meds[modalMed]["dose"] = document.getElementById("EdoseR").value;
+            		document.getElementById("rq"+modalMed).innerHTML = document.getElementById("EqtyR").value;
+            		qORD.meds[modalMed]["qty"] = document.getElementById("EqtyR").value;
+            		document.getElementById("rf"+modalMed).innerHTML = document.getElementById("EfreqR").value;
+            		qORD.meds[modalMed]["freq"] = document.getElementById("EfreqR").value;
+            		document.getElementById("rn"+modalMed).innerHTML = document.getElementById("EnoteR").value;
+            		qORD.meds[modalMed]["note"] = document.getElementById("EnoteR").value;
+  					uploadORD(qFileOrd);
+            		$('.modalMed.modal').modal('hide');
+        		}
+        	});
+
+	</script>
+
+  <script>
+
+  var lang = getLang();
+  var curPatient = "";
+  var curPatRow = "";
+  var curName = "";
+  var curDentist = "DR JEAN-YVES SIROIS";
+  var curInitials = "JS";
+  var curPrat = "123456";
+  var curAnt = 0;
+  var curExa = 0;
+  var curPlan = 0;
+  var curTrait = 0;
+  var curEnt = 0;
+  var curLab = 0;
+  var curOrd = 0;
+  var curParo = 0;
+  var curDoc = 0;
+  var curLoad = "examens";
+  var curPrefix = "E";
+  var curAlert = 0;
+  var tracks42 = "";
+  var aTooth = 0;
+  var trait = 0;
+  var isM = false;
+  var isL = false;
+  var isD = false;
+  var isB = false;
+  var isO = false;
+  var mapping = "";
+  var odonto = "";
+  var paro = "";
+  var searchItems = "";
+  var inTrait = false;
+  var qFilePat = "";
+  var qFile = "";
+  var qFileExa = "";
+  var qFileLab = "";
+  var qFileParo = "";
+  var qFilePlan = "";
+  var qFileTrait = "";
+  var qFileEnt = "";
+  var qFileOrd = "";
+  var qFileDoc = "";
+  //var firstJSON = getJSON();
+  var modalNum = 0;
+  var extID;
+  var extIDexa;
+  var allJSONs = "";
+  var allEXAMSs = "";
+  var qCODES = "";
+  var qJSON = "";
+  var firstJSON = "AXXAv5";
+  var firstEXA = "AXXEv3";
+  var forceMustSee = false;
+  var forceMustSeeExa = false;
+  var qANT = "";
+  var qEXAMS = "";
+  var qEXA = "";
+  var qODONS = "";
+  var qODO = "";
+  var qPARS = "";
+  var qPAR = "";
+  var qPAT = "";
+  var qPLANS = "";
+  var qPLA = "";
+  var qENTS = "";
+  var qENT = "";
+  var qLABOS = "";
+  var qLAB = "";
+  var qTRAS = "";
+  var qTRA = "";
+  var qORDS = "";
+  var qORD = "";
+  var qDOCS = "";
+  var qDOC = "";
+  var firstLabos = true;
+  var firstSign0 = true;
+  var firstSign1 = true;
+  var firstSignPad = true;
+  var signID = "";
+  var showAdult = true;
+  var showAdultP = true;
+  var curKind = "";
+  var curType = "";
+  var curProtName = "";
+  var pMaster = { };
+  var oMaster = { };
+  var pResp = { };
+  var masterResp = { };
+  var protAdd = true;
+  var isLockedODO = false;
+  var isLockedPAR = false;
+  var isLockedPLA = false;
+  var isLockedENT = false;
+  var isLockedLAB = false;
+  var isLockedTRA = false;
+  var isLockedORD = false;
+  var odoX = 1;
+  var odoY = 1;
+  var scaX = 1;
+  var scaY = 1;
+  var textS = "";
+  var keyNumPIN = "";
+  var qParams = { };
+
+  $('document').ready(function(){
+  	$('.menu .item')
+  		.tab()
+	;
+	$('.sortable.table').tablesort();
+	$('.modalProts.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalNoteProt.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSelect.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalLabos.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSelectBL.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSelectMD.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSelectSurf.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSelectDent.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSelo.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSeloBL.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSeloMD.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	$('.modalSeloSurf.modal')
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
+	loadParams();
+  	getPIN();
+    loadQJSON(firstJSON);
+    loadQEXA(firstEXA);
+	loadCODES();
+    loadProts();
+    loadSelect();
+    loadSelo();
+  	//loadPAT();
+  });
+
+  $("#odonto").on('mouseup', function(evt) {
+  	if (!isLockedODO)
+  	{
+      if (evt.target.getAttribute('id') == "odonto")
+    	{
+    		aToothO = getTooth(evt.clientX, evt.clientY);
+    		//alert(aToothO);
+    		if (aToothO > 0)
+    		{
+    			textS = "";
+    			oMaster = JSON.parse(JSON.stringify(qSelo));
+				displaySelo("Restauration");
+    			resetSeloButtons();
+  				inTrait = false;
+    			$('.modalSelo.modal').modal('show');
+    		}
+    	}
+  	}
+  });
+
+  $("#odonto").on('touchend', function(evt) {
+  	if (!isLockedODO)
+  	{
+      if (evt.originalEvent.changedTouches[0].target.getAttribute('id') == "odonto")
+    	{
+    		aToothO = getTooth(evt.originalEvent.changedTouches[0].clientX, evt.originalEvent.changedTouches[0].clientY);
+    		//alert(aToothO);
+    		if (aToothO > 0)
+    		{
+    			textS = "";
+    			oMaster = JSON.parse(JSON.stringify(qSelo));
+				displaySelo("Restauration");
+    			resetSeloButtons();
+  				inTrait = false;
+    			$('.modalSelo.modal').modal('show');
+    		}
+    	}
+    }
+  });
+
+  $("#paro").on('mouseup', function(evt) {
+  	if (!isLockedPAR)
+  	{
+      if (evt.target.getAttribute('id') == "paro")
+    	{
+    		aToothP = getToothP(evt.clientX, evt.clientY);
+    		//alert(aToothP);
+    		if (aToothP > 0)
+    		{
+    			document.getElementById("theToothP").innerHTML = "<font size=5>Poche, récession et mobilité, dent "+aToothP+"</font>";
+    			resetParo(aToothP);
+    			$('.modalParo.modal').modal('show');
+    		}
+    	}
+  	}
+  });
+
+  $("#paro").on('touchend', function(evt) {
+  	if (!isLockedPAR)
+  	{
+      if (evt.target.getAttribute('id') == "paro")
+    	{
+    		aToothP = getToothP(evt.clientX, evt.clientY);
+    		//alert(aToothP);
+    		if (aToothP > 0)
+    		{
+    			document.getElementById("theToothP").innerHTML = "<font size=5>Poche, récession et mobilité, dent "+aToothP+"</font>";
+    			resetParo(aToothP);
+    			$('.modalParo.modal').modal('show');
+    		}
+    	}
+  	}
+  });
+
+  </script>
+
+</body>
+</html>
