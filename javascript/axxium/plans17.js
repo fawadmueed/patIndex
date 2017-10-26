@@ -14,7 +14,8 @@
   			rdvList[qPLAN.todo[tt]["rdv"]] = [{ "code" : qPLAN.todo[tt]["code"], "unites" : qPLAN.todo[tt]["unites"] }];
   		}
   	}
-  	$.get("http://localhost/PatientService/PatientInfo.asmx/getAppointments?id="+curPatient+"&app="+JSON.stringify(rdvList), function(data, status){
+   // previous link fawad: $.get("http://localhost/PatientService/PatientInfo.asmx/getAppointments?id="+curPatient+"&app="+JSON.stringify(rdvList), function(data, status){
+  	$.get("http://192.168.2.15:8080/PatientInfo.asmx/Initialize?initial=&id="+curPatient+"&app="+JSON.stringify(rdvList), function(data, status){
 	        //alert("Data: " + data + "\nStatus: " + status);
 	        //var xmlString = (new XMLSerializer()).serializeToString(data);
 	        //alert(xmlString);

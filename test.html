@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>TESTING </title>
+	<script
+  src="https://code.jquery.com/jquery-3.2.1.js"
+  integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+  crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+
+<div id="main_place">
+  main
+</div>
+
+<button onclick="show('operation1')">Replace to operation 1</button>
+<button onclick="show('operation2')">Replace to operation 2</button>
+<button onclick="show('operation3')">Replace to operation 3</button>
+
+
+<div id=operation1 style=“display:none”>
+  Some textboxes and text
+</div>
+
+<div id=operation2 style=“display:none”>
+  Again some textboxes and text
+</div>
+
+<div id=operation3 style=“display:none”>
+  And again some textboxes and text
+</div>
+
+<script>
+  function show(param_div_id) {
+    document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+  }
+</script>
+
+<script type="text/javascript">
+	function myText(){
+		alert('Fawad');
+	}
+
+
+
+</script>
+
+
+
+
+</body>
+</html>
+
+
+
+<div id='test1' style="display: none">
+        <div class="ui grid">
+          <div class="ui form ">
+            <div class="three fields">
+              <div class="inline field">
+                <label> Tariff regulier </label>
+                <input type="radio" name="regular">
+              </div>
+              <div class="inline field">
+                <label>Tariff special</label>
+                <input type="radio" name="regular">
+              </div>
+              <div class="field">
+                
+                  <select class="ui dropdown"> 
+                    <option value="">Cas hospitalier</option>
+                    <option value="">Anesthesie locale</option>
+                    <option value="">Anesthesie generale</option>
+                    <option value="">Non applicable</option>
+                  </select>
+                
+              </div>
+
+            </div>
+            
+          </div>
+          
+        </div>        
+        
+      </div>

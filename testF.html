@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Check</title>
+	<script src="javascript/library/jquery.min.js"></script>
+  <script src="javascript/library/tablesort.js"></script>
+  <script src="javascript/dist/semantic.min.js"></script>
+    <link rel="stylesheet" type="text/css" class="ui" href="css/dist/semantic.min.css">
+    <link rel="stylesheet" type="text/css" class="ui" href="css/axxium.css">
+</head>
+<body>
+
+	<h1 style="text-align: center;">Welcome to Testing</h1>
+
+    <div class="ui container">
+      <div class="ui grid">
+          <div class="sixteen wide column"></div>
+          <div class="sixteen wide column"></div>
+          <div class="sixteen wide column"></div>
+
+        </div>
+        <!--<div class="ui axxium tiny button deny cancel" id="factTblAdd" onclick="factTableAdd();">Add</div>
+        <div class="ui axxium tiny button deny cancel" id="factTblAdd" onclick="factTableUpdate();">Update</div>!-->
+        <div class="ui axxium tiny button deny cancel" id="factTblAdd" onclick="newRecordFact();">New Record</div> 
+
+      <div class="ui axxium form segment"> 
+        <table id="factureTable" class="ui celled table" cellspacing="0" width="100%">
+          <!-- facturetable / -->
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Dent</th>
+                <th>Surface</th>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Frais Lab.</th>
+                <th>Honoraires</th>
+                <th>Total</th>
+                <th>Prod</th>
+               
+              </tr>
+            </thead>
+          <tbody id="factTableBody">
+            
+          </tbody>
+        </table>
+
+</div>
+<div class="ui grid">
+      <div class="ten wide column"></div>
+      <div class="six wide column"> 
+      <div class="two fields">
+
+        <div class="field">
+          <div class="ui axxium button" onclick="allTrs();">Generer la facture</div>
+        </div>
+        <div class="field">
+          <div class="ui axxium button ok" onclick="">Facturation anticipee</div>
+        </div>
+      </div>
+    </div>
+     </div>  
+     </div>
+
+
+<script type="text/javascript">
+	
+function newRecordFact(){
+
+    var tblBody=$('#factTableBody');
+    tblRow=$('<tr>');
+    var fields=['id','Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod'];
+    for(i=0;i<9;i++)
+      {
+      	if(i==8)
+      	{	
+      		
+      		tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1])
+      		.bind('keypress', function (e) 
+      			{  
+      				if(e.which == 13) {
+
+        				newRecordFact();
+        				
+        			};
+        			return e.which!=13;
+
+        		})
+      		 tblData.appendTo(tblRow);
+      	}
+      	else{
+      		
+       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]);
+       tblData.appendTo(tblRow);
+   }
+      }
+
+        tblRow.appendTo(tblBody);
+}
+
+//Array to Save all Objects of Facturation  
+var arrGrilleDeFacturation = [];
+  
+function getRowData(row)
+{ 
+  row1=$(row).text();
+    console.log(row1);
+  var dataObject={};
+  thisTr = $(row).children();
+  // console.log(thisTr);
+  $.each(thisTr, function(idx,val){
+    // console.log($(val).text());
+    var key = $(val).attr('data-target');
+    var value = $(val).text();
+    // console.log(key);
+
+    dataObject[key]= value;
+
+    // console.log(dataObject);
+    
+  });
+  console.log(dataObject);
+  arrGrilleDeFacturation.push(dataObject);
+  
+  console.log(arrGrilleDeFacturation);
+}
+
+	// $('#factTableBody tr td[data-target]').click(function(){
+	// 	alert('hi');
+	// });	
+
+function allTrs(){
+
+var myArray=[];
+var mytrs=$('#factTableBody tr');
+// console.log(mytrs);
+	$.each(mytrs, function(idx,val){
+		var myObjects={};
+		var mytds=$(val).children();
+
+		$.each(mytds,function(idx,val){
+
+		
+			var key=$(val).attr('data-target');
+			var value=$(val).text();
+
+			myObjects[key]=value;
+
+			})
+			console.log(myObjects);
+
+			myArray.push(myObjects);
+
+			// console.log(myArray);
+			
+		
+	});
+	console.log(myArray);
+}
+
+
+  
+</script>
+
+
+</body>
+</html>

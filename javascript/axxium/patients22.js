@@ -60,8 +60,8 @@
   	{    
 
   	    $.get("http://localhost:8080/Axxium/WebService/PatientInfo.asmx/getPatient?id="+axxNumber, function(data, status){
-          data="hi Fawad";
-          alert("Data: " + data + "\nStatus: " + status);
+          //data="hi Fawad";
+          //alert("Data: " + data + "\nStatus: " + status);
 	        var xmlString = (new XMLSerializer()).serializeToString(data);
 	        //alert(xmlString);
 	        var pos1 = xmlString.indexOf('{');
@@ -806,7 +806,7 @@
         	if (qPLANS.files.length > 0)
         	{
         		aDate = qPLANS.files[curPlan].date;
-        		document.getElementById("updateAvail").innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="createPLA();">Nouveau plan</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="bPrec" class="ui axxium tiny disabled button" onclick="backPLA();">Précédent</div>&nbsp;&nbsp;'+aDate+'&nbsp;&nbsp;&nbsp;<div id="bSuiv" class="ui axxium tiny disabled button" onclick="forPLA();">Suivant</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="getSign(0,\'PLA\');"><i class="write icon"></i> patient</div>&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="getSign(1,\'PLA\');"><i class="write icon"></i> dentiste</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny disabled button" onclick="sendCal();">Calendrier Vision-R</div>';
+        		document.getElementById("updateAvail").innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="createPLA();">Nouveau plan</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div id="bPrec" class="ui axxium tiny disabled button" onclick="backPLA();">Précédent</div>&nbsp;&nbsp;'+aDate+'&nbsp;&nbsp;&nbsp;<div id="bSuiv" class="ui axxium tiny disabled button" onclick="forPLA();">Suivant</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="getSign(0,\'PLA\');"><i class="write icon"></i> patient</div>&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="getSign(1,\'PLA\');"><i class="write icon"></i> dentiste</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="sendCal();">Calendrier Vision-R</div>';
         	
         		if (curPlan < qPLANS.files.length - 1) document.getElementById("bPrec").setAttribute("class", "ui axxium tiny button");
         		if (curPlan > 0) document.getElementById("bSuiv").setAttribute("class", "ui axxium tiny button");
@@ -815,6 +815,13 @@
         	{
         		document.getElementById("updateAvail").innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="createPLA();">Nouveau plan de traitement</div>';
         	}
+        }
+
+        if(aTab=="codes")
+        {
+          document.getElementById("updateAvail").innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui icon input"><input type="text" class="search1" onkeydown="searchPrix(false)" placeholder="Search by Codes" ><i class="circular search link icon"></i>';
+
+//</div><div class="ui form field"> <label>Search By Code</label><input type="text" class="search1" onkeydown="searchPrix()"></div>';
         }
         
         if (aTab == "ententes")

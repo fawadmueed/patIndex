@@ -91,3 +91,8 @@ a.ui.axxium.label:hover:before {
   background-color: #008883 !important;
   color: #FFFFFF !important;
 }
+.ui.large.menu{
+  background-color: rgba(250, 255, 253, 0.94);
+      font-size: 1.24285714rem;
+
+}

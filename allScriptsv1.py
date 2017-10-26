@@ -280,6 +280,77 @@ if (tx == "getEXAv1"):
 	except:
 		print '{ "outcome" : "error", "message" : "getEXAv1 error" } '
 
+if (tx == "updatePrix"):
+	import json 
+
+	try:
+		code=str(form["code"].value)
+		prix=form["prix"].value
+		ramq=form["ramq"].value
+		insurance=form["insurance"].value
+		special=form["special"].value
+		print 'Code changing value for: ', code 
+		
+		
+		import json
+
+		json_file=open("json/params/codeFawad.JSON",'r') 
+		json_dict = json.load(json_file)
+		json_file.close()
+
+		# print(json_data) 
+		print '=== Right Now values are ===='
+		print ' prix : ',json_dict[code]['prix']
+	 	print ' ramq  : ',json_dict[code]['ramq']
+	 	print ' insurance : ',json_dict[code]['insurance']
+	 	print ' special  : ',json_dict[code]['special']
+	 	print '================================'
+		
+		json_dict[code]['prix']= prix
+		json_dict[code]['ramq']= ramq
+		json_dict[code]['insurance']= insurance
+		json_dict[code]['special']= special
+
+		print '======== CHANGED TO ============'
+	 	print 'changed prix to : ',json_dict[code]['prix']
+	 	print 'changed ramq to : ',json_dict[code]['ramq']
+	 	print 'changed insurance to : ',json_dict[code]['insurance']
+	 	print 'changed special to : ',json_dict[code]['special']
+	 	print '==================================='
+		backToJson=json.dumps(json_dict)
+
+		print 'printing backToJson data : ', backToJson
+
+		json_file_write=open("json/params/blank.json",'w')
+
+		json.dump(json_dict,json_file_write)
+		json_file_write.close()
+
+
+		#  print 'changing it to 00000 '
+		# json_dict['02115']['prix']=00000;
+		# print json_data['02115']['prix']
+
+		    # print json_data
+
+		    # new=json.dumps(json_data)
+
+		    # json_dataJSON=json.dumps(json_data)
+		    # json_file.write(json_data)
+		    # print json_dataJSON
+
+		    
+
+		# myfile=open('json/params/codeFawad.JSON','r')
+		# print myfile.read()
+		# myfile.close()
+		# print insurance
+
+	except:
+		print '{ In the EXCEPT - Hello Fadi }'	
+		
+
+
 if (tx == "getFile"):
 	try:
 		pKey = form["pKey"].value
@@ -331,7 +402,7 @@ if (tx == "uploadJSONsub"):
 if (tx == "uploadDOC"):
 	#try:
 	import msvcrt
-	msvcrt.setmode (0, os.O_BINARY) # stdin  = 0
+	msvcrt.setmodde (0, os.O_BINARY) # stdin  = 0
 	msvcrt.setmode (1, os.O_BINARY) # stdout = 1
 	fileitem = form['file']
 	patID = form["dPatID"].value
