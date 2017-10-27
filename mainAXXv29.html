@@ -33,6 +33,7 @@
   <script src="javascript/axxium/odonto24.js"></script>
   <script src="javascript/axxium/paro20.js"></script>
   <script src="javascript/axxium/labos22.js"></script>
+  <script src="javascript/axxium/modals-facturation.js"></script>
 
   <!-- Translation File & Dictionary English French -->
   <script src="translator/jquery.translate.js"></script>
@@ -242,11 +243,10 @@
               $(this).addClass("active");
             });
             </script>
-            <div class="ui hidden divider"></div>
-
+            
               <div class="ui content" id="updateAvail">
                 <!-- 2nd Tab Contents Vary here by 1st Tabs -->
-
+                <!-- Buttons -->
               </div>
           </div>
        
@@ -282,9 +282,9 @@
                 </div>
                 <div class="ui tab segment" data-tab="Facturation">
                   
-                 <div class="ui axxium tiny button" onclick="openFactureModal();">Facture</div>
-                 <div class="ui axxium tiny button" onclick="modRapelFacture();">Rappel de facture</div>
-                 <div class="ui axxium tiny button" onclick="modFactAnticip();">Facturation anticipee</div>
+                 <div class="ui axxium tiny button" onclick="">Facture</div>
+                 <div class="ui axxium tiny button" onclick="">Rappel de facture</div>
+                 <div class="ui axxium tiny button" onclick="">Facturation anticipee</div>
                  <div class="ui axxium tiny button" onclick="modCdan();">cdanET</div>
             <!--      <div id="context3">
                     <div class="ui secondary menu">
@@ -1251,6 +1251,12 @@
     </div>
 
     <div class="ui bottom attached tab segment" data-tab="facturation">
+      <button class="ui  teal basic button" onclick="openFactureModal();">Facture</button>
+      <button class="ui  teal basic button" onclick="modRapelFacture();">Rappel de facture</button>
+      <button class="ui  teal basic button" onclick="modFactAnticip();">Facturation anticipée</button>
+      <button class="ui  teal basic button" onclick="modCdan();">cdanET</button>
+      <button class="ui  teal basic button" onclick="modRegie();">Regie</button>
+      <div class="ui hidden divider"></div>
       <div class="ui form ">
       <div class="ui two column grid">
         <div class="three wide column">
@@ -2663,7 +2669,7 @@
 
           </div>
           <div class="ui form segment">
-            <p1><strong>Renseignements Complementaires Regie</strong></p1>
+            <div class="ui horizontal divider"> <strong>Renseignements Complementaires Regie</strong></div>
                 <div class="ui two column grid">
                   <div class="eight wide column"> 
                    <div class="field">  <label>No de sequence</label> <input type="text" name="" id="no_sequence"></div>               
@@ -3921,29 +3927,10 @@
     allowMultiple: true
   });
 
-  function modFacture()
-  {
-    $('.modalFacture')
-   .modal('setting', {
-            closable  : false,
-            onDeny    : function(){
-              window.alert('Wait not yet!');
-              return false;
-            }
-  }).modal('show');
-  }
-    function modRapelFacture()
-  {
-    $('.modalRapelFacture').modal('show')
-  }
-    function modFactAnticip()
-  {
-    $('.modalFactAnticip').modal('show')
-  }
-    function modCdan()
-  {
-    $('.modalCdan').modal('show')
-  }
+
+  
+   
+
 //==========
  
 
