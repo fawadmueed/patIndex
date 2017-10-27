@@ -201,23 +201,15 @@
 
           </div>
 
+           <h4 class="ui center aligned header" id="patNameSub"></h4>
 
-          <!-- <h2 class="ui left aligned header">
-            <div id="topTitle" class="ui content">
-                  <h3 id="patName">IN&nbsp;&nbsp;&nbsp;
-          </h2> -->
-      
-            
-          </h3>
         </div>
-        <br>
-        <br>
-
+       
         <div id="loadingText" class="ui active inverted dimmer">
           <div class="ui text loader">Chargement initial des données...</div>
         </div>
         <!-- tabs1 -->
-        <br>
+       
         <div class="container"> 
           <div id="context1">
             <div class="ui top attached tabular menu active">
@@ -491,7 +483,7 @@
                         <div class="three fields">
                           <div class="field">
                           <label>Langue</label>
-                          <div class="ui selection dropdown">
+                          <div class="ui fluid selection dropdown">
                             <input type="hidden" name="gender">
                             <i class="dropdown icon"></i>
                             <div class="default text">Langue</div>
@@ -664,7 +656,7 @@
                                             <input type="checkbox" name="example">
                                           </div>
                                           <label>Type: </label>
-                                                      <div class="ui selection dropdown">
+                                                      <div class="ui fluid selection dropdown">
                                                        <input type="hidden" name="gender">
                                                        <i class="dropdown icon"></i>
                                                        <div class="default text">Aucun</div>
@@ -754,7 +746,7 @@
                           <label>Type 1</label>
                           <div class="four wide field">
                             
-                            <select value="CAS" placeholder="CAS" class="ui dropdown insurance_select">
+                            <select value="CAS" placeholder="CAS" class="ui fluid selection  dropdown insurance_select">
                               <option value="1">CAS</option>
                               <option value="2">Desjardin</option>
 
@@ -783,7 +775,7 @@
                         <div class="inline fields">
                           <label>Type 2</label>
                           <div class="four wide field">
-                            <select value="CAS" placeholder="CAS" class="ui dropdown insurance_select2">
+                            <select value="CAS" placeholder="CAS" class="ui fluid selection  dropdown insurance_select2">
                               <option value="1">CAS</option>
                               <option value="2">TD</option>
 
@@ -1251,109 +1243,144 @@
     </div>
 
     <div class="ui bottom attached tab segment" data-tab="facturation">
-      <button class="ui  teal basic button" onclick="openFactureModal();">Facture</button>
-      <button class="ui  teal basic button" onclick="modRapelFacture();">Rappel de facture</button>
-      <button class="ui  teal basic button" onclick="modFactAnticip();">Facturation anticipée</button>
-      <button class="ui  teal basic button" onclick="modCdan();">cdanET</button>
-      <button class="ui  teal basic button" onclick="modRegie();">Regie</button>
-      <div class="ui hidden divider"></div>
-      <div class="ui form ">
-      <div class="ui two column grid">
-        <div class="three wide column">
       
-          <div class="ui green form segment">
-            <div class="inline field">
-                <input type="radio" name="">
-                  <label>Tarif regulier</label>
-            </div>
-            <div class="inline field">
-                <input type="radio" name="">
-                  <label>Tarif special</label>
-            </div>
-            <div class="inline field">
-                <input type="radio" name="">
-                  <label>Regie</label>
-            </div>
-            <div class="inline field">
-                <select class=""> 
-                  <option selected="selected" disabled="disabled">Cas hospitalier</option>
-                  <option>Anesthesie Locale</option>
-                  <option>Anesthesie Generale</option>
-                  <option>Non applicable</option>
-                </select>
-            </div>
-          </div>
-          
+      <div id="context3">
+        <!-- ===========Tabs 2========= -->
+        <div class="ui secondary pointing menu" >
   
-  </div>
-     <div class="nine wide column">
-        <div class="ui grid">
-          <div class="sixteen wide column"></div>
+           <a class="active item" data-tab="facturation-sub">Facture</a>
+           <a class="item" data-tab="RapelFacture-sub">Rappel de facture</a>
+           <a class="item" data-tab="FactAnticip-sub">Facturation anticipée</a>
+           <a class="item" data-tab="cdanEt-sub">cdanET</a>
+           <a class="item" data-tab="Regie-sub">Regie</a>
+          
         </div>
-        <div class="row">
-           <canvas class="ui raised segment" id="odonto" width="100%" height="300" style="border:1px solid #c3c3c3;">
-                    Your browser does not support the HTML5 canvas tag.
-            </canvas>
+            <!-- ================ -->
+      <div class="ui tab segment active" data-tab="facturation-sub">
+     
+
+              <!-- <button class="ui  teal basic button" onclick="openFactureModal();">Facture</button>
+              <button class="ui  teal basic button" onclick="modRapelFacture();">Rappel de facture</button>
+              <button class="ui  teal basic button" onclick="modFactAnticip();">Facturation anticipée</button>
+              <button class="ui  teal basic button" onclick="modCdan();">cdanET</button>
+              <button class="ui  teal basic button" onclick="modRegie();">Regie</button> -->
+              <div class="ui hidden divider"></div>
+              <div class="ui form ">
+              <div class="ui two column grid">
+                <div class="three wide column">
+              
+                  <div class="ui green form segment">
+                    <div class="inline field">
+                        <input type="radio" name="">
+                          <label>Tarif regulier</label>
+                    </div>
+                    <div class="inline field">
+                        <input type="radio" name="">
+                          <label>Tarif special</label>
+                    </div>
+                    <div class="inline field">
+                        <input type="radio" name="">
+                          <label>Regie</label>
+                    </div>
+                    <div class="inline field">
+                        <select class=""> 
+                          <option selected="selected" disabled="disabled">Cas hospitalier</option>
+                          <option>Anesthesie Locale</option>
+                          <option>Anesthesie Generale</option>
+                          <option>Non applicable</option>
+                        </select>
+                    </div>
+                  </div>
+                  
+          
           </div>
-        
-    </div>
-   </div>
-   <div class="ui grid">
-   <div class="three wide column"></div>
-   <div class="ten wide column">
-   <div class="ui axxium form segment">
-         <table id="factureTable" class="ui striped compact table segment" cellspacing="0" width="100%">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Dent</th>
-                  <th>Surface</th>
-                  <th>Code</th>
-                  <th>Description</th>
-                  <th>Frais Lab.</th>
-                  <th>Honoraires</th>
-                  <th>Total</th>
-                  <th>Prod</th>
-                </tr>
-                <!-- NOTE : Role : By default 1 In every field -->
-                <!-- Note: Element contecxtuels : Displays Number of associated text / decription  -->
-              </thead>
-            <tbody id="factTableBody">
-                <tr id="1" class="">
-                  <td contenteditable="true" data-target="Type"></td>
-                  <td contenteditable="true" data-target="Dent"></td>
-                  <td contenteditable="true" data-target="Surface"></td>
-                  <td contenteditable="true" data-target="Code"></td>
-                  <td contenteditable="true" data-target="Description"></td>
-                  <td contenteditable="true" data-target="Frais"></td>
-                  <td contenteditable="true" data-target="Honoraires"></td>
-                  <td contenteditable="true" data-target="Total"></td>
-                  <td class="firstTdProd" contenteditable="true" data-target="Prod"></td>
-                </tr>
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-        <div class="three wide column"></div>
-      </div>
-
-
-        <div class="ui grid">
-          <div class="nine wide column"></div>
-          <div class="four wide column">
-          <div class="two fields">
-            <div class="field">
-              <div class="ui axxium tiny button" onclick="getAllTrData();">Generer la facture</div>
+             <div class="nine wide column">
+                <div class="ui grid">
+                  <div class="sixteen wide column"></div>
+                </div>
+                <div class="row">
+                   <canvas class="ui raised segment" id="odonto" width="100%" height="300" style="border:1px solid #c3c3c3;">
+                            Your browser does not support the HTML5 canvas tag.
+                    </canvas>
+                  </div>
+                
             </div>
-            <div class="field">
-              <div class="ui axxium tiny button ok" onclick="">Facturation anticipee</div>
+           </div>
+           <div class="ui grid">
+           <div class="three wide column"></div>
+           <div class="ten wide column">
+           <div class="ui axxium form segment">
+                 <table id="factureTable" class="ui striped compact table segment" cellspacing="0" width="100%">
+                      <thead>
+                        <tr>
+                          <th>Type</th>
+                          <th>Dent</th>
+                          <th>Surface</th>
+                          <th>Code</th>
+                          <th>Description</th>
+                          <th>Frais Lab.</th>
+                          <th>Honoraires</th>
+                          <th>Total</th>
+                          <th>Prod</th>
+                        </tr>
+                        <!-- NOTE : Role : By default 1 In every field -->
+                        <!-- Note: Element contecxtuels : Displays Number of associated text / decription  -->
+                      </thead>
+                    <tbody id="factTableBody">
+                        <tr id="1" class="">
+                          <td contenteditable="true" data-target="Type"></td>
+                          <td contenteditable="true" data-target="Dent"></td>
+                          <td contenteditable="true" data-target="Surface"></td>
+                          <td contenteditable="true" data-target="Code"></td>
+                          <td contenteditable="true" data-target="Description"></td>
+                          <td contenteditable="true" data-target="Frais"></td>
+                          <td contenteditable="true" data-target="Honoraires"></td>
+                          <td contenteditable="true" data-target="Total"></td>
+                          <td class="firstTdProd" contenteditable="true" data-target="Prod"></td>
+                        </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+                <div class="three wide column"></div>
+              </div>
+
+
+                <div class="ui grid">
+                  <div class="nine wide column"></div>
+                  <div class="four wide column">
+                  <div class="two fields">
+                    <div class="field">
+                      <div class="ui axxium tiny button" onclick="getAllTrData();">Generer la facture</div>
+                    </div>
+                    <div class="field">
+                      <div class="ui axxium tiny button ok" onclick="">Facturation anticipee</div>
+                    </div>
+                  </div>
+                </div>
+                </div>
             </div>
-          </div>
+            </div>
+            
+            <div class="ui tab segment " data-tab="RapelFacture-sub">
+              Rapel Facture
+            </div>
+
+            <div class="ui tab segment " data-tab="FactAnticip-sub">
+              Fact Aniticp
+            </div>
+
+            <div class="ui tab segment " data-tab="cdanEt-sub">
+              CdanEt
+            </div>
+
+            <div class="ui tab segment " data-tab="Regie-sub">
+              RegieSub
+            </div>
+
         </div>
-        </div>
-   </div>
-    </div>
+      </div>
 
      <div class="ui bottom attached tab segment" data-tab="documents">
       <div class="ui one column grid">
@@ -1383,6 +1410,7 @@
         </div>
       </div>
     </div>
+
 
   <div class="ui bottom attached tab segment" data-tab="odontos">
         <div class="ui grid">
@@ -1820,7 +1848,7 @@
                   </div>
                   <div class="field">
                     <label>Langue</label>
-                    <select class="ui dropdown">
+                    <select class="ui fluid selection  dropdown">
                       <option value="1"> English</option>
                       <option value="2"> French</option>
                     </select>
@@ -1851,13 +1879,13 @@
                    </div>
                    <div class="field">
                      <label>Code de parente</label>
-                     <select class="ui dropdown">
+                     <select class="ui fluid selection  dropdown">
                        <option></option>
                      </select>
                    </div>
                    <div class="field">
                      <label>Code de dependance</label>
-                     <select class="ui dropdown">
+                     <select class="ui fluid selection  dropdown">
                        <option></option>
                      </select>
                    </div>
@@ -1929,7 +1957,7 @@
                   </div>
                   <div class="field">
                     <label>Langue</label>
-                    <select class="ui dropdown">
+                    <select class="ui fluid selection  dropdown">
                       <option value="1"> English</option>
                       <option value="2"> French</option>
                     </select>
@@ -1960,13 +1988,13 @@
                    </div>
                    <div class="field">
                      <label>Code de parente</label>
-                     <select class="ui dropdown">
+                     <select class="ui fluid selection dropdown">
                        <option></option>
                      </select>
                    </div>
                    <div class="field">
                      <label>Code de dependance</label>
-                     <select class="ui dropdown">
+                     <select class="ui fluid selection dropdown">
                        <option></option>
                      </select>
                    </div>
@@ -1982,7 +2010,7 @@
                 <div class="two fields">
                   <div class="field">
                      <label>Code d'exception</label>
-                     <select class="ui dropdown">
+                     <select class="ui fluid selection dropdown">
                        <option></option>
                      </select>
                    </div>
@@ -2037,7 +2065,7 @@
               <div class="three inline fields">
                   <div class="five wide field ">
                     
-                      <div class="ui selection dropdown">
+                      <div class="ui fluid selection dropdown">
                         <input type="hidden" name="gender">
                         <i class="dropdown icon"></i>
                         <div class="default text">Mr</div>
@@ -2128,7 +2156,7 @@
         <div class="two fields">
           <div class="five wide field">
               <label>Disposition</label>
-              <select class="ui dropdown">
+              <select class="ui fluid selection dropdown">
                 <option value="1">Repondu</option>
                 <option value="2">Ligne engagee</option>
                 <option value="3">Ne repond pas</option>
@@ -2265,7 +2293,7 @@
 
           <div class="field">
           <label>Type</label>
-            <select class="ui selection dropdown">
+            <select class="ui fluid selection dropdown">
               <option value="1">Medicale</option>
               <option value="2">Financiere</option>
               <option value="3">Rendez-vous</option>
@@ -2650,7 +2678,7 @@
   </div>
   <div class="content">
     <div class="ui axxium form segment">
-      <div class="ui form segment">
+      
       <div class="ui three column grid">
         <div class="seven wide column">
           <div class="ui form segment">
@@ -2669,71 +2697,147 @@
 
           </div>
           <div class="ui form segment">
-            <div class="ui horizontal divider"> <strong>Renseignements Complementaires Regie</strong></div>
-                <div class="ui two column grid">
-                  <div class="eight wide column"> 
-                   <div class="field">  <label>No de sequence</label> <input type="text" name="" id="no_sequence"></div>               
-                   <div class="field">  <label>No d'autorisation</label><input type="text" name ="" id="no_auth"></div>
-                   <div class="field">  <label>No du professionnel</label><input type="text" name ="" id="no_prof"></div>
-                   <div class="field">  <label>No de referant</label><input type="text" name="" id="no_ref"></div>
-                   <div class="field">  <label>Date des services</label><input type="text" name="" id="date_srvc"></div>
-                   <div class="field">  <label>Consultation demandee </label><input type="text" name="" id="consl_demand"></div>
+                <div class="ui horizontal divider"> <strong>Renseignements Complementaires Regie</strong></div>
+                <div class="inline fields">
+                  <label>Carte d'assurance-maladie</label>
+                  <div class="field">
+                    <input type="radio" name="">
+                    <label>Oui</label>
                   </div>
-                  <div class="eight wide column">
-                    <div class="field"> <label>Date d'autorisation</label><input type="text" name="" id="date_auth"></div>
-                    <div class="field"> <label>No de groupe</label><input type="text" name="" id="no_groupe"></div>
-                    <div class="field"> <label>Son numero</label><input type="text" name="" id="son_numero"></div>
-                  </div>
+                  <div class="field">
+                    <input type="radio" name="">
+                    <label>Non</label>
+                  </div>              
                 </div>
-              </div>
-              <div class="ui two column grid">
-                <div class="eight wide column">
-                  <div class="ui form segment">
-                    <p1><strong>Code du diagnostic</strong></p1>
-                      <div class="inline field">
-                        <input type="radio" name="" id="cari_dent">
-                        <label>Carie dentaire(521,0)</label>  
-                      </div>
-                      <div class="inline field">
-                        <input type="radio" name="" id="etat_norm">
-                        <label>Etat normal(90,9)</label>  
-                      </div>
-                      <div class="inline field">
-                        <input type="radio" name="" id="autr_code">
-                        <label>Autres</label>  
-                      </div>
+                <div class="inline fields">
+                <label>Remboursement demandé par Patient</label>
+                  <div class="field">
+                    <input type="radio" name="">
+                    <label>Oui</label>
                   </div>
+                  <div class="field">
+                    <input type="radio" name="">
+                    <label>Non</label>
+                  </div>              
                 </div>
-                <div class="eight wide column">
+                <div class="ui grid">
+                 <div class="eight wide column">
                   <div class="ui form segment">
-                    <p1><strong>Establissement</strong></p1>
+                    <strong>Professional</strong>
+                    <div class="field">
+                      <label>No du professional</label>
+                      <input type="text" name="">
+                    </div>
+                    <div class="field">
+                      <label>No du groupe</label>
+                      <input type="text" name="">
+                    </div>
+                  </div>
+                  <div class="ui form segment">
+                    <strong>Événement</strong>
+                    <div class="field">
+                      <label>Code de diagnostic</label>
+                      <input type="text" name="">
+                    </div>
+                    <div class="field">
+                      <label>Date de l'événement</label>
+                      <input type="date" name="">
+                    </div>
+                    <div class="field">
+                      <label>Période d'hospitalisation</label>
+                      <input type="text" name="">
+                    </div>
+                  </div>
+                 </div>
+                 <div class="eight wide column">
+                  <div class="ui form segment">
+                    <strong>Lieu de dispensation</strong><br>
+                    <strong>Identification du lieu</strong>
+                    <div class="inline fields">
                       <div class="field">
-                        <label>Code</label>  
-                        <input type="text" name="" id="code_estb">
+                        <input type="radio" name="">
+                        <label>Lieu codifié é la Regie</label>
+                      </div>
+                      <div class="field">
+                        <input type="radio" name="">
+                        <label>Lieu non codifié</label>
+                      </div>
+                    </div>
+                    <div class="field">
+                        <label>Numéro du lieu</label>
+                        <input type="text" name="">
+                    </div>
+                    <div class="field">
+                        <label>Secteur d'activite</label>
+                          <div class="ui fluid selection dropdown">
+                            <input type="hidden" name="gender">
+                            <i class="dropdown icon"></i>
+                            <div class="default text"></div>
+                            <div class="menu">
+                              <div class="item" data-value="3">Unité de soins intensifs</div>
+                              <div class="item" data-value="3">Unité de soins généraux et spécialisés</div>
+                              <div class="item" data-value="3">Unité de soins de longue duréé(prolongés)</div>
+                              <div class="item" data-value="3">Unité coronarienne Unité de soins de longue duréé(hébergement)</div>
+                              <div class="item" data-value="3">Section gériatrique Section psychiatrique</div>
+                              <div class="item" data-value="2">Clinique externe Clinique d'urgence</div>
+                              <div class="item" data-value="1">Centre de douleur chronique</div>
+                              <div class="item" data-value="0">Female</div>
+                            </div>
+                            </div>                        
+                    </div>
+                    <script type="text/javascript"> 
+                      $('.ui.dropdown').dropdown(); 
+                    </script>
+                    <div class="inline field">
+                      <input type="radio" name="">
+                      <label>Liéu codifié é la Régie</label>
+                    </div>
+                    <div class="inline field">
+                      <input type="radio" name="">
+                      <label>Liéu non codifié</label>
+                    </div>
+                    
+                      <div class="inline field">
+                        <label>Code Postal</label>
+                        <input type="text" name="">
                       </div>
                       <div class="inline field">
-                        <label>Date d'entree</label>
-                        <input type="text" name="" id="date_entr_estab">
+                        <label>Code localité</label>
+                        <input type="text" name="">
                       </div>
                       <div class="inline field">
-                        <label>Date de sortie</label>
-                        <input type="text" name="" id="date_sort_estb">
+                        <label>No. bur.</label>
+                        <input type="text" name="">
                       </div>
+                   
+                    <label>Type de lieu</label>
+                    <div class="inline field">
+                    <input type="radio" name="">
+                    <label>Cabinet</label>
+                    </div>
+                    <div class="inline field">
+                    <input type="radio" name="">
+                    <label>Domicile</label>
+                    </div>
+                    <div class="inline field">
+                    <input type="radio" name="">
+                    <label>Autre</label>
+                    </div>
+
                   </div>
-              
-              </div>
-               </div>
-                <div class="ui form segment">
-                  <p1><strong>Diagnostic principal et renseignements complementaires</strong></p1>
-                  <textarea id="diag_renseig_text"> ... ! </textarea>
+                  
+                 </div>
                 </div>
+                
+            </div>
+             
                 
               <div class="ui grid">
                 <div class="twelve wide column"></div>
                 <div class="four wide column"> 
                   <div class="ui axxium button" onclick="SoumissionDemandesPaiement();"> Transferer a la Regie</div>
+                </div>
               </div>
-            </div>
       </div>
       
       <div class="six wide column">
@@ -2855,8 +2959,6 @@
       </div>
         
       </div>
-      </div>
-
     </div>
     
   </div>

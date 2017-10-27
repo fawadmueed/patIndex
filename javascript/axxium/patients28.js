@@ -674,6 +674,7 @@
     if (qPAT.patients[cPat].alert) 
     {
       medAlert = qPAT.patients[cPat].alert;
+      console.log(medAlert);
       if (qPAT.patients[cPat].alertD) medAlert = qPAT.patients[cPat].alertD + " " + medAlert;
     }
     medSuivi = "";
@@ -695,11 +696,13 @@
     // document.getElementById("Elabo03").value = "";
     // document.getElementById("Elabo04").value = "";
     //Centre dentaire Sirois<br>100001 - Claude Arsenault, 1946-07-12&nbsp;&nbsp;&nbsp;&nbsp;
-    var topPat = curInitials+aPat+' - '+curName+', '+birth;
-    if (medAlert.length > 0) topPat = topPat + '<br><i class="red first aid icon"></i>&nbsp;&nbsp;Alerte : ' + medAlert;
+    var topPat = '<h3 class="ui center aligned header">'+curInitials+aPat+' - '+curName+', '+birth + '</h3>';
+    var topPatSub;
+    if (medAlert.length > 0) topPatSub=' <i class="red first aid icon"></i>&nbsp;&nbsp;Alerte : ' + medAlert;
     // var topPat = curInitials+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="reOpenSearch();">Changer de patient</div>&nbsp;&nbsp;&nbsp;'+aPat+' - '+curName+', '+birth+'&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="showLabos();">Laboratoires</div>&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="window.print();">Imprimer</div>&nbsp;&nbsp;&nbsp;<div class="ui axxium tiny button" onclick="location.reload();">Déconnexion</div>';
     // if (medAlert.length > 0) topPat = topPat + '<br><i class="red first aid icon"></i>&nbsp;&nbsp;Alerte : ' + medAlert;
     document.getElementById("patName").innerHTML = topPat;
+    document.getElementById("patNameSub").innerHTML=topPatSub;
   }
   
   function updateAvail(aTab)
