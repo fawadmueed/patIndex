@@ -35,6 +35,7 @@
   <script src="javascript/axxium/labos22.js"></script>
   <script src="javascript/axxium/modals-facturation.js"></script>
 
+
   <!-- Translation File & Dictionary English French -->
   <script src="translator/jquery.translate.js"></script>
 
@@ -42,8 +43,8 @@
   <script src="javascript/pdf/pdf.js"></script>
   <script src="javascript/pdf/jspdf.min.js"></script>
 <!-- Alex Files -->
-<script src="javascript/axxium/facture28.js"></script> 
-<script src="javascript/axxium/ramq28.js"></script> 
+<script src="javascript/axxium/facture28.js"></script>
+<script src="javascript/axxium/ramq28.js"></script>
 <!-- <script type="text/javascript"> var translator = $('body').translate({lang:"", t:dict});  </script> -->
 <!-- Alexey JS FILE -->
 <style type="text/css">
@@ -116,11 +117,11 @@
       alert("Le code numérique doit compter 4 chiffres");
       keyNumPIN = "";
 
-      
+
     }
     else
     {
-          //changed from keyNumPIN to 1234 to make it direct and above 4 to 0 
+          //changed from keyNumPIN to 1234 to make it direct and above 4 to 0
           $.get("allScriptsv1.py?tx=getJSONsub&sub=signatures&code=S_"+1234+"&rand="+Math.random(), function(data, status){
                 if (data["code"])
                 {
@@ -153,10 +154,10 @@
 
     $.get("allScriptsv1.py?tx=updatePrix&code="+code+"&prix="+prix+"&ramq="+ramq+"&insurance="+insurance+"&special="+special,function(data,status){
     });
-    //Debug F 
+    //Debug F
     alert('File Updated');
 
-    $('#prixEdit').modal('hide'); 
+    $('#prixEdit').modal('hide');
     $.getJSON("json/params/blank.json",function(data){
       dataJsonCode=data;
     });
@@ -164,6 +165,8 @@
   }
 
   </script>
+
+  <script src="javascript/axxium/facture_table.js"></script>
 
 </head>
 
@@ -179,23 +182,23 @@
         <a class="item">Testimonials</a>
         <a class="item">Sign-in</a>
       </div> -->
-      
+
         <div class="ui borderless large menu">
         <!-- <div class="ui container"> -->
-          
+
               <!-- <img src="images/tooth.png"> -->
               <a class="item"><h3><i class="doctor blue icon"></i></h3>MP</a>
               <a class="item" onclick="reOpenSearch();"><h3><i class="user green icon"></i></h3>Change Patient</a>
               <a class=""></a>
               <a class=""></a>
-  
+
               <div class="right menu">
                   <a class="item" id="patName"></a>
               </div>
               <a class="right fitted item" onclick="location.reload();"><h3><i class="remove user red icon"></i></h3> Deconnexion</a>
               <a class="item" onclick="window.print();"><h3><i class="print blue icon"></i></h3>Print</a>
               <a class="item" onclick="showLabos();"><i class="emergency red icon"></i>Laboratories</a>
-<!-- 
+<!--
               <a class="item" onclick="changeLang('en')">En <i class="us flag "></i></a>
               <a class="item" onclick="changeLang(' ')"><i class="fr flag "></i> Fr</a>  -->
 
@@ -204,17 +207,17 @@
            <h4 class="ui center aligned header" id="patNameSub"></h4>
 
         </div>
-       
+
         <div id="loadingText" class="ui active inverted dimmer">
           <div class="ui text loader">Chargement initial des données...</div>
         </div>
         <!-- tabs1 -->
-       
-        <div class="container"> 
+
+        <div class="container">
           <div id="context1">
             <div class="ui top attached tabular menu active">
                 <div class="item" data-tab="patient"><i class="user circular orange icon trn" data-trn-key=""></i>Patient</div>
-                <div class="item" data-tab="facturation"><i class="dollar circular  blue icon trn" data-trn-key=""></i>Facturation</div>
+                <div class="item active" data-tab="facturation"><i class="dollar circular  blue icon trn" data-trn-key=""></i>Facturation</div>
                 <div class="item" data-tab="documents"><i class="file image outline circular yellow icon trn" data-trn-key=""></i>Docs</div>
                 <div class="item" data-tab="antecedents"><i class="heartbeat circular red icon trn" data-trn-key=""></i>Hist</div>
                 <div class="item" data-tab="examens"><i class="doctor circular purple icon trn" data-trn-key=""></i>Exam</div>
@@ -222,7 +225,7 @@
                 <div class="item" data-tab="plans"><i class="list circular blue icon trn" data-trn-key=""></i>Plan RDV</div>
                 <div class="item" data-tab="traitements"><i class="treatment circular yellow icon trn" data-trn-key=""></i>Traits</div>
                 <div class="item" data-tab="ordonnances"><i class="lab circular green icon trn" data-trn-key=""></i>Rx</div>
-                <div class="item active" data-tab="paros"><i class="crosshairs circular red icon trn" data-trn-key=""></i>Paro</div>
+                <div class="item" data-tab="paros"><i class="crosshairs circular red icon trn" data-trn-key=""></i>Paro</div>
                 <div class="item" data-tab="ententes"><i class="thumbs circular up blue icon trn" data-trn-key=""></i>Entente</div>
                 <div class="item" data-tab="codes"><i class="plus circular red icon trn" data-trn-key=""></i>Code Edit Prix</div>
 
@@ -235,19 +238,19 @@
               $(this).addClass("active");
             });
             </script>
-            
+
               <div class="ui content" id="updateAvail">
                 <!-- 2nd Tab Contents Vary here by 1st Tabs -->
                 <!-- Buttons -->
               </div>
           </div>
-       
+
     </div>
 
-     <div class="ui bottom attached active tab " data-tab="patient">
-      
+     <div class="ui bottom attached tab " data-tab="patient">
+
       <div id="context2">
-                <div class="ui pointing secondary menu"> 
+                <div class="ui pointing secondary menu">
                  <a class="item trn" data-tab="Dossier" >Dossier Patient</a>
                  <a class="item trn" data-tab="Facturation" >Facturation</a>
                  <a class="item trn" data-tab="traitement" >Plan de traitement</a>
@@ -270,10 +273,10 @@
                   <div class="ui axxium tiny button" onclick="modImpression();">Impression</div>
                   <div class="ui axxium tiny button" onclick="modAlert();">Alerte médicale</div>
                   <div class="ui axxium tiny button" onclick="modSuivi();">Suivi médical</div>
-                  <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div> 
+                  <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div>
                 </div>
                 <div class="ui tab segment" data-tab="Facturation">
-                  
+
                  <div class="ui axxium tiny button" onclick="">Facture</div>
                  <div class="ui axxium tiny button" onclick="">Rappel de facture</div>
                  <div class="ui axxium tiny button" onclick="">Facturation anticipee</div>
@@ -308,7 +311,7 @@
                  <div class="ui axxium tiny button" onclick="modImpression();">Impression</div>
                  <div class="ui axxium tiny button" onclick="modAlert();">Alerte médicale</div>
                  <div class="ui axxium tiny button" onclick="modSuivi();">Suivi médical</div>
-                 <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div>                 
+                 <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div>
                </div>
                 <div class="ui tab segment" data-tab="Paiements">
                  <div class="ui axxium tiny button" onclick="modCreateDos();">Creer un dossier</div>
@@ -322,7 +325,7 @@
                  <div class="ui axxium tiny button" onclick="modImpression();">Impression</div>
                  <div class="ui axxium tiny button" onclick="modAlert();">Alerte médicale</div>
                  <div class="ui axxium tiny button" onclick="modSuivi();">Suivi médical</div>
-                 <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div> 
+                 <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div>
                 </div>
                 <div class="ui tab segment" data-tab="Historique">
                  <div class="ui axxium tiny button" onclick="modCreateDos();">Creer un dossier</div>
@@ -336,14 +339,14 @@
                  <div class="ui axxium tiny button" onclick="modImpression();">Impression</div>
                  <div class="ui axxium tiny button" onclick="modAlert();">Alerte médicale</div>
                  <div class="ui axxium tiny button" onclick="modSuivi();">Suivi médical</div>
-                 <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div> 
+                 <div class="ui axxium tiny button" onclick="modLabo();">Laboratoires</div>
                 </div>
 
                 <div class="ui tab segment" data-tab="Alertes">
 
                 </div>
               </div>
-              
+
 
 
 
@@ -363,13 +366,13 @@
                   </div>
                   <div class="nine wide column">
                     <div class="ui tiny equal width form">
-                      
+
                       <div class="six wide field">
                           <label>No Dossier </label>
-                          <input id="EID" readonly=""  type="text"> 
+                          <input id="EID" readonly=""  type="text">
                       </div>
                         <div class="two fields">
-                         <div class="field">  
+                         <div class="field">
                            <label>Nom </label>
                            <input id="Elast" readonly="" type="text" >
                          </div>
@@ -384,31 +387,31 @@
                             <label>Rue</label>
                             <input id="Elast" readonly="" type="text">
                           </div>
-                        
+
                          <div class="field">
                            <label>Ville</label>
                            <input id="Elast" readonly="" type="text">
                          </div>
                        </div>
-                        
+
                       <div class="two fields">
                         <div class="eight wide field">
                           <label>Province</label>
                           <input id="Elast" readonly="" type="text">
-                        </div> 
-                         
+                        </div>
+
                         <div class="eight wide field">
                           <label>Code Postal</label>
                           <input id="Elast" readonly="" type="text">
-                        </div> 
-                      </div>           
+                        </div>
+                      </div>
                     </div>
                   </div>
                  </div>
 
                   <div class="two column row">
-                    <div class="seven wide column "> 
-                      <div class="ui form segment"> 
+                    <div class="seven wide column ">
+                      <div class="ui form segment">
                            <div class="two fields">
                               <div class="ten wide field">
                                 <label>RAMQ</label>
@@ -417,7 +420,7 @@
                             <div class="six wide field">
                               <label>Expiration</label>
                               <input type="text" id="">
-                            </div> 
+                            </div>
                           </div>
                           <div class="three fields">
                               <div class="nine wide field">
@@ -431,13 +434,13 @@
                             <div class="five wide field">
                               <label>Age</label>
                               <input type="text" id="">
-                            </div> 
+                            </div>
                           </div>
 
                       </div>
                     </div>
                     <div class="nine wide column ">
-                    
+
                       <div class="ui form segment">
                         <div class="two fields">
                         <div class="field">
@@ -447,7 +450,7 @@
                          <div class="field">
                             <label>Cellulaire</label>
                             <input type="text" name="" value="514">
-                          </div> 
+                          </div>
                       </div>
                         <div class="two fields">
                           <div class="field">
@@ -458,24 +461,24 @@
                             <label>Poste</label>
                             <input type="text" name="" value="514">
                           </div>
-                         </div> 
+                         </div>
                               <div class="two fields">
                                 <div class="eleven wide field">
                                   <label>Courriel</label>
                                   <input type="text" name="">
                                 </div>
-                                
+
                                 <div class="field">
                                   <label>  </label>
                                   <button class="circular ui basic icon button" style="margin-top:18px">
                                     <i class="green icon send"></i>
                                 </button>
                               </div>
-                        </div> 
-                      </div> 
+                        </div>
+                      </div>
                   </div>
                 </div>
-                 
+
 
                   <div class="row">
                     <div class="sixteen wide column">
@@ -504,15 +507,15 @@
                               <input type="checkbox" tabindex="0" class="hidden">
                               <label style=" margin-top: 12px"">Urgence Seulement</label>
                            </div>
-                            
-                            
+
+
                           </div>
                         </div>
-                      
+
                     </div>
                     </div>
                     </div>
-                
+
                 <div class="row">
                   <div class="sixteen wide column">
                     <div class="ui form segment">
@@ -520,7 +523,7 @@
                           <div class="ui grid">
                             <div class="thirteen wide column "> </div>
                             <div class="column">
-                              <div id="" class="ui inverted green button" onclick='modExtra();'>Extra</div> 
+                              <div id="" class="ui inverted green button" onclick='modExtra();'>Extra</div>
                               </div>
                           </div>
                         </div>
@@ -558,13 +561,13 @@
               </div>
               </div>
             </div>
-              
+
               <div class="inline fields" ">
-                                    
+
                   <label style="font-weight: bold;">Dossier Actif </label>
                   <input type="checkbox" name="example" style="" checked=""> <label> Oui </label>
                   <input type="checkbox" name="example" style=""> <label> Non </label>
-                                    
+
               </div>
 
           </div>
@@ -573,9 +576,9 @@
               <div class="ui axxium form segment">
                   <div class="ui grid">
                     <div class="eight wide column">
-                    
+
                     <div class="eight  wide field">
-                      <label>Date premiere visite</label>  
+                      <label>Date premiere visite</label>
                       <input type="text" readonly="" name="">
                     </div>
                   </div>
@@ -587,7 +590,7 @@
                   </div>
                 </div>
                  <br>
-                  
+
                     <h4 class="ui horizontal divider header" >
                                    <i class="history icon" style="color: #138d30!important;"></i>
                                      Historique des rendez-vous
@@ -604,7 +607,7 @@
                               <th>Status</th>
                               <th>Description de traitement</th>
                             </tr>
-                            </thead>  
+                            </thead>
                             <tbody>
                               <td></td>
                               <td></td>
@@ -615,7 +618,7 @@
                               <td></td>
                               </tbody>
                           </table>
-                  
+
                   <div class="ui form">
                     <div class="inline fields">
                       <label>Tous</label>
@@ -624,12 +627,12 @@
                     </div>
                     <label>Annule</label>
                   <div class="one wide field">
-                      
+
                       <input type="text" name="example">
                   </div>
                   <label>Manque</label>
                   <div class="one wide field">
-                      
+
                       <input type="text" name="example">
                   </div>
                   <label>En attente</label>
@@ -639,14 +642,14 @@
                   </div>
                 </div>
                 </div>
-              
+
 
                     <!-- <div class="two column row"> -->
-                            
+
                               <div class="ui form segment">
-                               
+
                                       <div class="inline fields" >
-                                        <label><h3>Message R</h3></label>    
+                                        <label><h3>Message R</h3></label>
                                          <label>Oui</label>
                                           <div class="ui checkbox">
                                             <input type="checkbox" name="example">
@@ -665,61 +668,61 @@
                                                            <div class="item" data-value="0">XYZ</div>
                                                        </div>
                                                      </div>
-                                             
+
                                          <div class="field">
                                          <div id="" class="ui circular basic icon button" onclick='' style="margin-left:20px">
                                           <i class="green calendar icon"></i>
-                                        </div> 
+                                        </div>
                                       </div>
                                 </div>
-                                </div> 
-                                          
-              
+                                </div>
+
+
                       <h4 class="ui horizontal divider header">
                                    <i class="call icon" style="color: #138d30!important;"></i>
                                      Rappel
                                   </h4>
-                    <div class="ui form segment"> 
+                    <div class="ui form segment">
 
                       <div class="three field">
                         <div class="inline fields">
                           <label>Date</label>
                           <div class="four wide field">
-                            
+
                             <input type="text" readonly="" name="">
                           </div>
                            <label>Raison de rappel #1</label>
                            <div class="six wide field">
-                            
+
                             <input type="text" readonly="" name="">
                           </div>
                           <label>Action rappel 1</label>
                            <div class="four wide field">
-                            
+
                             <input type="text" readonly="" name="">
                           </div>
-                           
+
                         </div>
 
                       </div>
-                     
+
                       <div class="three field">
                         <div class="inline fields">
                           <label>Date</label>
                           <div class="four wide field">
-                            
+
                             <input type="text" readonly="" name="">
                           </div>
                            <label>Raison de rappel #2</label>
                            <div class="six wide field">
-                            
+
                             <input type="text" readonly="" name="">
                           </div>
-                           
-                        
+
+
                         <label>Action rappel 2</label>
                            <div class="four wide field">
-                            
+
                             <input type="text" readonly="" name="">
                         </div>
 
@@ -729,37 +732,37 @@
                               <div class="thirteen wide column"></div>
                               <div class="three wide column">
                                 <div id="" class="ui inverted green tiny button" onclick='modIntervenRappel();' >Intervention Rappel</div>
-                              </div>    
+                              </div>
                       </div>
-                    
+
 
                 </div>
 
                           <h4 class="ui horizontal divider header" >
                                    <i class="credit card alternative icon" style="color: #138d30!important";></i>
-                                     Types de paiements ou d'assurances 
+                                     Types de paiements ou d'assurances
                                   </h4>
                     <div class="ui form segment">
-                      
+
                         <div class="four field">
                         <div class="inline fields">
                           <label>Type 1</label>
                           <div class="four wide field">
-                            
+
                             <select value="CAS" placeholder="CAS" class="ui fluid selection  dropdown insurance_select">
                               <option value="1">CAS</option>
                               <option value="2">Desjardin</option>
 
                             </select>
                           </div>
-                           
+
                            <div class="six wide field">
-                            
+
                             <input type="text" readonly="" name="">
                           </div>
                            <div class="field">
-                              <div id="" class="ui inverted green tiny button" onclick='modInfoCourver();' style="margin: 10px; outline-offset: 5px;">Info couverture</div> 
-                            
+                              <div id="" class="ui inverted green tiny button" onclick='modInfoCourver();' style="margin: 10px; outline-offset: 5px;">Info couverture</div>
+
                           </div>
                           <div class="field">
                               <div class="ui axxium tiny button insurance_add" onclick="modInsuranceAdd();" >
@@ -770,7 +773,7 @@
 
                       </div>
 
-                     
+
                       <div class="two field">
                         <div class="inline fields">
                           <label>Type 2</label>
@@ -781,12 +784,12 @@
 
                             </select>
                           </div>
-                           
+
                            <div class="six wide field">
-                            
+
                             <input type="text" readonly="" name="">
                           </div>
-                           
+
                         </div>
 
                       </div>
@@ -800,7 +803,7 @@
                           <th>'>'90 jrs</th>
                           <th>Total</th>
                           <th>Autres</th>
-                         </tr>   
+                         </tr>
                         </thead>
                         <tbody>
                         <tr>
@@ -848,12 +851,12 @@
                           <td>CELL</td>
                           <td>CELL</td>
                         </tr>
-                        
+
                         </tbody>
                       </table>
-                        
+
                       </div>
-                      
+
                 </div>
 
 
@@ -862,7 +865,7 @@
           </div>
         </div>
       </div>
-     
+
 
      <div class="ui bottom attached tab segment" data-tab="antecedents">
       <div class="ui one column grid">
@@ -1067,7 +1070,7 @@
       </div>
     </div>
 
-  
+
 
     <div class="ui bottom attached tab segment" data-tab="codes">
       <div class="ui one column grid">
@@ -1082,7 +1085,7 @@
               <th class="one wide">Special ($)</th>
             </thead>
             <tbody id="codesBody">
-            
+
             </tbody>
 
             <tfoot>
@@ -1114,10 +1117,10 @@
      <i class="close icon"></i>
 
         <div class="header">
-        <i class="money icon"></i> 
+        <i class="money icon"></i>
          <i> <p> Price Edit for Code </p> </i>
-          
-          <div id="keyPrixEdit"> 
+
+          <div id="keyPrixEdit">
           </div>
         </div>
 
@@ -1126,15 +1129,15 @@
             <div class="ui content">
               <div class="field">
 
-               <label>Prix ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="prixRead" ></div> 
+               <label>Prix ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="prixRead" ></div>
                <div class="field" > <label>New Prix</label><input type="text" name="ramq" id="newPrixRead"> </div> </div>
-               <label>Ramq ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="ramqPrixRead" ></div> 
+               <label>Ramq ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="ramqPrixRead" ></div>
                <div class="field" > <label>New Prix</label><input type="text" name="ramq" id="newRamqPrixRead"> </div> </div>
-               <label>Insurance ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="insurancePrixRead" ></div> 
+               <label>Insurance ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="insurancePrixRead" ></div>
                <div class="field" > <label>New Prix</label><input type="text" name="ramq" id="newInsurancePrixRead" > </div> </div>
-               <label>Special ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="specialPrixRead" ></div> 
+               <label>Special ($)</label> <br><div class="two fields"> <div class="field" > <label>Previous Prix</label> <input type="text"  readonly  id="specialPrixRead" ></div>
                <div class="field" > <label>New Prix</label><input type="text" name="ramq" id="newSpecialPrixRead"> </div> </div>
-              </div>  
+              </div>
             </div>
         </div>
         <div class="actions">
@@ -1242,22 +1245,22 @@
       </div>
     </div>
 
-    <div class="ui bottom attached tab segment" data-tab="facturation">
-      
+    <div class="ui bottom attached tab segment active" data-tab="facturation">
+
       <div id="context3">
         <!-- ===========Tabs 2========= -->
         <div class="ui secondary pointing menu" >
-  
+
            <a class="active item" data-tab="facturation-sub">Facture</a>
            <a class="item" data-tab="RapelFacture-sub">Rappel de facture</a>
            <a class="item" data-tab="FactAnticip-sub">Facturation anticipée</a>
            <a class="item" data-tab="cdanEt-sub">cdanET</a>
            <a class="item" data-tab="Regie-sub">Regie</a>
-          
+
         </div>
             <!-- ================ -->
       <div class="ui tab segment active" data-tab="facturation-sub">
-     
+
 
               <!-- <button class="ui  teal basic button" onclick="openFactureModal();">Facture</button>
               <button class="ui  teal basic button" onclick="modRapelFacture();">Rappel de facture</button>
@@ -1268,7 +1271,7 @@
               <div class="ui form ">
               <div class="ui two column grid">
                 <div class="three wide column">
-              
+
                   <div class="ui green form segment">
                     <div class="inline field">
                         <input type="radio" name="">
@@ -1283,7 +1286,7 @@
                           <label>Regie</label>
                     </div>
                     <div class="inline field">
-                        <select class="ui dropdown fluid selection"> 
+                        <select class="ui dropdown fluid selection">
                           <option selected="selected" disabled="disabled">Cas hospitalier</option>
                           <option>Anesthesie Locale</option>
                           <option>Anesthesie Generale</option>
@@ -1291,8 +1294,8 @@
                         </select>
                     </div>
                   </div>
-                  
-          
+
+
           </div>
              <div class="nine wide column">
                 <div class="ui grid">
@@ -1303,7 +1306,7 @@
                             Your browser does not support the HTML5 canvas tag.
                     </canvas>
                   </div>
-                
+
             </div>
            </div>
            <div class="ui grid">
@@ -1322,6 +1325,7 @@
                           <th>Honoraires</th>
                           <th>Total</th>
                           <th>Prod</th>
+                          <th></th>
                         </tr>
                         <!-- NOTE : Role : By default 1 In every field -->
                         <!-- Note: Element contecxtuels : Displays Number of associated text / decription  -->
@@ -1337,6 +1341,7 @@
                           <td contenteditable="true" data-target="Honoraires"></td>
                           <td contenteditable="true" data-target="Total"></td>
                           <td class="firstTdProd" contenteditable="true" data-target="Prod"></td>
+                          <td><div class="ui axxium tiny button" onclick="thisTd(this.parent);" >More!</div></td>
                         </tr>
                     </tbody>
                   </table>
@@ -1362,7 +1367,7 @@
                 </div>
             </div>
             </div>
-            
+
             <div class="ui tab segment " data-tab="RapelFacture-sub">
               Rapel Facture
             </div>
@@ -1377,6 +1382,7 @@
 
             <div class="ui tab segment " data-tab="Regie-sub">
               RegieSub
+              
             </div>
 
         </div>
@@ -1782,7 +1788,7 @@
     </div>
 
     <div class="ui large modalInsuranceAddForm modal">
-      <i class="close icon"></i> 
+      <i class="close icon"></i>
       <div class="header">
         <i class="user icon"></i>Assurance
       </div>
@@ -1791,10 +1797,10 @@
 
           <div class="divider"></div>
           <label>Renseignements - Assurance</label>
-              
+
               <div class="ui form segment">
-                <label>Assuré principal</label>  
-                
+                <label>Assuré principal</label>
+
                 <div class="three fields">
                   <div class="field">
                     <label>Code Assurance</label>
@@ -1831,7 +1837,7 @@
                     <label>Suffixe</label>
                     <input type="text" name="">
                   </div>
-                  
+
                 </div>
                 <div class="four fields">
                   <div class="field">
@@ -1890,14 +1896,14 @@
                      </select>
                    </div>
 
-                  
+
                 </div>
 
 
               </div>
 
               <div class="ui form segment">
-                <label>Assuré secondaire</label>  
+                <label>Assuré secondaire</label>
                   <div class="four fields">
                     <div class="field">
                       <label>Code Ass.Sec</label>
@@ -1940,7 +1946,7 @@
                     <label>Suffixe</label>
                     <input type="text" name="">
                   </div>
-                  
+
                 </div>
                 <div class="four fields">
                   <div class="field">
@@ -1999,7 +2005,7 @@
                      </select>
                    </div>
 
-                  
+
                 </div>
 
 
@@ -2018,7 +2024,7 @@
                       <label>Nom de l'etablissement</label>
                       <input type="text" name="">
                    </div>
-               </div>  
+               </div>
               </div>
               <div class="three fields">
                 <div class="fifteen wide field">
@@ -2035,9 +2041,9 @@
                       </div>
                     </div>
 
-                
+
               </div>
-          
+
 
 
         </div>
@@ -2059,12 +2065,12 @@
             <input type="text" name="">
             </div>
 
-            
+
             <div class="field">
             <label>Salutation et # de dossier du responsable</label>
               <div class="three inline fields">
                   <div class="five wide field ">
-                    
+
                       <div class="ui fluid selection dropdown">
                         <input type="hidden" name="gender">
                         <i class="dropdown icon"></i>
@@ -2083,7 +2089,7 @@
                    </div>
                    <label>Le Solde inclus :</label>
                    <div class="four wide inline field ">
-                      
+
                       <input type="text" name="">
                     </div>
               </div>
@@ -2125,13 +2131,13 @@
           <div class=" two wide column ">
             <div class="ui axxium button" onclick="" >OK</div>
           </div>
-          
+
         </div>
     </div>
   </div>
 
   <div class="ui modalIntervenRappel modal">
-    <i class="close icon"></i> 
+    <i class="close icon"></i>
     <div class="header">
       <i class="user icon"></i>Gestion des rappels
     </div>
@@ -2163,8 +2169,8 @@
                 <option value="4">Laisee un message</option>
                 <option value="5">Va rappeler</option>
                 <option value="6">Confirm RV</option>
-                <option value="7">Va rappeler pour RV</option>     
-                   
+                <option value="7">Va rappeler pour RV</option>
+
               </select>
             </div>
             <div class="field">
@@ -2181,7 +2187,7 @@
           <div class="three wide column">
             <div class="ui axxium tiny button" onclick="">Enregistrer</div>
           </div>
-        </div> 
+        </div>
 
       </div>
       <div class="ui form segment">
@@ -2202,13 +2208,13 @@
                 <td></td>
                 <td></td>
                 <td></td>
-              </tbody>  
-            
+              </tbody>
+
           </table>
           <div class='field'>
             <label>Notes</label>
             <textarea></textarea>
-            
+
           </div>
           <div class="ui grid">
           <div class="thirteen wide column"></div>
@@ -2241,7 +2247,7 @@
             <label>Montant admissible</label>
             <input type="text" name="">
           </div>
-        </div> 
+        </div>
         <div class="two fields">
           <div class="field">
             <label>Date fin</label>
@@ -2255,7 +2261,7 @@
         <div class="two fields">
           <div class="field">
             <label></label>
-            
+
           </div>
           <div class=' field'>
             <label>Montant restant</label>
@@ -2284,7 +2290,7 @@
     <i class="close icon"></i>
     <div class="header">
       <i class="user icon"></i> Alerte
-      
+
     </div>
     <div class="modalAlertNew content">
 
@@ -2313,7 +2319,7 @@
           <div class="field">
             <div class="ui axxium tiny button" onclick="modifyAlert();" style="margin-top: 20px">Ajouter</div>
           </div>
-          
+
         </div>
           <table class="ui basic table">
             <col width="40">
@@ -2396,7 +2402,7 @@
           </tbody>
         </table>
       </div>
-            
+
     </div>
   </div>
 
@@ -2407,7 +2413,7 @@
       <i class="user icon"></i>Famille
     </div>
     <div class=" content">
-       <div class="ui axxium form segment"> 
+       <div class="ui axxium form segment">
         <table class="ui celled table">
 
             <thead>
@@ -2443,15 +2449,15 @@
       </div>
       <div class="three wide column"></div>
       <div class="eight wide column">
-      
+
         <div class="ui axxium button" onclick="">Chercher Patient</div>
-      
-      
+
+
         <div class="ui axxium button" onclick="">Retirer</div>
-    
+
         <div class="ui axxium button" onclick="">OK</div>
       </div>
-       
+
      </div>
      </div>
   </div>
@@ -2464,16 +2470,16 @@
     </div>
     <div class="modalExtra content">
        <div class="ui axxium form segment">
-         
+
           <div class="field">
             <textarea></textarea>
           </div>
           <div class="ui axxium labeled submit icon button">
             <i class="icon edit"></i> OK
           </div>
-  
+
        </div>
-    </div>   
+    </div>
   </div>
 
   <div class="ui modalReference small modal">
@@ -2481,46 +2487,46 @@
     <div class="header">
      <i class="user icon"></i>References et employeur
     </div>
-    
+
 
     <div class="content">
-      <div class="ui axxium form segment" >  
+      <div class="ui axxium form segment" >
           <select class="ui fluid selection dropdown">
             <i class="dropdown icon"></i>
             <span class="default text">Select</span>
               <option value=" " ></option>
               <option value="1" >Patient</option>
-              
-              <option value="2">Medical</option> 
-              
+
+              <option value="2">Medical</option>
+
               <option value="3">En passant</option>
-              
-              <option value="4">Internet</option> 
-              
+
+              <option value="4">Internet</option>
+
               <option value="5">PubliPos</option>
-              
+
               <option value="6">Aucune</option>
-              
+
             </select>
-              
+
 
             <div class="SelectedContent">
 
             </div>
-          
 
-        </div>           
+
+        </div>
     </div>
     <div class="ui modalAdRef small modal">
       <i class="close icon"></i>
       <div class="header">
-        <i class="user icon"></i>References 
+        <i class="user icon"></i>References
       </div>
 
     <div class="content">
       <div class="ui axxium mini form segment">
         <!-- <div class="two column ui grid "> -->
-        
+
         <!-- <div class="eight wide column"> -->
 
           <div class="two fields">
@@ -2528,35 +2534,35 @@
             <div class="five wide field">
               <label>Titre</label>
               <input type="text" name="" placeholder="Titre">
-            </div> 
+            </div>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
-            
+
             <div class="six wide field">
-              <label> No Dossier</label>  
+              <label> No Dossier</label>
               <input type="text" name="">
             </div>
 
           </div>
-            
-          
-            
+
+
+
             <div class="seven wide field">
-              <label>Nom</label>  
+              <label>Nom</label>
               <input type="text" name="">
             </div>
-            
+
             <div class="eight wide field">
               <label> Prenom</label>
               <input type="text" name="">
             </div>
-         
+
 
           <div class="field">
             <label>Rue</label>
             <input type="text" name="">
           </div>
-          
+
           <div class="field">
             <label> Ville</label>
             <input type="text" name="">
@@ -2571,7 +2577,7 @@
               <label>Code Postal</label>
               <input type="text" name="">
             </div>
-           </div> 
+           </div>
 
           <div class="field">
             <label> Couriel </label>
@@ -2596,13 +2602,13 @@
           <div class="three fields">
             <div class="eight wide field"></div>
             <div class="four wide field">
-              
+
               <div class="ui axxium tiny button" onclick="">OK</div>
-              
+
             </div>
             <div class="six wide field"></div>
           </div>
-  
+
         </div>
       </div>
 
@@ -2621,7 +2627,7 @@
      <i class="user icon"></i>Facture
    </div>
    <div class="content">
-    
+
    </div>
  </div>
 <!-- Dont Need for now -->
@@ -2678,7 +2684,7 @@
   </div>
   <div class="content">
     <div class="ui axxium form segment">
-      
+
       <div class="ui three column grid">
         <div class="seven wide column">
           <div class="ui form segment">
@@ -2707,7 +2713,7 @@
                   <div class="field">
                     <input type="radio" name="">
                     <label>Non</label>
-                  </div>              
+                  </div>
                 </div>
                 <div class="inline fields">
                 <label>Remboursement demandé par Patient</label>
@@ -2718,7 +2724,7 @@
                   <div class="field">
                     <input type="radio" name="">
                     <label>Non</label>
-                  </div>              
+                  </div>
                 </div>
                 <div class="ui grid">
                  <div class="eight wide column">
@@ -2783,10 +2789,10 @@
                               <div class="item" data-value="1">Centre de douleur chronique</div>
                               <div class="item" data-value="0">Female</div>
                             </div>
-                            </div>                        
+                            </div>
                     </div>
-                    <script type="text/javascript"> 
-                      $('.ui.dropdown').dropdown(); 
+                    <script type="text/javascript">
+                      $('.ui.dropdown').dropdown();
                     </script>
                     <div class="inline field">
                       <input type="radio" name="">
@@ -2796,7 +2802,7 @@
                       <input type="radio" name="">
                       <label>Liéu non codifié</label>
                     </div>
-                    
+
                       <div class="inline field">
                         <label>Code Postal</label>
                         <input type="text" name="">
@@ -2809,7 +2815,7 @@
                         <label>No. bur.</label>
                         <input type="text" name="">
                       </div>
-                   
+
                     <label>Type de lieu</label>
                     <div class="inline field">
                     <input type="radio" name="">
@@ -2825,26 +2831,26 @@
                     </div>
 
                   </div>
-                  
+
                  </div>
                 </div>
-                
+
             </div>
-             
-                
+
+
               <div class="ui grid">
                 <div class="twelve wide column"></div>
-                <div class="four wide column"> 
+                <div class="four wide column">
                   <div class="ui axxium button" onclick="SoumissionDemandesPaiement();"> Transferer a la Regie</div>
                 </div>
               </div>
       </div>
-      
+
       <div class="six wide column">
         <div class="ui form segment">
           <p1><strong>PAIEMENT</strong> </p1>
-          <div class="ui axxium form"> 
-            <div class="ui two column grid"> 
+          <div class="ui axxium form">
+            <div class="ui two column grid">
               <div class="column">
                 <strong>Solde Actuel</strong>
                 <div class="field">
@@ -2888,7 +2894,7 @@
             </div>
             <div class="ui form segment">
               <label>CREDIT</label>
-              <div class="two fields"> 
+              <div class="two fields">
                 <div class="inline field"><input type="radio" name="" id="visa_crdt_rad"><label>VISA</label></div>
                 <div class="inline field"> <input type="text" name="" id="visa_crdt_inpt"> </div>
               </div>
@@ -2904,9 +2910,9 @@
                 <div class="inline field"> <label>Date</label> <input type="text" name="" id="pst_dat"></div>
                 <div class="inline field"> <label>Nb</label> <input type="text" name="" id="pst_nb"></div>
               </div>
-                <div class="inline field"> 
-                  <label>Type</label> 
-                  <select id="pst_type"> 
+                <div class="inline field">
+                  <label>Type</label>
+                  <select id="pst_type">
                     <option disabled="Cheque"></option>
                     <option>MC</option>
                     <option>VISA</option>
@@ -2943,7 +2949,7 @@
       </div>
 
       <div class="three wide column">
-        <div class="ui form segment"> 
+        <div class="ui form segment">
           <label>Fractionner Paiement</label>
           <div class="two fields">
             <label>Montant</label> <label> Products</label>
@@ -2957,10 +2963,10 @@
           <div class="ui axxium tiny button">Enregistere</div>
         </div>
       </div>
-        
+
       </div>
     </div>
-    
+
   </div>
  </div>
 
@@ -2984,7 +2990,7 @@
      <div class="ui axxium form segment">
 
     </div>
-     
+
    </div>
 
  </div>
@@ -2996,7 +3002,7 @@
    <div class="content">
      <div class="ui axxium form segment">
       <label>Renseignements - Reclamations CDANET</label>
-        <div class="ui two column grid" > 
+        <div class="ui two column grid" >
           <div class="column">
               <div class="ui form segment">
                 <div class="field">
@@ -3009,7 +3015,7 @@
                 </div>
                 <div class="field">
                   <label>Payable &agrave;:</label>
-                  <select> 
+                  <select>
                     <option>At the dentist</option>
                     <option>At the insured</option>
                     <option>At another person</option>
@@ -3025,12 +3031,12 @@
                 </div>
                 <div class="field">
                   <label>Placement initial ?</label>
-                  <select> 
+                  <select>
                     <option>Oui</option>
                     <option>Non</option>
                   </select>
                 </div>
-               
+
               </div>
             </div>
             <div class="column">
@@ -3063,8 +3069,8 @@
             </div>
       </div>
       </div>
-    
-     
+
+
    </div>
 
  </div>
@@ -3077,7 +3083,7 @@
     function sel(){
 
        var selection=$(".ui.fluid.selection.dropdown option:selected" ).text();
-      
+
 
        switch(selection) {
         case "Patient":
@@ -3085,7 +3091,7 @@
 
           $('.SelectedContent').empty();
            $('.SelectedContent').append(string);
-         
+
         break;
 
         case "Medical":
@@ -3111,7 +3117,7 @@
         <div class="ui axxium tiny button" onclick="adRef();" style="margin: 4px;">Ajouter</div>\
         <div class="ui axxium tiny button" onclick=";" style="margin: 4px;">Imprimer Une etiquette</div>\
         <div class="ui axxium tiny button" onclick=";"  style="margin: 4px;">Courriel a la reference</div></div></div> </div>';
-          
+
 
            $('.SelectedContent').empty();
            $('.SelectedContent').append(string1);
@@ -3119,15 +3125,15 @@
 
         case "En passant":
         $('.SelectedContent').empty();
-                 
+
         break;
 
         case "PubliPos":
-        $('.SelectedContent').empty();       
+        $('.SelectedContent').empty();
         break;
 
         case "Internet":
-        $('.SelectedContent').empty();     
+        $('.SelectedContent').empty();
         break;
 
         case "Aucune":
@@ -3141,12 +3147,341 @@
 
        }
 
-     
+
 }
     </script>
 
-  
-  
+  <div class="ui modalFactTableMore fullscreen modal">
+    <i class="close icon"></i>
+    <div class="header">
+      <i class="user icon"></i>More Info - Dentiste
+    </div>
+    <div class="content">
+      <div class="ui form segment">
+        
+        <select class="ui selection dropdown" id="modFactTabl_dropDown">
+          
+          <option value="Dentiste" selected="selected">Dentiste</option>
+          <option value="Chirurgiens">Chirurgiens</option>
+          <option value="Denturologiste">Denturologiste</option>
+        </select>
+
+        <div id="modal_factTbl_more" >
+          
+        </div>
+        <br><br>
+
+        <!-- ==== Dentiste Modal -->
+  <div id="div_dentiste" style="display: none;">        
+    <div class="ui axxium form segment"> 
+      <label>Renseignements complémentaires Regie (Dentiste)</label>
+      <div class="ui grid">
+        <div class="eight wide column">
+          <div class="ui segment">
+            <label>Prothése en acrylique</label>
+            <div class="field">
+              <label>No d'autorisation</label>
+              <input type="text" name="">
+            </div>
+            <div class="field">
+              <label>Date a'utorisation</label>
+              <input type="date" name="">
+            </div>
+          </div>
+          <div class="ui segment">
+            <label>Traite,emt demtaire</label>
+            <div class="field">
+              <label>Type et raison</label>
+              <input type="text" name="">
+            </div>
+            <div class="field">
+              <label>Type et site</label>
+              <input type="text" name="">
+            </div>
+          </div>
+            <div class="field">
+              <label>Médicament consommé</label>
+              <input type="text" name="">
+            </div>
+            <div class="field">
+              <label>Éléments de contexte</label>
+             
+              <select  id="dropD_dentiste">
+                
+                <option>Acte posé plus souvent que convenu à l entente (1727)</option>
+                <option>Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                <option>Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                <option>Mise en place de la première plaque de reconstruction (37)</option>
+                <option>Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                <option>Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                <option>Patient sous anesthésie générale (1724)</option>
+                <option>Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option>Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                <option>Séance différente (1746)</option>
+                <option>Service dont la complexité est inhabituelle (34)</option>
+                <option>Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                <option>Site différent (1749)</option>
+                <option>Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                <option>Soins d urgence (1725)</option>
+                <option>Soins post-opératoire confiés à un autre dentiste (35)</option>
+                <option>Soins post-opératoire confiés par un autre dentiste (36)</option>
+                <option>Suite à un traumatisme (1744)</option>
+                <option>Suite à une malformation osseuse (1729)</option>
+
+              </select>
+
+            </div>
+            <div class="four wide field">
+              <label>Médicament consommé</label>
+              <input type="text" name="">
+            </div>
+
+        </div>
+        <div class="eight wide column">
+        <div class="ui form segment">
+          <label>Lieu de référence</label>
+          <div class="field">
+            <label>Situation liée au lieu de réf.</label>
+            <input type="text" name="">
+          </div>
+          <div class="ui form segment">
+            <label>Identification du lieu</label>
+            <div class="inline field">
+              <input type="radio" name="">
+              <label>Lieu codifié á la Régie</label>
+            </div>
+            <div class="inline field">
+              <input type="radio" name="">
+              <label>Lieu non codifié</label>
+            </div>
+            <div class="three fields">
+              <div class="field">
+                <label>Code postal</label>
+                <input type="text" name="">
+              </div>
+              <div class="field">
+                <label>Code localité</label>
+                <input type="text" name="">
+              </div>
+              <div class="field">
+                <label>No. bur.</label>
+                <input type="text" name="">
+              </div>
+            </div>
+          </div>
+          <label>Type de lieu</label>
+            <div class="three inline fields">
+              <div class="field">
+                <input type="radio" name="">
+                <label>Cabinet</label>
+              </div>
+              <div class="field">
+                <input type="radio" name="">
+                <label>Domicile</label>
+              </div>
+              <div class="field">
+                <input type="radio" name="">
+                <label>Autre</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui form segment">
+            <label>Référant</label>
+            <div class="field">
+              <label>No du référant</label>
+              <input type="text" name="">
+            </div>
+            <div class="two fields">
+              <div class="field">
+                <label>Nom</label>
+                <input type="text" name="">
+              </div>
+              <div class="field">
+                <label>Prénom</label>
+                <input type="text" name="">
+              </div>
+            </div>
+            <div class="field">
+              <label>Type de profession</label>
+              <input type="text" name="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+    <!-- ===xx dentiste modal -->
+
+    <!-- == Chirugiean -->
+    <div id="div_chirurgiens" style="display: none;">
+        <div class="ui axxium form segment" >
+      <label>Renseignements complémentaires Regie (Chirguen)</label>
+      <div class="ui grid">
+        <div class="eight wide column">
+          <div class="ui segment">
+            <label>Prothése en acrylique</label>
+            <div class="field">
+              <label>No d'autorisation</label>
+              <input type="text" name="">
+            </div>
+            <div class="field">
+              <label>Date a'utorisation</label>
+              <input type="date" name="">
+            </div>
+          </div>
+          <div class="ui segment">
+            <label>Traite,emt demtaire</label>
+            <div class="field">
+              <label>Type et raison</label>
+              <input type="text" name="">
+            </div>
+            <div class="field">
+              <label>Type et site</label>
+              <input type="text" name="">
+            </div>
+          </div>
+            <div class="field">
+              <label>Médicament consommé</label>
+              <input type="text" name="">
+            </div>
+            <div class="field">
+              <label>Éléments de contexte</label>
+              <select id="dropD_chirurgiens">
+
+                <option> Acte posé plus souvent que convenu à l entente (1735)</option>
+                <option> Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (1734)</option>
+                <option> Mise en place de la première plaque de reconstruction (1733)</option>
+                <option> Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1751)</option>
+                <option> Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (1736)</option>
+                <option> Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option> Remplacement de deux prothèses pour perte ou bris (1737)</option>
+                <option> Séance différente (1745)</option>
+                <option> Patient sous anesthésie générale (1732)</option>
+                <option>  Service dont la complexité est inhabituelle (1731)</option>
+                <option>  Site différent (1748)</option>
+                <option>  Soins d urgence (1739)</option>
+                <option>  Soins d urgence pendant l horaire de garde (1738)</option>
+                <option>  Suite à un traumatisme (1743)</option>
+                <option>  Suite à une malformation osseuse (1730)</option>
+
+              </select>
+            </div>
+            <div class="four wide field">
+              <label>Médicament consommé</label>
+              <input type="text" name="">
+            </div>
+
+        </div>
+        <div class="eight wide column">
+        <div class="ui form segment">
+          <label>Lieu de référence</label>
+          <div class="field">
+            <label>Situation liée au lieu de réf.</label>
+            <input type="text" name="">
+          </div>
+          <div class="ui form segment">
+            <label>Identification du lieu</label>
+            <div class="inline field">
+              <input type="radio" name="">
+              <label>Lieu codifié á la Régie</label>
+            </div>
+            <div class="inline field">
+              <input type="radio" name="">
+              <label>Lieu non codifié</label>
+            </div>
+            <div class="three fields">
+              <div class="field">
+                <label>Code postal</label>
+                <input type="text" name="">
+              </div>
+              <div class="field">
+                <label>Code localité</label>
+                <input type="text" name="">
+              </div>
+              <div class="field">
+                <label>No. bur.</label>
+                <input type="text" name="">
+              </div>
+            </div>
+          </div>
+          <label>Type de lieu</label>
+            <div class="three inline fields">
+              <div class="field">
+                <input type="radio" name="">
+                <label>Cabinet</label>
+              </div>
+              <div class="field">
+                <input type="radio" name="">
+                <label>Domicile</label>
+              </div>
+              <div class="field">
+                <input type="radio" name="">
+                <label>Autre</label>
+              </div>
+            </div>
+          </div>
+          <div class="ui form segment">
+            <label>Référant</label>
+            <div class="field">
+              <label>No du référant</label>
+              <input type="text" name="">
+            </div>
+            <div class="two fields">
+              <div class="field">
+                <label>Nom</label>
+                <input type="text" name="">
+              </div>
+              <div class="field">
+                <label>Prénom</label>
+                <input type="text" name="">
+              </div>
+            </div>
+            <div class="field">
+              <label>Type de profession</label>
+              <input type="text" name="">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+    <!-- ===xx Chirguein -->
+
+    <!--  Denturologiste-->
+    <div id="div_denturologiste" style="display: none;">
+    <div class="ui axxium form segment"> 
+      <label>Prothése en acrylique</label>
+      <div class="field">
+        <label>No d'autorisation</label>
+        <input type="text" name="">
+      </div>
+      <div class="field">
+        <label>Date d'autorisation</label>
+        <input type="date" name="">
+      </div>
+      <div class="field">
+        <label>Éléments de contexte</label>
+        <select  id="dropD_denturologiste">
+          <option>Remplacement d une prothèse pour perte ou bris (1740)</option>
+          <option>Remplacement de deux prothèses pour perte ou bris (1741)</option>
+          <option>Séance différente (1747)</option>
+          <option>Site différent (1750)</option>
+        </select>
+
+    </div>
+  </div>
+    <!-- ===xx=== -->
+
+
+      </div>
+      
+
+    </div>
+  </div>
+</div>
+
 
   <div class="ui modalDosConsul small modal">
     <i class="close icon"></i>
@@ -3189,11 +3524,11 @@
                 <div class="four wide column">
                   <div class="field">
                     <div class="ui axxium tiny button" onclick=';'> Annuler </div>
-                    
+
                   </div>
                 </div>
                 <div class="six wide column"></div>
-                
+
               </div>
 
       </div>
@@ -3904,7 +4239,7 @@
 
    $(document).ready(function(){
 
-    
+
 });
 
   $('.modNoteProt.content .ui.form')
@@ -3928,25 +4263,25 @@
           });
 
   function addToFactTbl()
-  { 
-    //facturefunction 
+  {
+    //facturefunction
 
   }
 
 //fawad modal functions
-//Dont need for now  
+//Dont need for now
   // function factTableAdd()
   // {
 
   //   $('.factTableAddWindow.modal').modal('attach events', '.modalFacture td') .modal({
   //   allowMultiple: true
   // }).modal('show').modal('setting', 'closable', false);
-  // } 
+  // }
 
   function modPayment()
   {
     $('.modalPayment.modal').modal('show');
-  } 
+  }
   function modLabo()
   {
     $('.modalLabo.modal').modal('show');
@@ -4002,7 +4337,7 @@
   function modInfoCourver()
   {
     $('.modalInfoCourver').modal('show');
-  } 
+  }
 
   function modNumeroRetire()
   {
@@ -4018,7 +4353,7 @@
   {
     $('.modalInsuranceAddForm').modal('show')
   }
-//===== Facture ===== 
+//===== Facture =====
   function modFactResponse()
   {
   $('.facture_response').modal('show');
@@ -4030,11 +4365,11 @@
   });
 
 
-  
-   
+
+
 
 //==========
- 
+
 
   function modifyLabo()
   {
@@ -4712,27 +5047,27 @@
       dataJsonCode=data;
     });
 
-    
+
 
   </script>
 
   <script type="text/javascript">
-   
+
     function searchPrix(){
-    
-     var output; 
-      
+
+     var output;
+
       var search1= $('.search1').val();
       var reg=new RegExp(search1,'i');
 
         $.each(dataJsonCode,function(key,val){
-          
+
           if(key.search(reg) != -1)
           {
 
 
           output+="<tr>";
-          output+="<td id=" + key + " class=selectable> <a href='javascript:modalPrixEdit("+key+","+val.prix+","+val.ramq+","+val.insurance+","+val.special+");'> <b>" +key+" </b> </a></td>"; 
+          output+="<td id=" + key + " class=selectable> <a href='javascript:modalPrixEdit("+key+","+val.prix+","+val.ramq+","+val.insurance+","+val.special+");'> <b>" +key+" </b> </a></td>";
           output+="<td id=" + key + ">" +val.prix+"</td>";
           output+="<td id=" + key + ">" +val.ramq+"</td>";
           output+="<td id=" + key + ">" +val.insurance+"</td>";
@@ -4748,18 +5083,18 @@
 
         $('#codesBody').html(output);
 
-      
+
   };
 
     function modalPrixEdit(key,prix,ramq,insurance,special){
-      
+
       $('#keyPrixEdit').html(key);
 
       document.getElementById('ramqPrixRead').value=ramq;
       document.getElementById('prixRead').value=prix;
       document.getElementById('insurancePrixRead').value=insurance;
       document.getElementById('specialPrixRead').value=special;
-       $('#prixEdit').modal('show'); 
+       $('#prixEdit').modal('show');
     };
 
     $('.ui.dropdown')
@@ -4773,83 +5108,7 @@
 
   <script type="text/javascript">
 
-    var DataSet_fact=new Array();
-
    
-
-function newRecordFact(){
-
-    var tblBody=$('#factTableBody');
-    tblRow=$('<tr>');
-    var fields=['id','Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod'];
-    for(i=0;i<9;i++)
-      {
-        if(i==8)
-        { 
-          tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1])
-          .bind('keypress', function (e) 
-            {  
-              if(e.which == 13) {
-                newRecordFact();
-                
-              };
-              return e.which!=13;
-
-            })
-           tblData.appendTo(tblRow);
-        }
-        else{
-          
-       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]);
-       tblData.appendTo(tblRow);
-   }
-      }
-
-        tblRow.appendTo(tblBody);
-}
-
-
-  $('.firstTdProd').keypress(function (e) 
-            {  
-              if(e.which == 13) 
-              {
-                newRecordFact();
-                
-              };
-              return e.which!=13;
-
-            });
-
-function getAllTrData(){
-  modPayment();
-  arrGrilleDeFacturation=[]
-
-var mytrs=$('#factTableBody tr');
-// console.log(mytrs);
-  $.each(mytrs, function(idx,val){
-    var myObjects={};
-    var mytds=$(val).children();
-
-    $.each(mytds,function(idx,val){
-
-    
-      var key=$(val).attr('data-target');
-      var value=$(val).text();
-
-      myObjects[key]=value;
-
-      })
-      console.log(myObjects);
-
-      arrGrilleDeFacturation.push(myObjects);
-
-      // console.log(myArray);
-      
-    
-  });
-  console.log(arrGrilleDeFacturation);
-}
-
 function changeLang(x)
   {
     $("label").addClass("trn");
