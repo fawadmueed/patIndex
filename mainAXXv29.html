@@ -1341,7 +1341,7 @@
                           <td contenteditable="true" data-target="Honoraires"></td>
                           <td contenteditable="true" data-target="Total"></td>
                           <td class="firstTdProd" contenteditable="true" data-target="Prod"></td>
-                          <td><div class="ui axxium tiny button" onclick="thisTd(this.parent);" >More!</div></td>
+                          <td><div class="ui axxium tiny button" onclick="findTableData(this)" >More!</div></td>
                         </tr>
                     </tbody>
                   </table>
@@ -3154,27 +3154,19 @@
   <div class="ui modalFactTableMore fullscreen modal">
     <i class="close icon"></i>
     <div class="header">
-      <i class="user icon"></i>More Info - Dentiste
+      <i class="user icon"></i>More Info
     </div>
     <div class="content">
-      <div class="ui form segment">
-        
-        <select class="ui selection dropdown" id="modFactTabl_dropDown">
-          
-          <option value="Dentiste" selected="selected">Dentiste</option>
-          <option value="Chirurgiens">Chirurgiens</option>
-          <option value="Denturologiste">Denturologiste</option>
-        </select>
-
+      
         <div id="modal_factTbl_more" >
-          
+               <!-- DIV TO SHOW THE SELECTED DENTIST TYPE '-DIV CONTENT FORM-' -->
         </div>
-        <br><br>
-
+     
         <!-- ==== Dentiste Modal -->
-  <div id="div_dentiste" style="display: none;">        
-    <div class="ui axxium form segment"> 
-      <label>Renseignements complémentaires Regie (Dentiste)</label>
+  <div id="div_dentiste" style="display: none;">
+    <div class="ui axxium form segment">
+    <h4 class="ui horizontal divider header">DENTISTE</h4> 
+      <label>Renseignements complémentaires Regie</label>
       <div class="ui grid">
         <div class="eight wide column">
           <div class="ui segment">
@@ -3306,6 +3298,7 @@
               <input type="text" name="">
             </div>
           </div>
+          <div class="ui axxium tiny button">Submit</div>
         </div>
       </div>
 
@@ -3316,6 +3309,7 @@
     <!-- == Chirugiean -->
     <div id="div_chirurgiens" style="display: none;">
         <div class="ui axxium form segment" >
+          <h4 class="ui horizontal divider header">CHIRURGIENS</h4>
       <label>Renseignements complémentaires Regie (Chirguen)</label>
       <div class="ui grid">
         <div class="eight wide column">
@@ -3442,6 +3436,7 @@
               <input type="text" name="">
             </div>
           </div>
+          <div class="ui axxium tiny button">Submit</div>
         </div>
       </div>
 
@@ -3452,6 +3447,7 @@
     <!--  Denturologiste-->
     <div id="div_denturologiste" style="display: none;">
     <div class="ui axxium form segment"> 
+      <h4 class="ui horizontal divider header">DENTUROLOGISTE</h4>
       <label>Prothése en acrylique</label>
       <div class="field">
         <label>No d'autorisation</label>
@@ -3470,15 +3466,16 @@
           <option>Site différent (1750)</option>
         </select>
 
-    </div>
+      </div>
   </div>
+  <div class="ui axxium tiny button">Submit</div>
     <!-- ===xx=== -->
 
 
       </div>
       
 
-    </div>
+    
   </div>
 </div>
 

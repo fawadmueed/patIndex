@@ -1,8 +1,11 @@
 
+  var dent_Type; //will have Type of Dentist
+
  // ====== factureTable last TD Enter key Monitor
 
 $(document).ready(function(){
 
+  
   $('.firstTdProd').keypress(function (e)
             {
               if(e.which == 13)
@@ -15,44 +18,44 @@ $(document).ready(function(){
             })
 
 //=== Populate modal default with Dentiste Div
-   var thisVal=$('#modFactTabl_dropDown').val();
-   if(thisVal=='Dentiste')
-            {
-              var data=$('#div_dentiste').html();
-              $('#modal_factTbl_more').html(data);
-            }
+   // var thisVal=$('#modFactTabl_dropDown').val();
+   // if(thisVal=='Dentiste')
+   //          {
+   //            var data=$('#div_dentiste').html();
+   //            $('#modal_factTbl_more').html(data);
+   //          }
             
   // ==Modal DropDown 
 
-   $('#modFactTabl_dropDown').dropdown().change(function() {
-            var thisVal=$('#modFactTabl_dropDown').val();
+   // $('#modFactTabl_dropDown').dropdown().change(function() {
+   //          var thisVal=$('#modFactTabl_dropDown').val();
           
 
-            if(thisVal=='Dentiste')
-            {
-              var data=$('#div_dentiste').html();
-              $('#modal_factTbl_more').html(data);
-            }
+   //          if(thisVal=='Dentiste')
+   //          {
+   //            var data=$('#div_dentiste').html();
+   //            $('#modal_factTbl_more').html(data);
+   //          }
 
-            if(thisVal=='Chirurgiens')
-            {
+   //          if(thisVal=='Chirurgiens')
+   //          {
 
-            var data=$('#div_chirurgiens').html();
-            $('#modal_factTbl_more').html(data);
-            }
+   //          var data=$('#div_chirurgiens').html();
+   //          $('#modal_factTbl_more').html(data);
+   //          }
 
-            if(thisVal=='Denturologiste')
-            {
-              var data=$('#div_denturologiste').html();
-              $('#modal_factTbl_more').html(data);
-            }
-            // if(thisVal=='État de compte')
-            // {
+   //          if(thisVal=='Denturologiste')
+   //          {
+   //            var data=$('#div_denturologiste').html();
+   //            $('#modal_factTbl_more').html(data);
+   //          }
+   //          // if(thisVal=='État de compte')
+   //          // {
 
-            // }
+   //          // }
 
 
-          }) ;
+   //        }) ;
 });
 //===xx
 
@@ -86,7 +89,7 @@ function newRecordFact(){
        tblData.appendTo(tblRow);
    }
       }
-           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="thisTd(this.parent);" >More!</div>');
+           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="findTableData(this);" >More!</div>');
        tblData.appendTo(tblRow);
 
         tblRow.appendTo(tblBody);
@@ -123,16 +126,55 @@ var mytrs=$('#factTableBody tr');
   console.log(arrGrilleDeFacturation);
 }
 
-function thisTd(x){
-  modFactTableMore();  
- console.log(x);
+function findTableData(x){
+  
+   //==Closest Row
+  var row=$(x).closest('tr');
+ 
+ //==All Td's
+  var tds=row.find('td');
 
+  //==Specific nth-td value
+  var tdSpc=row.find("td:nth-child(1)").text();
+  // console.log(tdSpc);
+    
+  //==Specific td with class 
+  var tdByAttribute=row.find("td[data-target='Type']").text();
+
+  dent_Type=tdByAttribute;
+  
+
+  //CALL MODAL
+  modFactTableMore();  
 }
 
 //===Modal
 
 function modFactTableMore()
-{
+{ 
+    
+   switch(dent_Type){
+      
+      case 'A':
+        
+              var data=$('#div_dentiste').html();
+              $('#modal_factTbl_more').html(data);
+              break;
+
+      case 'B':
+      
+              var data=$('#div_chirurgiens').html();
+              $('#modal_factTbl_more').html(data);
+              break;
+      case 'C':
+      
+              var data=$('#div_denturologiste').html();
+              $('#modal_factTbl_more').html(data);
+              break;
+      default:
+              $('#modal_factTbl_more').html('<h1>Error Aquiring the Dentist Type</h1>');
+
+  }
   $('.modalFactTableMore').modal('show');
 }
 
