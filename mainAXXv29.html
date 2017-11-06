@@ -198,9 +198,9 @@
               <a class="right fitted item" onclick="location.reload();"><h3><i class="remove user red icon"></i></h3> Deconnexion</a>
               <a class="item" onclick="window.print();"><h3><i class="print blue icon"></i></h3>Print</a>
               <a class="item" onclick="showLabos();"><i class="emergency red icon"></i>Laboratories</a>
-<!--
+
               <a class="item" onclick="changeLang('en')">En <i class="us flag "></i></a>
-              <a class="item" onclick="changeLang(' ')"><i class="fr flag "></i> Fr</a>  -->
+              <a class="item" onclick="changeLang(' ')"><i class="fr flag "></i> Fr</a>  
 
           </div>
 
@@ -217,7 +217,7 @@
           <div id="context1">
             <div class="ui top attached tabular menu active">
                 <div class="item" data-tab="patient"><i class="user circular orange icon trn" data-trn-key=""></i>Patient</div>
-                <div class="item active" data-tab="facturation"><i class="dollar circular  blue icon trn" data-trn-key=""></i>Facturation</div>
+                <div class="item active" data-tab="facturation" id="facturation" onclick="checkDentType();"><i class="dollar circular  blue icon trn" data-trn-key=""></i>Facturation</div>
                 <div class="item" data-tab="documents"><i class="file image outline circular yellow icon trn" data-trn-key=""></i>Docs</div>
                 <div class="item" data-tab="antecedents"><i class="heartbeat circular red icon trn" data-trn-key=""></i>Hist</div>
                 <div class="item" data-tab="examens"><i class="doctor circular purple icon trn" data-trn-key=""></i>Exam</div>
@@ -1332,7 +1332,7 @@
                       </thead>
                     <tbody id="factTableBody">
                         <tr id="1" class="">
-                          <td contenteditable="true" data-target="Type"></td>
+                          <td contenteditable="true" data-target="Type" ></td>
                           <td contenteditable="true" data-target="Dent"></td>
                           <td contenteditable="true" data-target="Surface"></td>
                           <td contenteditable="true" data-target="Code"></td>
@@ -1340,7 +1340,7 @@
                           <td contenteditable="true" data-target="Frais"></td>
                           <td contenteditable="true" data-target="Honoraires"></td>
                           <td contenteditable="true" data-target="Total"></td>
-                          <td class="firstTdProd" contenteditable="true" data-target="Prod"></td>
+                          <td contenteditable="true" data-target="Prod" class="firstTdProd"></td>
                           <td><div class="ui axxium tiny button" onclick="findTableData(this)" >More!</div></td>
                         </tr>
                     </tbody>
@@ -2630,52 +2630,29 @@
 
    </div>
  </div>
-<!-- Dont Need for now -->
-<!--  <div class="ui factTableAddWindow modal">
-   <i class="close icon"></i>
-   <div class="header">
-    <i class="user icon"></i>New Entry
-  </div>
-  <div class="content">
-    <div class="ui axxium form segment">
-      <div class="two fields">
-        <div class="field">
-          <input type="text" name="">
-        </div>
-        <div class="field">
-          <input type="text" name="">
-        </div>
-      </div>
-      <div class="two fields">
-        <div class="field">
-          <input type="text" name="">
-        </div>
-        <div class="field">
-          <input type="text" name="">
-        </div>
-      </div>
-      <div class="two fields">
-        <div class="field">
-          <input type="text" name="">
-        </div>
-        <div class="field">
-          <input type="text" name="">
-        </div>
-      </div>
-      <div class="two fields">
-        <div class="field">
-          <input type="text" name="">
-        </div>
-        <div class="field">
-          <input type="text" name="">
-        </div>
-      </div>
-      <div class="field">
-          <input type="text" name="">
-        </div>
-  </div>
+
+ <div class="ui small dentSelectModal modal">
+  <i class="close icon"></i>
+   <div class="ui header">
+     <i class="user icon"></i>Select Dentiste Type
+   </div>
+   <div class="content">
+    <div class="inline field">
+      <input type="radio" name="dent" value='Dentiste'>
+      <label>Dentiste</label>
+    </div>
+    <div class="inline field">
+      <input type="radio" name="dent" value='Chirurgiens'>
+      <label>Chirurgiens</label>
+    </div>
+    <div class="inline field">
+      <input type="radio" name="dent" value='Denturologiste'>
+      <label>Denturologiste</label>
+    </div>
+    <div class="ui axxium tiny button" onclick="setDentType();">Save</div>
+   </div>
  </div>
-</div> -->
+
 
  <div class="ui modalPayment fullscreen modal">
   <i class="close icon"></i>
@@ -3164,6 +3141,7 @@
      
         <!-- ==== Dentiste Modal -->
   <div id="div_dentiste" style="display: none;">
+    <form id="form_dentiste" class="dent" method="post">
     <div class="ui axxium form segment">
     <h4 class="ui horizontal divider header">DENTISTE</h4> 
       <label>Renseignements complémentaires Regie</label>
@@ -3173,32 +3151,32 @@
             <label>Prothése en acrylique</label>
             <div class="field">
               <label>No d'autorisation</label>
-              <input type="text" name="">
+              <input type="text" name="no_autorisation_dentiste">
             </div>
             <div class="field">
               <label>Date a'utorisation</label>
-              <input type="date" name="">
+              <input type="date" name="date_autorisation_dentiste">
             </div>
           </div>
           <div class="ui segment">
             <label>Traite,emt demtaire</label>
             <div class="field">
               <label>Type et raison</label>
-              <input type="text" name="">
+              <input type="text" name="type_raison_dentiste">
             </div>
             <div class="field">
               <label>Type et site</label>
-              <input type="text" name="">
+              <input type="text" name="type_site_dentiste">
             </div>
           </div>
             <div class="field">
               <label>Médicament consommé</label>
-              <input type="text" name="">
+              <input type="text" name="medicament_dentiste">
             </div>
             <div class="field">
               <label>Éléments de contexte</label>
              
-              <select  id="dropD_dentiste">
+              <select  id="dropD_dentiste" name="element_contexte_dentiste">
                 
                 <option>Acte posé plus souvent que convenu à l entente (1727)</option>
                 <option>Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
@@ -3224,8 +3202,8 @@
 
             </div>
             <div class="four wide field">
-              <label>Médicament consommé</label>
-              <input type="text" name="">
+              <label>Médicament mesurables</label>
+              <input type="text" name="mesurables_dentiste">
             </div>
 
         </div>
@@ -3234,45 +3212,45 @@
           <label>Lieu de référence</label>
           <div class="field">
             <label>Situation liée au lieu de réf.</label>
-            <input type="text" name="">
+            <input type="text" name="situation_lieu_dentiste">
           </div>
           <div class="ui form segment">
             <label>Identification du lieu</label>
             <div class="inline field">
-              <input type="radio" name="">
+              <input type="radio" name="identification_lieu_dentiste">
               <label>Lieu codifié á la Régie</label>
             </div>
             <div class="inline field">
-              <input type="radio" name="">
+              <input type="radio" name="lieu_codifie_dentiste">
               <label>Lieu non codifié</label>
             </div>
             <div class="three fields">
               <div class="field">
                 <label>Code postal</label>
-                <input type="text" name="">
+                <input type="text" name="postal_dentiste">
               </div>
               <div class="field">
                 <label>Code localité</label>
-                <input type="text" name="">
+                <input type="text" name="code_localite_dentiste">
               </div>
               <div class="field">
                 <label>No. bur.</label>
-                <input type="text" name="">
+                <input type="text" name="no_bur_dentiste">
               </div>
             </div>
           </div>
           <label>Type de lieu</label>
             <div class="three inline fields">
               <div class="field">
-                <input type="radio" name="">
+                <input type="radio" name="cabinet_dentiste">
                 <label>Cabinet</label>
               </div>
               <div class="field">
-                <input type="radio" name="">
+                <input type="radio" name="domicile_dentiste">
                 <label>Domicile</label>
               </div>
               <div class="field">
-                <input type="radio" name="">
+                <input type="radio" name="autre_dentiste">
                 <label>Autre</label>
               </div>
             </div>
@@ -3281,24 +3259,37 @@
             <label>Référant</label>
             <div class="field">
               <label>No du référant</label>
-              <input type="text" name="">
+              <input type="text" name="no_referant_dentiste">
             </div>
             <div class="two fields">
               <div class="field">
                 <label>Nom</label>
-                <input type="text" name="">
+                <input type="text" name="nom_dentiste">
               </div>
               <div class="field">
                 <label>Prénom</label>
-                <input type="text" name="">
+                <input type="text" name="prenom_dentiste">
               </div>
             </div>
             <div class="field">
               <label>Type de profession</label>
-              <input type="text" name="">
+              <input type="text" name="type_profession_dentiste">
             </div>
           </div>
-          <div class="ui axxium tiny button">Submit</div>
+          <button class="ui axxium button" type="submit" >Submit</button>
+        </form>
+
+        <script type="text/javascript">
+              $("#form_dentiste").on("submit", function(event) {
+              
+                event.preventDefault();
+                var moreInfoArray=$(this).serializeArray();
+                moreInfoArray_glbl=moreInfoArray;
+                $('.modalFactTableMore').modal('hide');
+                
+              });
+        </script>
+          
         </div>
       </div>
 
@@ -3308,6 +3299,7 @@
 
     <!-- == Chirugiean -->
     <div id="div_chirurgiens" style="display: none;">
+      <form id="form_chirurgiens">
         <div class="ui axxium form segment" >
           <h4 class="ui horizontal divider header">CHIRURGIENS</h4>
       <label>Renseignements complémentaires Regie (Chirguen)</label>
@@ -3317,31 +3309,31 @@
             <label>Prothése en acrylique</label>
             <div class="field">
               <label>No d'autorisation</label>
-              <input type="text" name="">
+              <input type="text" name="atrsn_chirgien">
             </div>
             <div class="field">
               <label>Date a'utorisation</label>
-              <input type="date" name="">
+              <input type="date" name="date_chirgien">
             </div>
           </div>
           <div class="ui segment">
             <label>Traite,emt demtaire</label>
             <div class="field">
               <label>Type et raison</label>
-              <input type="text" name="">
+              <input type="text" name="type_rsn_chirgien">
             </div>
             <div class="field">
               <label>Type et site</label>
-              <input type="text" name="">
+              <input type="text" name="site_chirgien">
             </div>
           </div>
             <div class="field">
               <label>Médicament consommé</label>
-              <input type="text" name="">
+              <input type="text" name="medicament_chirgien">
             </div>
             <div class="field">
               <label>Éléments de contexte</label>
-              <select id="dropD_chirurgiens">
+              <select id="dropD_chirurgiens" name="elemnt_contx_chirgien">
 
                 <option> Acte posé plus souvent que convenu à l entente (1735)</option>
                 <option> Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (1734)</option>
@@ -3362,8 +3354,8 @@
               </select>
             </div>
             <div class="four wide field">
-              <label>Médicament consommé</label>
-              <input type="text" name="">
+              <label>Elements mesurables</label>
+              <input type="text" name="elmnt_msrble_chirgien">
             </div>
 
         </div>
@@ -3372,45 +3364,45 @@
           <label>Lieu de référence</label>
           <div class="field">
             <label>Situation liée au lieu de réf.</label>
-            <input type="text" name="">
+            <input type="text" name="situatn_lie_chirgien">
           </div>
           <div class="ui form segment">
             <label>Identification du lieu</label>
             <div class="inline field">
-              <input type="radio" name="">
+              <input type="radio" name="lieu_chirgien">
               <label>Lieu codifié á la Régie</label>
             </div>
             <div class="inline field">
-              <input type="radio" name="">
+              <input type="radio" name="lieu_ncodife_chirgien">
               <label>Lieu non codifié</label>
             </div>
             <div class="three fields">
               <div class="field">
                 <label>Code postal</label>
-                <input type="text" name="">
+                <input type="text" name="postal_chirgien">
               </div>
               <div class="field">
                 <label>Code localité</label>
-                <input type="text" name="">
+                <input type="text" name="code_chirgien">
               </div>
               <div class="field">
                 <label>No. bur.</label>
-                <input type="text" name="">
+                <input type="text" name="no_bur_chirgien">
               </div>
             </div>
           </div>
           <label>Type de lieu</label>
             <div class="three inline fields">
               <div class="field">
-                <input type="radio" name="">
+                <input type="radio" name="cabinet_chirgien">
                 <label>Cabinet</label>
               </div>
               <div class="field">
-                <input type="radio" name="">
+                <input type="radio" name="domicile_chirgien">
                 <label>Domicile</label>
               </div>
               <div class="field">
-                <input type="radio" name="">
+                <input type="radio" name="autre_chirgien">
                 <label>Autre</label>
               </div>
             </div>
@@ -3419,24 +3411,34 @@
             <label>Référant</label>
             <div class="field">
               <label>No du référant</label>
-              <input type="text" name="">
+              <input type="text" name="referamt_chirgien">
             </div>
             <div class="two fields">
               <div class="field">
                 <label>Nom</label>
-                <input type="text" name="">
+                <input type="text" name="nom_chirgien">
               </div>
               <div class="field">
                 <label>Prénom</label>
-                <input type="text" name="">
+                <input type="text" name="prenom_chirgien">
               </div>
             </div>
             <div class="field">
               <label>Type de profession</label>
-              <input type="text" name="">
+              <input type="text" name="type_profession_chirgien">
             </div>
           </div>
-          <div class="ui axxium tiny button">Submit</div>
+          <button class="ui axxium tiny button" type="submit">Submit</div>
+        </form>
+              <script type="text/javascript">
+              $("#form_chirurgiens").on("submit", function(event) {
+                event.preventDefault();
+                var moreInfoArray=$(this).serializeArray();
+                moreInfoArray_glbl=moreInfoArray;
+                $('.modalFactTableMore').modal('hide');
+                
+              });
+        </script>
         </div>
       </div>
 
@@ -3446,20 +3448,21 @@
 
     <!--  Denturologiste-->
     <div id="div_denturologiste" style="display: none;">
+      <form id="form_denturologiste" > 
     <div class="ui axxium form segment"> 
       <h4 class="ui horizontal divider header">DENTUROLOGISTE</h4>
       <label>Prothése en acrylique</label>
       <div class="field">
         <label>No d'autorisation</label>
-        <input type="text" name="">
+        <input type="text" name="autrstn_dentur">
       </div>
       <div class="field">
         <label>Date d'autorisation</label>
-        <input type="date" name="">
+        <input type="date" name="date_aut_dentur">
       </div>
       <div class="field">
         <label>Éléments de contexte</label>
-        <select  id="dropD_denturologiste">
+        <select  id="dropD_denturologiste" name="element_context_dentur">
           <option>Remplacement d une prothèse pour perte ou bris (1740)</option>
           <option>Remplacement de deux prothèses pour perte ou bris (1741)</option>
           <option>Séance différente (1747)</option>
@@ -3468,9 +3471,19 @@
 
       </div>
   </div>
-  <div class="ui axxium tiny button">Submit</div>
+  <button class="ui axxium tiny button" type="submit">Submit</button>
+</form>
+      <script type="text/javascript">
+              $("#form_denturologiste").on("submit", function(event) {
+                
+                event.preventDefault();
+                var moreInfoArray=$(this).serializeArray();
+                moreInfoArray_glbl=moreInfoArray;
+                $('.modalFactTableMore').modal('hide');
+                
+              });
+        </script>
     <!-- ===xx=== -->
-
 
       </div>
       
@@ -4877,6 +4890,7 @@
   var textS = "";
   var keyNumPIN = "";
   var qParams = { };
+  var dent_Type='';
 
   $('#context2 .menu .item').tab({
     // tabs are inside of this element
@@ -5113,6 +5127,9 @@ function changeLang(x)
     // $("div").addClass("trn");
     translator.lang(x);
   }
+
+
+
 
   </script>
 

@@ -2,7 +2,8 @@
     var ExtentDict={
       
         "DOSSIER Patient" : { 
-        en: " "
+        en: "File Patient "
+        
       },
       //DOSSIER Patient - Sub Tabs
       "Creer un dossier" : {

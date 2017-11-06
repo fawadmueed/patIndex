@@ -1,11 +1,18 @@
 
-  var dent_Type; //will have Type of Dentist
+   var moreInfoArray_glbl="";
 
- // ====== factureTable last TD Enter key Monitor
+ 
 
 $(document).ready(function(){
 
-  
+  // $("#form_denturologiste").on("submit", function(event) {
+  //             alert('Hiii');
+  //               event.preventDefault();
+  //               var moreInfoArray=$(this).serializeArray();
+  //               console.log(moreInfoArray);
+  //             });
+
+  // ====== factureTable last TD Enter key Monitor
   $('.firstTdProd').keypress(function (e)
             {
               if(e.which == 13)
@@ -16,52 +23,9 @@ $(document).ready(function(){
               return e.which!=13;
 
             })
-
-//=== Populate modal default with Dentiste Div
-   // var thisVal=$('#modFactTabl_dropDown').val();
-   // if(thisVal=='Dentiste')
-   //          {
-   //            var data=$('#div_dentiste').html();
-   //            $('#modal_factTbl_more').html(data);
-   //          }
-            
-  // ==Modal DropDown 
-
-   // $('#modFactTabl_dropDown').dropdown().change(function() {
-   //          var thisVal=$('#modFactTabl_dropDown').val();
-          
-
-   //          if(thisVal=='Dentiste')
-   //          {
-   //            var data=$('#div_dentiste').html();
-   //            $('#modal_factTbl_more').html(data);
-   //          }
-
-   //          if(thisVal=='Chirurgiens')
-   //          {
-
-   //          var data=$('#div_chirurgiens').html();
-   //          $('#modal_factTbl_more').html(data);
-   //          }
-
-   //          if(thisVal=='Denturologiste')
-   //          {
-   //            var data=$('#div_denturologiste').html();
-   //            $('#modal_factTbl_more').html(data);
-   //          }
-   //          // if(thisVal=='État de compte')
-   //          // {
-
-   //          // }
-
-
-   //        }) ;
 });
-//===xx
 
 
-
-// ======== For table with id= factureTable 
 function newRecordFact(){
 
     var tblBody=$('#factTableBody');
@@ -103,7 +67,10 @@ function getAllTrData(){
 var mytrs=$('#factTableBody tr');
 // console.log(mytrs);
   $.each(mytrs, function(idx,val){
+    
     var myObjects={};
+    // For each TR
+
     var mytds=$(val).children();
 
     $.each(mytds,function(idx,val){
@@ -115,15 +82,15 @@ var mytrs=$('#factTableBody tr');
       myObjects[key]=value;
 
       })
-      console.log(myObjects);
-
       arrGrilleDeFacturation.push(myObjects);
+});
+  if(moreInfoArray_glbl!=""){
+    arrGrilleDeFacturation.push(moreInfoArray_glbl );
+    }
+  console.log(arrGrilleDeFacturation);  
+  // console.log(moreInfoArray_glbl  )
+  getMoreInfo();
 
-      // console.log(myArray);
-
-
-  });
-  console.log(arrGrilleDeFacturation);
 }
 
 function findTableData(x){
@@ -141,32 +108,37 @@ function findTableData(x){
   //==Specific td with class 
   var tdByAttribute=row.find("td[data-target='Type']").text();
 
-  dent_Type=tdByAttribute;
-  
-
   //CALL MODAL
   modFactTableMore();  
+}
+
+function getMoreInfo(){
+  
+  // var anyData={};
+  // anyData['hello']='fawad';
+  // console.log(anyData); 
+
+
 }
 
 //===Modal
 
 function modFactTableMore()
 { 
-    
+   
    switch(dent_Type){
       
-      case 'A':
-        
+      case 'Dentiste':
               var data=$('#div_dentiste').html();
               $('#modal_factTbl_more').html(data);
               break;
 
-      case 'B':
+      case 'Chirurgiens':
       
               var data=$('#div_chirurgiens').html();
               $('#modal_factTbl_more').html(data);
               break;
-      case 'C':
+      case 'Denturologiste':
       
               var data=$('#div_denturologiste').html();
               $('#modal_factTbl_more').html(data);
@@ -178,5 +150,24 @@ function modFactTableMore()
   $('.modalFactTableMore').modal('show');
 }
 
+function checkDentType(){
+  // will check any type for Dentist Selected - 
+  
+  if(dent_Type!=''){
+    return;
+  }
+  else{
+    $('.dentSelectModal').modal('show');
+  }
 
+}
 
+function setDentType(){
+
+  dent_Type=$("input[name*='dent']:checked").val();
+  $('.dentSelectModal').modal('hide');
+
+}
+function closeModal(){
+  $('.modalFactTableMore').modal('hide');
+}
