@@ -1,9 +1,10 @@
 
-   var moreInfoArray_glbl="";
-
- 
+  var arrGrilleDeFacturation=[];
+  var arrGrilleDeFacturation_forms=[];
 
 $(document).ready(function(){
+
+  newRecordFact();
 
   // $("#form_denturologiste").on("submit", function(event) {
   //             alert('Hiii');
@@ -13,6 +14,7 @@ $(document).ready(function(){
   //             });
 
   // ====== factureTable last TD Enter key Monitor
+
   $('.firstTdProd').keypress(function (e)
             {
               if(e.which == 13)
@@ -29,7 +31,8 @@ $(document).ready(function(){
 function newRecordFact(){
 
     var tblBody=$('#factTableBody');
-    tblRow=$('<tr>');
+    fact_tbl_row_id=fact_tbl_row_id+1;
+    tblRow=$('<tr>').attr('id',fact_tbl_row_id);
     var fields=['id','Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod'];
     for(i=0;i<9;i++)
       {
@@ -70,9 +73,12 @@ var mytrs=$('#factTableBody tr');
     
     var myObjects={};
     // For each TR
-
     var mytds=$(val).children();
 
+    var key='row_id';
+    var value=$(val).attr('id');
+    myObjects[key]=value;
+    
     $.each(mytds,function(idx,val){
 
 
@@ -82,34 +88,20 @@ var mytrs=$('#factTableBody tr');
       myObjects[key]=value;
 
       })
+
       arrGrilleDeFacturation.push(myObjects);
 });
-  if(moreInfoArray_glbl!=""){
-    arrGrilleDeFacturation.push(moreInfoArray_glbl );
-    }
-  console.log(arrGrilleDeFacturation);  
+  console.log(arrGrilleDeFacturation); 
+  console.log(arrGrilleDeFacturation_forms); 
   // console.log(moreInfoArray_glbl  )
   getMoreInfo();
 
 }
 
 function findTableData(x){
-  
-   //==Closest Row
-  var row=$(x).closest('tr');
- 
- //==All Td's
-  var tds=row.find('td');
-
-  //==Specific nth-td value
-  var tdSpc=row.find("td:nth-child(1)").text();
-  // console.log(tdSpc);
-    
-  //==Specific td with class 
-  var tdByAttribute=row.find("td[data-target='Type']").text();
-
-  //CALL MODAL
-  modFactTableMore();  
+  //Get id of the Row Working
+  var row_id=$(x).closest('tr').attr('id'); 
+  modFactTableMore(row_id);  
 }
 
 function getMoreInfo(){
@@ -123,25 +115,31 @@ function getMoreInfo(){
 
 //===Modal
 
-function modFactTableMore()
+function modFactTableMore(row_id)
 { 
    
    switch(dent_Type){
       
       case 'Dentiste':
               var data=$('#div_dentiste').html();
-              $('#modal_factTbl_more').html(data);
+              $('#modal_factTbl_more').html(data); 
+              $('form #rowId_dent').val(row_id); //Assign id of Row Working - to the Form 
+              console.log($('form #rowId_dent').val());
               break;
 
       case 'Chirurgiens':
       
               var data=$('#div_chirurgiens').html();
               $('#modal_factTbl_more').html(data);
+              $('form #rowId_chir').val(row_id); //Assign id of Row Working - to the Form 
+              console.log($('form #rowId_chir').val());
               break;
       case 'Denturologiste':
       
               var data=$('#div_denturologiste').html();
               $('#modal_factTbl_more').html(data);
+              $('form #rowId_dentu').val(row_id); //Assign id of Row Working - to the Form 
+              console.log($('form #rowId_dentu').val());
               break;
       default:
               $('#modal_factTbl_more').html('<h1>Error Aquiring the Dentist Type</h1>');

@@ -415,11 +415,11 @@
                            <div class="two fields">
                               <div class="ten wide field">
                                 <label>RAMQ</label>
-                                <input type="text" id="">
+                                <input type="text" id="ramq_no">
                               </div>
                             <div class="six wide field">
                               <label>Expiration</label>
-                              <input type="text" id="">
+                              <input type="text" id="ramq_exp">
                             </div>
                           </div>
                           <div class="three fields">
@@ -749,7 +749,8 @@
                           <label>Type 1</label>
                           <div class="four wide field">
 
-                            <select value="CAS" placeholder="CAS" class="ui fluid selection  dropdown insurance_select">
+                            <select value="CAS" placeholder="Select Type" class="ui fluid selection dropdown ">
+                              <option value="0" selected="selected"></option>
                               <option value="1">CAS</option>
                               <option value="2">Desjardin</option>
 
@@ -1331,8 +1332,8 @@
                         <!-- Note: Element contecxtuels : Displays Number of associated text / decription  -->
                       </thead>
                     <tbody id="factTableBody">
-                        <tr id="1" class="">
-                          <td contenteditable="true" data-target="Type" ></td>
+                       <!--  <tr id="1" class="">
+                          <td contenteditable="true" data-target="Type"></td>
                           <td contenteditable="true" data-target="Dent"></td>
                           <td contenteditable="true" data-target="Surface"></td>
                           <td contenteditable="true" data-target="Code"></td>
@@ -1342,7 +1343,7 @@
                           <td contenteditable="true" data-target="Total"></td>
                           <td contenteditable="true" data-target="Prod" class="firstTdProd"></td>
                           <td><div class="ui axxium tiny button" onclick="findTableData(this)" >More!</div></td>
-                        </tr>
+                        </tr> -->
                     </tbody>
                   </table>
                 </div>
@@ -2491,7 +2492,7 @@
 
     <div class="content">
       <div class="ui axxium form segment" >
-          <select class="ui fluid selection dropdown">
+          <select class="ui fluid selection dropdown references">
             <i class="dropdown icon"></i>
             <span class="default text">Select</span>
               <option value=" " ></option>
@@ -3053,7 +3054,7 @@
  </div>
     <script type="text/javascript">
 
-    $(".ui.fluid.selection.dropdown").change(function(){
+    $(".ui.fluid.selection.dropdown.references").change(function(){
       sel();
     });
 
@@ -3148,6 +3149,8 @@
       <div class="ui grid">
         <div class="eight wide column">
           <div class="ui segment">
+            <input type="text" name="row_id" id="rowId_dent" style="display: none">
+
             <label>Prothése en acrylique</label>
             <div class="field">
               <label>No d'autorisation</label>
@@ -3280,11 +3283,11 @@
         </form>
 
         <script type="text/javascript">
+
               $("#form_dentiste").on("submit", function(event) {
-              
                 event.preventDefault();
                 var moreInfoArray=$(this).serializeArray();
-                moreInfoArray_glbl=moreInfoArray;
+                arrGrilleDeFacturation_forms.push(moreInfoArray);
                 $('.modalFactTableMore').modal('hide');
                 
               });
@@ -3301,6 +3304,7 @@
     <div id="div_chirurgiens" style="display: none;">
       <form id="form_chirurgiens">
         <div class="ui axxium form segment" >
+          <input type="text" name="row_id" id="rowId_chir" style="display: none">
           <h4 class="ui horizontal divider header">CHIRURGIENS</h4>
       <label>Renseignements complémentaires Regie (Chirguen)</label>
       <div class="ui grid">
@@ -3434,7 +3438,7 @@
               $("#form_chirurgiens").on("submit", function(event) {
                 event.preventDefault();
                 var moreInfoArray=$(this).serializeArray();
-                moreInfoArray_glbl=moreInfoArray;
+                arrGrilleDeFacturation_forms.push(moreInfoArray);
                 $('.modalFactTableMore').modal('hide');
                 
               });
@@ -3450,6 +3454,7 @@
     <div id="div_denturologiste" style="display: none;">
       <form id="form_denturologiste" > 
     <div class="ui axxium form segment"> 
+      <input type="text" name="row_id" id="rowId_dentu" style="display: none">
       <h4 class="ui horizontal divider header">DENTUROLOGISTE</h4>
       <label>Prothése en acrylique</label>
       <div class="field">
@@ -3478,7 +3483,8 @@
                 
                 event.preventDefault();
                 var moreInfoArray=$(this).serializeArray();
-                moreInfoArray_glbl=moreInfoArray;
+
+                arrGrilleDeFacturation_forms.push(moreInfoArray);
                 $('.modalFactTableMore').modal('hide');
                 
               });
@@ -4785,7 +4791,9 @@
   </script>
 
   <script>
-  var arrGrilleDeFacturation=[];
+  var fact_tbl_row_id=0;
+  var arrGrilleDeFacturation=[]; 
+  var arrGrilleDeFacturation_forms=[]; 
   var lang = getLang();
   var translator = $('body').translate({lang:"", t:dict});
   var curPatient = "";
