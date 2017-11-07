@@ -1,17 +1,19 @@
-var strServicePath = "http://ramqtest.cloudapp.net/RamqTest.svc/ajaxEndpoint/SoumissionDemandesPaiement";
 
 //var arrGrilleDeFacturation = getarrGrilleDeFacturation(); //for test only. in production arrGrilleDeFacturation should be global;
 function SoumissionDemandesPaiement()
 {
+    //TODO: Remove this call when ramqCredentials functionality will be implemented.
+    RamqGetCredentials(pClinicId);
+
     var objSoumissionDemandesPaiementData = SoumissionDemandesPaiementGetData();
     if (objSoumissionDemandesPaiementData != null)
     {
         var operationName = "Paiement";
         var jsonData = getData(operationName, objSoumissionDemandesPaiementData);
-
+        var methodName = "api/RamqWebApi/PostPaymentRequest";
         $.ajax({
             type: "POST",
-            url: strServicePath,
+            url: globRamqApiPath + methodName,
             ProcessData: false,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -47,7 +49,7 @@ function SoumissionDemandesModification()
 
     $.ajax({
         type: "POST",
-        url: strServicePath,
+        url: globRamqApiPath,
         ProcessData: false,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
@@ -78,7 +80,7 @@ function SoumissionDemandesAnnulation() {
 
         $.ajax({
             type: "POST",
-            url: strServicePath,
+            url: globRamqApiPath,
             ProcessData: false,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -105,10 +107,7 @@ function SoumissionDemandesAnnulation() {
 
 function getData(operationName, _objData)
 {
-    var idUtilisateur, motDePasse, xmlAEnvoyer, data;
-    var arrCredentials = getCredentials();
-    idUtilisateur = arrCredentials[0];
-    motDePasse = arrCredentials[1];
+    var xmlAEnvoyer, data;
 
     if (operationName == 'Paiement')
     {
@@ -123,27 +122,27 @@ function getData(operationName, _objData)
         xmlAEnvoyer = getSoumissionDemandesAnnulationXML();
     }
     
-    data = '{"idUtilisateur":"' + idUtilisateur + '","motDePasse":"' + motDePasse + '","xmlAEnvoyer":"' + xmlAEnvoyer + '"}';
+    data = '{"idUtilisateur":"' + globRamqObjCredentials.MachineId + '","motDePasse":"' + globRamqObjCredentials.MachineIdPass + '","xmlAEnvoyer":"' + xmlAEnvoyer + '"}';
     return data;
 }
 
-function getCredentials()
-{
-    var arr = [];
-    var jsonCredentials = '["AGR18011K","rT_Xw^9M"]';// TODO: getCredentials from DB
-    try
-    {
-        arr = JSON.parse(jsonCredentials); 
-    }
-    catch(Exception){
-        return null;
-    }
+//function getCredentials()
+//{
+//    var arr = [];
+//    var jsonCredentials = '["AGR18011K","rT_Xw^9M"]';// TODO: getCredentials from DB
+//    try
+//    {
+//        arr = JSON.parse(jsonCredentials); 
+//    }
+//    catch(Exception){
+//        return null;
+//    }
 
-    if(arr.length == 2)
-        return arr;
-    else 
-        return null;
-}
+//    if(arr.length == 2)
+//        return arr;
+//    else 
+//        return null;
+//}
 
 
 function getSoumissionDemandesPaimentXML(_objData) {
@@ -153,7 +152,7 @@ function getSoumissionDemandesPaimentXML(_objData) {
     var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
     '<dem_paimt xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
     //'<no_dem_ext>' + $('#no_dem_ext').val() + '</no_dem_ext>' + //?
-    '<no_dem_ext>' + new Date().getTime() + '</no_dem_ext>' +// for test only
+    '<no_dem_ext>' + new Date().getTime() + '</no_dem_ext>' +//TODO: implement algorithm for no_dem_ext
     '<logcl_fact>' +
         '<no_devpr_logcl>' + _objData.NoDevprLogcl + '</no_devpr_logcl>' + //?
         '<nom_devpr_logcl>' + _objData.NomDevprLogcl + '</nom_devpr_logcl>' + //?

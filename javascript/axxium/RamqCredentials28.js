@@ -25,10 +25,9 @@
    
 
 */
-var globRamqMachineId;
-var globRamqUserName;
+
 var globServerUrl = 'http://144.217.219.194/axxium/';
-var globApiAddress = "http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/";
+var globRamqApiPath = "http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/";
 var globRamqObjCredentials;
 //var globClinicId;
 
@@ -126,7 +125,7 @@ function RamqUpdateMachineId() {
     var _data = JSON.stringify(dataJSON);
     $.ajax({
         type: "POST",
-        url: globApiAddress + 'api/RamqWebApi/PostChangePassword',
+        url: globRamqApiPath + 'api/RamqWebApi/PostChangePassword',
         data: _data,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
