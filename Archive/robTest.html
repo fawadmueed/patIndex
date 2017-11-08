@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>RobTest</title>
+	<meta charset="utf-8" />
+    <title>Semantic UI CDN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js"></script>
+</head>
+<body>
+	<div class="ui container">
+		<div class="ui teal button" onclick="saveFile();">PRESS!</div>
+		<div class="ui teal button" onclick="getJSON();">GET JSON!</div>
+
+	</div>
+
+	<script type="text/javascript">
+		function saveFile(){
+
+			var patLabo= {
+            "clinicId" : 5555,
+            "MachineId" :"CCC12123",
+            "MachineIdPass" : "Passasss1"
+            };
+
+			$.post("allScriptsv1.py", {tx: "uploadJSONsub", sub: "params", name: "222", json: JSON.stringify(patLabo)}, function(result){
+
+				console.log(result);
+              });
+		}
+
+		function getJSON(){
+			$.get("allScriptsv1.py?tx=getJSONsub&sub=params&code=222", function(data, status){
+                console.log(data);
+          });
+		}
+	</script>
+
+</body>
+</html>
