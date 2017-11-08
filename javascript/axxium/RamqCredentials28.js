@@ -32,9 +32,9 @@ var globRamqObjCredentials;
 //var globClinicId;
 
 //TODO: call this function from PageLoad event.
-$(function () {
-    RamqGetClinicIdFromUrl();
-});
+//$(function () {
+//    RamqGetClinicIdFromUrl();
+//});
 
 function RamqGetClinicIdFromUrl()
 {
