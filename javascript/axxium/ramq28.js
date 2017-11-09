@@ -123,7 +123,7 @@ function RamqGetData(operationName, _objData)
 }
 
 
-
+// Create common part for all specialists
 function RamqGetSoumissionDemandesPaimentXML(_arrData) {
     ////For test only:
     //var d = new Date();
@@ -151,14 +151,14 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
         '<typ_moda_paimt>' + _arrData[1].TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
     '</moda_paimt>' +
     '<liste_fact>' +
-        RamqGetListe_factXML(_arrData) +
+        RamqGetListe_factXML(_arrData, "Dentiste") +
     '</liste_fact>' +
 '</dem_paimt>';
     return xml;
 
 }
 
-function RamqGetListe_factXML(_arrData)
+function RamqGetListe_factXML(_arrData, dent_Type)
 {
     switch(dent_Type) {
         case "Dentiste":
@@ -186,6 +186,7 @@ function RamqGetListe_factXML(_arrData)
     return xml;
 }
 
+// Create part of xml for Chirg Denti
 function RamqGetListFactChirgDenti(_arrData)
 {
     var objDataFromVisionR = _arrData[1];
@@ -207,7 +208,7 @@ function RamqGetListFactChirgDenti(_arrData)
                             '<typ_situ_consi>' + objDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
                             '<typ_id_pers>' + objDataFromVisionR.TypIdPers + '</typ_id_pers>' + //1 : NAM RAMQ
                             '<id_pers>' + objDataFromVisionR.IdPers + '</id_pers>' + // NAM
-                        '</pers_patnt_avec_idt>' +
+                        '</pers_patnt_avec_idt>' + //TODO: implement case if user doesn't have NAM
                     '</liste_pers_objet_fact>' +
                     '<ind_fact_assoc_dr>' + objDataFromVisionR.IndFactAssosDr + '</ind_fact_assoc_dr>' + //? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
                     '<liste_ligne_fact_serv_denta_chirg_denti>' +
@@ -216,49 +217,101 @@ function RamqGetListFactChirgDenti(_arrData)
                 '</fact_serv_denta_chirg_denti_1_1_0>';
 }
 
-function RamqGetListe_ligne_fact_serv_denta_chirg_denti(pObjBillData)
+function RamqGetListe_ligne_fact_serv_denta_chirg_denti(pArrBillData)
 {
     var xml = '';
     var ligneNum = 1;
 
-    if (pObjBillData.Type == 'AMQ' || pObjBillData.Type == 'BES')
+    for (var i = 0; i < pArrBillData.length; i++)
     {
-        xml = xml + '<ligne_fact_serv_denta_chirg_denti>' +
-                        '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
-                        '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
-                        '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
-                        '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
-                        '<cod_role>' + '1' + '</cod_role>' + //TODO: Where from? Data1 : Responsable 4 : Assistant
-                        '<info_serv_denta>' +
-                            '<no_dent>' + RamqGetCurrentDate.Dent + '</no_dent>' +
-                            '<liste_surf_dent_trait>' +
-                                RamqGetListe_surf_dent_trait(RamqGetCurrentDate.Surface) +
-                            '</liste_surf_dent_trait>' +
-                            '<rais_trait_denta>'+
-							    '<typ_id_rais_trait_denta>' + '3' + '</typ_id_rais_trait_denta>' + //TODO: is this constant?
-							    '<id_rais_trait_denta>' + pObjBillData.type_raison_dentiste + '</id_rais_trait_denta>' +
-						    '</rais_trait_denta>'+
-						'<site_trait_denta>'
-							'<typ_id_site_trait_denta>'+'1'+'</typ_id_site_trait_denta>'+ //TODO: is this constant?
-							'<id_site_trait_denta>' + pObjBillData.type_site_dentiste + '</id_site_trait_denta>' +
-						'</site_trait_denta>' +
-                        '<info_med_consm>'+
-						    '<typ_med_consm>'+'1'+'</typ_med_consm>' + //TODO: is this constant?
-						    '<liste_med_consm>'+ //TODO: we have only one field fo list?
-							    '<med_consm>'+
-								    '<typ_id_med_consm>'+'1'+'</typ_id_med_consm>'+//TODO: is this constant?
-								    '<id_med_consm>'+pObjBillData.medicament_dentiste+'</id_med_consm>'+ 
-							    '</med_consm>'+
-						    '</liste_med_consm>'+
-						'</info_med_consm>'
-        // Continue here
-                        '</info_serv_denta>' +
-                        '<mnt_prcu_patnt>' + "0" + '</mnt_prcu_patnt>' +//?
-                    '</ligne_fact_serv_denta_chirg_denti>';
-        ligneNum++;
+        var pObjBillData = pArrBillData[i];
+        if (pObjBillData.Type == 'AMQ' || pObjBillData.Type == 'BES')
+        {
+            xml = xml + '<ligne_fact_serv_denta_chirg_denti>' +
+                            '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
+                            '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                            '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
+                            '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
+                            '<cod_role>' + '1' + '</cod_role>' + //TODO: Where from? Data1 : Responsable 4 : Assistant
+                            '<info_serv_denta>' +
+                                '<no_dent>' + RamqGetCurrentDate.Dent + '</no_dent>' +
+                                '<liste_surf_dent_trait>' +
+                                    RamqGetListe_surf_dent_trait(RamqGetCurrentDate.Surface) +
+                                '</liste_surf_dent_trait>' +
+                                //optional
+                                '<rais_trait_denta>' +
+                                    '<typ_id_rais_trait_denta>' + '3' + '</typ_id_rais_trait_denta>' + //TODO: is this constant?
+                                    '<id_rais_trait_denta>' + pObjBillData.type_raison_dentiste + '</id_rais_trait_denta>' +
+                                '</rais_trait_denta>' +
+                                //Optional
+                                '<site_trait_denta>'
+                                    '<typ_id_site_trait_denta>' + '1' + '</typ_id_site_trait_denta>' + //TODO: is this constant?
+                                    '<id_site_trait_denta>' + pObjBillData.type_site_dentiste + '</id_site_trait_denta>' +
+                                '</site_trait_denta>' +
+                                //optional
+                                '<info_med_consm>' +
+                                    '<typ_med_consm>' + '1' + '</typ_med_consm>' + //TODO: is this constant?
+                                    '<liste_med_consm>' + //TODO: we have only one field fo list?
+                                        '<med_consm>' +
+                                            '<typ_id_med_consm>' + '1' + '</typ_id_med_consm>' +//TODO: is this constant?
+                                            '<id_med_consm>' + pObjBillData.medicament_dentiste + '</id_med_consm>' +
+                                        '</med_consm>' +
+                                    '</liste_med_consm>' +
+                                '</info_med_consm>'
+                            '</info_serv_denta>' +
+                                //optional
+                                '<liste_elm_mesur>'+
+                                    '<elm_mesur>'+
+                                        '<cod_elm_mesur>'+'1'+'</cod_elm_mesur>'//TODO: is this constant?
+            '<val_mes>'+ pObjBillData.mesurables_dentiste+'</val_mes>'+ //TODO: we have only one field fo list?
+            '</elm_mesur>'+
+            '</liste_elm_mesur>' +
+            '<liste_elm_contx>' +
+                '<elm_contx>'+
+                    '<cod_elm_contx>' + pObjBillData.element_contexte_dentiste + '</cod_elm_contx>' +
+                '</elm_contx>'+
+            '</liste_elm_contx>' +
+            '<lieu_en_refre>'+
+        '<typ_refre_lieu>'+ '10'+'</typ_refre_lieu>'+ //TODO: where  from get this data?
+        '<liste_lieu_refre>'+
+          '<lieu_refre_phys>' +
+            '<typ_id_lieu_phys>'+'1'+'</typ_id_lieu_phys>'+
+            '<id_lieu_phys>'+'id_lieu_p1'+'</id_lieu_phys>'+
+            '<no_sect_activ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />'+
+          '</lieu_refre_phys>'+
+          '<lieu_refre_geo>'+
+            '<typ_id_lieu_geo>'+2+'</typ_id_lieu_geo>'+
+            '<id_lieu_geo>'+id_lieu_g1+'</id_lieu_geo>'+
+            '<typ_lieu_geo>'+C+'</typ_lieu_geo>'+
+            '<no_bur xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true" />'+
+          '</lieu_refre_geo>'+
+          '<lieu_refre_phys>'+
+            '<typ_id_lieu_phys>'+1+'</typ_id_lieu_phys>'+
+            '<id_lieu_phys>'+id_lieu_p2+'</id_lieu_phys>'+
+            '<no_sect_activ>'+1+'</no_sect_activ>'+
+          '</lieu_refre_phys>'+
+        '</liste_lieu_refre>'+
+      '</lieu_en_refre>' +
+    '<refre_autre_prof>'+
+        '<typ_refre_autre_prof>'+1+'</typ_refre_autre_prof>'+
+        '<info_prof_refre>'+
+            '<prof_refre_connu>'+
+            '<typ_id_prof>'+1+'</typ_id_prof>'+
+            '<id_prof>'+id_prof1+'</id_prof>'+
+            '</prof_refre_connu>'+
+        '</info_prof_refre>'+
+        '</refre_autre_prof>'+
+
+                                    // Continue here
+                                    
+                                    '<mnt_prcu_patnt>' + "0" + '</mnt_prcu_patnt>' +//?
+                                '</ligne_fact_serv_denta_chirg_denti>';
+            ligneNum++;
+        }
     }
      return xml;
 }
+
 
 function RamqGetListe_surf_dent_trait(strSurf)
 {
