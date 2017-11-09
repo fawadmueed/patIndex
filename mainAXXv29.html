@@ -34,6 +34,7 @@
   <script src="javascript/axxium/paro20.js"></script>
   <script src="javascript/axxium/labos22.js"></script>
   <script src="javascript/axxium/modals-facturation.js"></script>
+  <script src="javascript/axxium/factTable_validation.js"></script>
 
 
   <!-- Translation File & Dictionary English French -->
@@ -411,16 +412,16 @@
                  </div>
 
                   <div class="two column row">
-                    <div class="seven wide column ">
+                    <div class="eight wide column ">
                       <div class="ui form segment">
                            <div class="two fields">
                               <div class="ten wide field">
                                 <label>RAMQ</label>
                                 <input type="text" id="ramq_no">
                               </div>
-                            <div class="six wide field">
+                            <div class="field">
                               <label>Expiration</label>
-                              <input type="text" id="ramq_exp">
+                              <input type="date" id="ramq_exp">
                             </div>
                           </div>
                           <div class="three fields">
@@ -440,7 +441,7 @@
 
                       </div>
                     </div>
-                    <div class="nine wide column ">
+                    <div class="eight wide column ">
 
                       <div class="ui form segment">
                         <div class="two fields">
@@ -750,9 +751,9 @@
                           <label>Type 1</label>
                           <div class="four wide field">
 
-                            <select value="CAS" placeholder="Select Type" class="ui fluid selection dropdown ">
-                              <option value="0" selected="selected"></option>
-                              <option value="1">CAS</option>
+                            <select value="CAS" placeholder="Select Type" class="ui fluid selection dropdown " id="ramq_select">
+                              <option value="0" ></option>
+                              <option value="1" selected="selected">CAS</option>
                               <option value="2">Desjardin</option>
 
                             </select>
@@ -3182,25 +3183,25 @@
              
               <select  id="dropD_dentiste" name="element_contexte_dentiste">
                 
-                <option>Acte posé plus souvent que convenu à l entente (1727)</option>
-                <option>Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
-                <option>Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
-                <option>Mise en place de la première plaque de reconstruction (37)</option>
-                <option>Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
-                <option>Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
-                <option>Patient sous anesthésie générale (1724)</option>
-                <option>Remplacement d une prothèse pour perte ou bris (41)</option>
-                <option>Remplacement de deux prothèses pour perte ou bris (1723)</option>
-                <option>Séance différente (1746)</option>
-                <option>Service dont la complexité est inhabituelle (34)</option>
-                <option>Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
-                <option>Site différent (1749)</option>
-                <option>Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
-                <option>Soins d urgence (1725)</option>
-                <option>Soins post-opératoire confiés à un autre dentiste (35)</option>
-                <option>Soins post-opératoire confiés par un autre dentiste (36)</option>
-                <option>Suite à un traumatisme (1744)</option>
-                <option>Suite à une malformation osseuse (1729)</option>
+                <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
+                <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
+                <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                <option value="1724">Patient sous anesthésie générale (1724)</option>
+                <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                <option value="1746">Séance différente (1746)</option>
+                <option value="34">Service dont la complexité est inhabituelle (34)</option>
+                <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                <option value="1749">Site différent (1749)</option>
+                <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                <option value="1725">Soins d urgence (1725)</option>
+                <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
+                <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
+                <option value="1744">Suite à un traumatisme (1744)</option>
+                <option value="1729">Suite à une malformation osseuse (1729)</option>
 
               </select>
 
@@ -3340,21 +3341,21 @@
               <label>Éléments de contexte</label>
               <select id="dropD_chirurgiens" name="elemnt_contx_chirgien">
 
-                <option> Acte posé plus souvent que convenu à l entente (1735)</option>
-                <option> Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (1734)</option>
-                <option> Mise en place de la première plaque de reconstruction (1733)</option>
-                <option> Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1751)</option>
-                <option> Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (1736)</option>
-                <option> Remplacement d une prothèse pour perte ou bris (41)</option>
-                <option> Remplacement de deux prothèses pour perte ou bris (1737)</option>
-                <option> Séance différente (1745)</option>
-                <option> Patient sous anesthésie générale (1732)</option>
-                <option>  Service dont la complexité est inhabituelle (1731)</option>
-                <option>  Site différent (1748)</option>
-                <option>  Soins d urgence (1739)</option>
-                <option>  Soins d urgence pendant l horaire de garde (1738)</option>
-                <option>  Suite à un traumatisme (1743)</option>
-                <option>  Suite à une malformation osseuse (1730)</option>
+                <option value="1735"> Acte posé plus souvent que convenu à l entente (1735)</option>
+                <option value="1734"> Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (1734)</option>
+                <option value="1733"> Mise en place de la première plaque de reconstruction (1733)</option>
+                <option value="1751"> Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1751)</option>
+                <option value="1736"> Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (1736)</option>
+                <option value="41"> Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option value="1737"> Remplacement de deux prothèses pour perte ou bris (1737)</option>
+                <option value="1745"> Séance différente (1745)</option>
+                <option value="1732"> Patient sous anesthésie générale (1732)</option>
+                <option value="1731">  Service dont la complexité est inhabituelle (1731)</option>
+                <option value="1748">  Site différent (1748)</option>
+                <option value="1739">  Soins d urgence (1739)</option>
+                <option value="1738">  Soins d urgence pendant l horaire de garde (1738)</option>
+                <option value="1743">  Suite à un traumatisme (1743)</option>
+                <option value="1730">  Suite à une malformation osseuse (1730)</option>
 
               </select>
             </div>

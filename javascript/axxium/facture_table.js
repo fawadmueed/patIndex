@@ -6,14 +6,6 @@ $(document).ready(function(){
 
   newRecordFact();
 
-  // $("#form_denturologiste").on("submit", function(event) {
-  //             alert('Hiii');
-  //               event.preventDefault();
-  //               var moreInfoArray=$(this).serializeArray();
-  //               console.log(moreInfoArray);
-  //             });
-
-  // ====== factureTable last TD Enter key Monitor
 
   $('.firstTdProd').keypress(function (e)
             {
@@ -25,9 +17,8 @@ $(document).ready(function(){
               return e.which!=13;
 
             })
-});
 
-
+   });
 function newRecordFact(){
 
     var tblBody=$('#factTableBody');
@@ -64,10 +55,11 @@ function newRecordFact(){
 
 
 function getAllTrData(){
+  
   modPayment();
   arrGrilleDeFacturation=[]
 
-var mytrs=$('#factTableBody tr');
+  var mytrs=$('#factTableBody tr');
 // console.log(mytrs);
   $.each(mytrs, function(idx,val){
     

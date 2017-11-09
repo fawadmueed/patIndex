@@ -838,7 +838,7 @@
   function drawOdon()
   {
   	
-  	console.log('Ondonto function DrawOdon called');
+  
     //alert("Draw the whole thing!");
   	var canvas = document.getElementById("odonto");
     	var ctx = canvas.getContext("2d");
