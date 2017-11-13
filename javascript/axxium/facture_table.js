@@ -5,20 +5,28 @@
 $(document).ready(function(){
 
   newRecordFact();
-
-
   $('.firstTdProd').keypress(function (e)
             {
               if(e.which == 13)
               {
                 newRecordFact();
-
               };
               return e.which!=13;
-
             })
+  
+  $(document.body).on("submit","#form_dentiste", function(event) {
+                submitForm(this);
+              });
+  $(document.body).on("submit","#form_chirurgiens", function(event) {
+                submitForm(this);
+                
+              });
+  $(document.body).on("submit","#form_denturologiste", function(event) {
+              submitForm(this);
+              });
 
    });
+
 function newRecordFact(){
 
     var tblBody=$('#factTableBody');
@@ -47,7 +55,7 @@ function newRecordFact(){
        tblData.appendTo(tblRow);
    }
       }
-           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="findTableData(this);" >More!</div>');
+           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="findTableData(this);" >More</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Delete</div>');
        tblData.appendTo(tblRow);
 
         tblRow.appendTo(tblBody);
@@ -55,10 +63,9 @@ function newRecordFact(){
 
 
 function getAllTrData(){
-  
-  modPayment();
+  var count_ramq=0;
+  var count_insur=0;
   arrGrilleDeFacturation=[]
-
   var mytrs=$('#factTableBody tr');
 // console.log(mytrs);
   $.each(mytrs, function(idx,val){
@@ -73,9 +80,18 @@ function getAllTrData(){
     
     $.each(mytds,function(idx,val){
 
-
       var key=$(val).attr('data-target');
       var value=$(val).text();
+
+      if(key=='Type'&&(value=='AMQ'||value=='BES'||value=='HOP')) {
+        // Count Table Row entries for type RAMQ
+        count_ramq=count_ramq+1;
+      }
+      if(key=='Type'&&((!(value=='AMQ'||value=='BES'||value=='HOP'))&&(!(value=='CAS')) )) {
+        // Count Table Row entries for type Insurance
+        count_insur=count_insur+1;
+        console.log('INSUR count'+ count_insur);
+      }
 
       myObjects[key]=value;
 
@@ -83,11 +99,27 @@ function getAllTrData(){
 
       arrGrilleDeFacturation.push(myObjects);
 });
-  console.log(arrGrilleDeFacturation); 
-  console.log(arrGrilleDeFacturation_forms); 
-  // console.log(moreInfoArray_glbl  )
-  getMoreInfo();
+   if((count_ramq>=10)||(count_insur>=7))
+   {
+    alert('Limit Exceeded! Allow Limit : RamQ Bill = 10 Lines , Insurance Bill = 7 Lines. Delete few entries to proceed');
+   }
+   else{
+    console.log(arrGrilleDeFacturation); 
+    console.log(arrGrilleDeFacturation_forms); 
+    // console.log(moreInfoArray_glbl  )
+    modPayment();
+    // getMoreInfo();
+   }
+  
 
+}
+
+function submitForm(thisForm){
+    event.preventDefault();
+    var moreInfoArray=$(thisForm).serializeArray();
+    arrGrilleDeFacturation_forms.push(moreInfoArray);
+    $('.modalFactTableMore').modal('hide');
+                
 }
 
 function findTableData(x){
@@ -116,7 +148,7 @@ function modFactTableMore(row_id)
               var data=$('#div_dentiste').html();
               $('#modal_factTbl_more').html(data); 
               $('form #rowId_dent').val(row_id); //Assign id of Row Working - to the Form 
-              console.log($('form #rowId_dent').val());
+              
               break;
 
       case 'Chirurgiens':
@@ -138,6 +170,56 @@ function modFactTableMore(row_id)
 
   }
   $('.modalFactTableMore').modal('show');
+}
+
+function emptyTable (){
+  //Empty Existing Table and Initialize all parameters of Table
+  fact_tbl_row_id=0;
+  arrGrilleDeFacturation=[];
+  arrGrilleDeFacturation_forms=[];
+  dent_Type=''; 
+  checkDentType();
+  //IMP! call Dent_type Modal again for selection in Main FactTabl
+  $("#factTableBody tr").remove(); 
+  newRecordFact();
+
+}
+
+function deleteRow(x){
+
+  var row_id_Del=$(x).closest('tr').attr('id');
+
+  var row=$(x).closest('tr').remove();
+  //remove this Row's Form too 
+  var deleteThisIdForm=deleteFromArray('delete','row_id',row_id_Del);
+  if(deleteThisIdForm){ console.log('Deleted Success'); };
+
+}
+
+function deleteFromArray(toDo,namR,valR){
+  // Delete complete array if Matched in its object nameR and valR send i.e : nameR=row_id valR=2
+  //toDo= for now =='delete'
+  var nameD=namR;
+  var valueD=valR;
+  var action=toDo;
+
+
+    for(var i=0;i<arrGrilleDeFacturation_forms.length;i++)
+        {
+          for(var j=0;j<arrGrilleDeFacturation_forms[i].length;j++)
+          {
+            if((arrGrilleDeFacturation_forms[i][j].name==nameD)&&(arrGrilleDeFacturation_forms[i][j].value==valR))
+            {
+              if(action=='delete')
+              {
+              arrGrilleDeFacturation_forms.splice([i],1);
+              return true;
+              }
+              
+            }
+          
+          }
+        }
 }
 
 function checkDentType(){

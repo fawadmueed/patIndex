@@ -24,6 +24,7 @@
 
    });
 
+
   function validation(type,val)
   {
     if(type=="Type")
@@ -97,7 +98,6 @@
 
     if(curYear<formD_year)
     {
-      alert('Valid Date! Card not expire');
       return true;
     }
     else if(curYear==formD_year)
@@ -105,7 +105,7 @@
       if(curMonth<formD_month)
       {
       return true;
-      alert('Valid Date! Card not expire');
+      
       }
       else
       {

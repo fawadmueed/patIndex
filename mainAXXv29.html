@@ -35,6 +35,7 @@
   <script src="javascript/axxium/labos22.js"></script>
   <script src="javascript/axxium/modals-facturation.js"></script>
   <script src="javascript/axxium/factTable_validation.js"></script>
+  <script src="javascript/axxium/Fact_Regie.js"></script>
 
 
   <!-- Translation File & Dictionary English French -->
@@ -1313,9 +1314,9 @@
             </div>
            </div>
            <div class="ui grid">
-           <div class="three wide column"></div>
-           <div class="ten wide column">
-           <div class="ui axxium form segment">
+           <div class="two wide column"></div>
+           <div class="twelve wide column">
+           <div class="ui teal form raised segment">
                  <table id="factureTable" class="ui striped compact table segment" cellspacing="0" width="100%">
                       <thead>
                         <tr>
@@ -1349,25 +1350,13 @@
                     </tbody>
                   </table>
                 </div>
-
+                <div class="ui axxium tiny button" onclick="emptyTable();">New Bill!</div>
+                <div class="ui axxium tiny button" onclick="getAllTrData();">Generer la facture</div>
+                <div class="ui axxium tiny button ok" onclick="">Facturation anticipee</div>
               </div>
-                <div class="three wide column"></div>
+                <div class="two wide column"></div>
               </div>
 
-
-                <div class="ui grid">
-                  <div class="nine wide column"></div>
-                  <div class="four wide column">
-                  <div class="two fields">
-                    <div class="field">
-                      <div class="ui axxium tiny button" onclick="getAllTrData();">Generer la facture</div>
-                    </div>
-                    <div class="field">
-                      <div class="ui axxium tiny button ok" onclick="">Facturation anticipee</div>
-                    </div>
-                  </div>
-                </div>
-                </div>
             </div>
             </div>
 
@@ -1384,9 +1373,333 @@
             </div>
 
             <div class="ui tab segment " data-tab="Regie-sub">
-              RegieSub
               
+              <div class="ui selection dropdown fact_regie">
+               <input type="hidden" name="gender">
+               <i class="dropdown icon"></i>
+               <div class="default text">Gender</div>
+                 <div class="menu">
+                    <div class="item" data-value="3">Factures</div>
+                    <div class="item" data-value="2">Paiements</div>
+                    <div class="item" data-value="1">Messages</div>
+                    <div class="item" data-value="0">État de compte</div>
+                </div>
+              </div>
+
+              <div id="fact_regie_div">
+                <!-- Content of the Selected Value will appear here -->
+              </div>
+
+              <div class="regieContents"> 
+
+        <div id="fact_regie_div_facture" style="display: none;">
+
+          <div class="ui teal form segment">
+            
+            <div class="inline four fields">
+                
+                <div class="three wide field">
+                  <label>Année</label>
+                  <input type="text"></input>
+                </div>
+
+                <div class="three wide field">
+                  <label>-</label>
+                  <input type="text"></input>
+                </div>
+                <div class="four wide field">
+                  <label>No de facture</label>
+                  <input type="text"></input>
+                </div>
+                <div class="three wide field">
+                  <label>-</label>
+                  <input type="text"></input>
+                </div>
+
             </div>
+          <div class="for_Facture_Drop down">
+            <table class="ui striped  table">
+              <thead>
+                <tr>
+                  <th>Dossier</th>
+                  <th>#RAMQ</th>
+                  <th>Date</th>
+                  <th>No de Facture</th>
+                  <th>Nom</th>
+                  <th>Prénom</th>
+                  <th>Montant</th>
+                  <th>Status</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td></td></tr>
+               
+              </tbody>
+            </table>
+            <div class="ui small form">
+                <div class="four inline fields">
+                  
+                    <label>Nombre de factures</label>
+                    <div class="one wide field">
+                      <input type="text" maxlength="5"></input>
+                    </div>
+                    <label>Montant total:</label>
+                    <div class="three wide field">
+                      
+                      <input type="text"></input>
+                    </div>
+                </div>
+            
+            
+            <div class="four fields">
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Tous les factures</label>
+                </div>
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Factures Payées</label>
+                </div>
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Factures non payées</label>
+                </div>
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Factures en attente</label>
+                </div>
+            </div>
+        
+      </div>
+        <div class="ui grid">
+          <div class="six column row">
+            <div class="left floated column"></div>
+            <div class="right floated column">
+              <div class="ui axxium tiny button">Exporter XLS</div>
+            </div>
+          </div>
+        </div>
+            
+          </div>
+
+        </div>
+      </div>
+
+      <div id="fact_regie_paiements" style="display: none;">
+
+          <div class="ui teal form segment">
+            
+           
+          <div class="for_Facture_Drop down">
+            <table class="ui striped  table">
+              <thead>
+                <tr>
+                  <th>Dossier</th>
+                  <th>#AMQ</th>
+                  <th>Date</th>
+                  <th>No de Facture</th>
+                  <th>Honoraires</th>
+                  <th>No reçu</th>
+                  <th>Code</th>
+                  <th>Raison</th>
+                  <th>Paiement</th>
+                  <th>Effectué</th>
+                  <th>Payée</th>
+                </tr>
+
+              </thead>
+              <tbody>
+                <tr><td></td></tr>
+               
+              </tbody>
+            </table>
+            <div class="ui segment">
+            <div class="ui small form">
+                <div class="four inline fields">
+                  
+                    <label>Factures non payées</label>
+                    <div class="field">
+                      <input type="text" maxlength="5"></input>
+                    </div>
+                    <label>Total Facture:</label>
+                    <div class="field">
+                      <input type="text"></input>
+                    </div>
+                    <label>No de paiements</label>
+                    <div class="field">
+                      <input type="text" maxlength="5"></input>
+                    </div>
+                    <label>Total paiements</label>
+                    <div class="field">
+                      <input type="text"></input>
+                    </div>
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="three fields">
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Tous les factures</label>
+                </div>
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Factures Payées</label>
+                </div>
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Factures non payées</label>
+                </div>
+            </div>
+        
+      </div>
+        <div class="ui grid">
+          <div class="seven column row">
+            <div class="column"></div>
+            <div class="column"></div>
+             <div class="column"></div>
+            <div class="column"></div>
+            <div class="column"></div>
+            
+            <div class="right floated column">
+              <div class="ui axxium tiny button">Exporter XLS</div>
+            </div>
+            <div class="right floated column">
+              <div class="ui axxium tiny button">Télé. Paiements</div>
+            </div>
+          </div>
+        </div>
+            
+          </div>
+
+        </div>
+
+
+
+      <div id="fact_regie_messages" style="display: none;">
+
+          <div class="ui teal form segment">
+            
+          <div class="inline four fields">
+                
+                <div class="three wide field">
+                  <label>Année</label>
+                  <input type="text"></input>
+                </div>
+
+                <div class="three wide field">
+                  <label>-</label>
+                  <input type="text"></input>
+                </div>
+                <div class="four wide field">
+                  <label>No de facture</label>
+                  <input type="text"></input>
+                </div>
+                <div class="three wide field">
+                  <label>-</label>
+                  <input type="text"></input>
+                </div>
+
+            </div> 
+          <div class="for_Facture_Drop down">
+            <table class="ui striped  table">
+              <thead>
+                <tr>
+                  <th>#RAMQ</th>
+                  <th>#Facture</th>
+                  <th>Date</th>
+                  <th>Status de recevabilitié</th>
+                  <th>Messages</th>
+                </tr>
+
+              </thead>
+              <tbody>
+                <tr><td></td></tr>
+               
+              </tbody>
+            </table>
+            </div>
+            <div class="two fields">
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Tous les messages</label>
+                </div>
+                <div class="inline field">
+                  <input type="checkbox" ></input>
+                  <label>Messages dérreur</label>
+                </div>
+            </div>
+     
+        <div class="ui grid">
+          <div class="seven column row">
+            <div class="column"></div>
+            <div class="column"></div>
+             <div class="column"></div>
+            <div class="column"></div>
+            <div class="column"></div>
+            
+            <div class="right floated column">
+              <div class="ui axxium tiny button">Exporter XLS</div>
+            </div>
+          </div>
+        </div>
+             </div>
+          </div>
+
+      
+      <div id="fact_regie_etatCompte" style="display: none;">
+          <div class="ui teal form segment">
+            
+           <div class="inline fields">
+                
+                <div class=" field">
+                  <label>Date entre</label>
+                  <input type="text"></input>
+                </div>
+
+                <div class="three wide field">
+                  <label>-</label>
+                  <input type="text"></input>
+                </div>
+            </div> 
+
+          <div class="for_Facture_Drop down">
+            <table class="ui striped  table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>#État de compte</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+
+              </thead>
+              <tbody>
+                <tr><td></td></tr>
+               
+              </tbody>
+            </table>
+            <div class="ui grid">
+            <div class="column"></div>
+            </div> 
+          </div>
+      
+
+              <div class="ui axxium tiny button">Télé Etat. compte</div>
+           
+              <div class="ui axxium tiny button">Imprimer</div>
+  
+            
+              </div>
+
+          </div>
+          </div>
+        </div>
+
+
+          </div>
 
         </div>
       </div>
@@ -3283,17 +3596,6 @@
           </div>
           <button class="ui axxium button" type="submit" >Submit</button>
         </form>
-
-        <script type="text/javascript">
-
-              $("#form_dentiste").on("submit", function(event) {
-                event.preventDefault();
-                var moreInfoArray=$(this).serializeArray();
-                arrGrilleDeFacturation_forms.push(moreInfoArray);
-                $('.modalFactTableMore').modal('hide');
-                
-              });
-        </script>
           
         </div>
       </div>
@@ -3434,17 +3736,8 @@
               <input type="text" name="type_profession_chirgien">
             </div>
           </div>
-          <button class="ui axxium tiny button" type="submit">Submit</div>
+          <button class="ui axxium tiny button" type="submit">Submit</button>
         </form>
-              <script type="text/javascript">
-              $("#form_chirurgiens").on("submit", function(event) {
-                event.preventDefault();
-                var moreInfoArray=$(this).serializeArray();
-                arrGrilleDeFacturation_forms.push(moreInfoArray);
-                $('.modalFactTableMore').modal('hide');
-                
-              });
-        </script>
         </div>
       </div>
 
@@ -3480,17 +3773,7 @@
   </div>
   <button class="ui axxium tiny button" type="submit">Submit</button>
 </form>
-      <script type="text/javascript">
-              $("#form_denturologiste").on("submit", function(event) {
-                
-                event.preventDefault();
-                var moreInfoArray=$(this).serializeArray();
 
-                arrGrilleDeFacturation_forms.push(moreInfoArray);
-                $('.modalFactTableMore').modal('hide');
-                
-              });
-        </script>
     <!-- ===xx=== -->
 
       </div>
@@ -5142,6 +5425,6 @@ function changeLang(x)
 
 
   </script>
-
+  
 </body>
 </html>
