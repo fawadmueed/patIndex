@@ -5,7 +5,7 @@
 function SoumissionDemandesPaiement()
 {
     var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
-    if (objSoumissionDemandesPaiementData != null)
+    if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[2].length>0) //TODO: empty line shouldn't be added to an array.
     {
         var operationName = "Paiement";
         var jsonData = RamqGetData(operationName, objSoumissionDemandesPaiementData);
@@ -19,12 +19,12 @@ function SoumissionDemandesPaiement()
             data: jsonData,
 
             success: function (data, status, jqXHR) {
-                if (data.d != null && data.d.substring(0, 5) == 'Error') {
+                if (data != null && data.substring(0, 5) == 'Error') {
                     //alert(data.d);
-                    displayRamqAnswer("RAMQ", data.d);
+                    displayRamqAnswer("RAMQ", data);
                 }
-                else if (data.d != null && data.d.substring(0, 5) != 'Error') {
-                    var objResponse = parseRAMQResponsePaiment(data.d);
+                else if (data != null && data.substring(0, 5) != 'Error') {
+                    var objResponse = parseRAMQResponsePaiment(data);
                     displayResponsePaiment(objResponse);
                 }
                 else {
@@ -37,11 +37,16 @@ function SoumissionDemandesPaiement()
             }
         });
     }
+    else {
+        alert("There is nothing to send.")
+    }
+
+    
 }
 
 function RamqSoumissionDemandesModification()
 {
-    var jsonData = getData("Modification");
+    var jsonData = RamqGetData("Modification");
 
     $.ajax({
         type: "POST",
@@ -72,7 +77,7 @@ function RamqSoumissionDemandesAnnulation() {
     var objSoumissionDemandesAnnulationData = SoumissionDemandesAnnulationGetData();
     if (objSoumissionDemandesAnnulationData != null)
     {
-        var jsonData = getData("Annulation");
+        var jsonData = RamqGetData("Annulation");
 
         $.ajax({
             type: "POST",
@@ -101,6 +106,7 @@ function RamqSoumissionDemandesAnnulation() {
     }
 }
 
+
 function RamqGetData(operationName, _objData)
 {
     var xmlAEnvoyer, data;
@@ -118,7 +124,7 @@ function RamqGetData(operationName, _objData)
         xmlAEnvoyer = RamqGetSoumissionDemandesAnnulationXML();
     }
     
-    data = '{"idUtilisateur":"' + globRamqObjCredentials.MachineId + '","motDePasse":"' + globRamqObjCredentials.MachineIdPass + '","xmlAEnvoyer":"' + xmlAEnvoyer + '"}';
+    data = '{"UserId":"' + globRamqObjCredentials.MachineId + '","UserPass":"' + globRamqObjCredentials.MachineIdPass + '","XmlToSend":"' + xmlAEnvoyer + '"}';
     return data;
 }
 
@@ -151,7 +157,7 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
         '<typ_moda_paimt>' + _arrData[1].TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
     '</moda_paimt>' +
     '<liste_fact>' +
-        RamqGetListe_factXML(_arrData, "Dentiste") +
+        RamqGetListe_factXML(_arrData, dent_Type) +// dent_Type is a global variable : Dentist, Chirurgiens, Denturologiste
     '</liste_fact>' +
 '</dem_paimt>';
     return xml;
@@ -160,20 +166,17 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
 
 function RamqGetListe_factXML(_arrData, dent_Type)
 {
+    var xml = '';
     switch(dent_Type) {
         case "Dentiste":
-            {
-                RamqGetListFactChirgDenti(_arrData);
-            }
-            break;
         case "Chirurgiens":
             {
-                RamqGetListFactChirgBucc(_arrData);
+                xml = RamqGetListFactChirg(_arrData, dent_Type);
             }
             break;
         case "Denturologiste":
             {
-                RamqGetListFactDentu(_arrData);
+                xml = RamqGetListFactDentu(_arrData);
             }
             break;
         default:
@@ -181,17 +184,29 @@ function RamqGetListe_factXML(_arrData, dent_Type)
                 alert("Ramq: dent_Type is not correct!")
             }
     }
-    
-
     return xml;
 }
 
-// Create part of xml for Chirg Denti
-function RamqGetListFactChirgDenti(_arrData)
+// Create part of xml for Chirg 
+function RamqGetListFactChirg(_arrData, _dent_Type)
 {
     var objDataFromVisionR = _arrData[1];
     var xml = '';
-    xml += '<fact_serv_denta_chirg_denti_1_1_0>' +
+    var factServDentaChirTitle = '';
+    var listeLigneFactServDentaChirgTitle = '';
+    if (_dent_Type == 'Dentiste')
+    {
+        factServDentaChirTitle = 'fact_serv_denta_chirg_denti_1_1_0';
+        listeLigneFactServDentaChirgTitle = 'liste_ligne_fact_serv_denta_chirg_denti';
+    }
+    else if (_dent_Type == 'Chirurgiens')
+    {
+        factServDentaChirTitle = 'fact_serv_denta_chirg_bucc_1_1_0';
+        listeLigneFactServDentaChirgTitle = 'liste_ligne_fact_serv_denta_chirg_bucc';
+    }
+
+    xml +=
+        '<' + factServDentaChirTitle + '>' +
                     '<no_fact_ext>' + RamqGetFactNumber() + '</no_fact_ext>' +
                     '<prof>' +
                         '<typ_id_prof>' + objDataFromVisionR.TypIdProf + '</typ_id_prof>' + //const 1 : Numéro dispensateur RAMQ
@@ -211,15 +226,23 @@ function RamqGetListFactChirgDenti(_arrData)
                         '</pers_patnt_avec_idt>' + //TODO: implement case if user doesn't have NAM
                     '</liste_pers_objet_fact>' +
                     '<ind_fact_assoc_dr>' + objDataFromVisionR.IndFactAssosDr + '</ind_fact_assoc_dr>' + //? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
-                    '<liste_ligne_fact_serv_denta_chirg_denti>' +
-                        RamqGetListe_ligne_fact_serv_denta_chirg_denti(_arrData[2]) +
-                    '</liste_ligne_fact_serv_denta_chirg_denti>' +
-                '</fact_serv_denta_chirg_denti_1_1_0>';
+                    '<' + listeLigneFactServDentaChirgTitle + '>' +
+                        RamqGetListe_ligne_fact_serv_denta_chirg(_arrData[2], _dent_Type) +
+                    '</' + listeLigneFactServDentaChirgTitle + '>' +
+                '</' + factServDentaChirTitle + '>';
+    return xml;
 }
 
-function RamqGetListe_ligne_fact_serv_denta_chirg_denti(pArrBillData)
+function RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type)
 {
     var xml = '';
+    var ligneFactServDentaChirgTitle = '';
+    if (_dent_Type == 'Dentiste') {
+        ligneFactServDentaChirgTitle = 'ligne_fact_serv_denta_chirg_denti';
+    }
+    else if (_dent_Type =='Chirurgiens') {
+        ligneFactServDentaChirgTitle = 'ligne_fact_serv_denta_chirg_bucc';
+    }
     var ligneNum = 1;
 
     for (var i = 0; i < pArrBillData.length; i++)
@@ -228,16 +251,17 @@ function RamqGetListe_ligne_fact_serv_denta_chirg_denti(pArrBillData)
         if (pObjBillData.Type == 'AMQ' || pObjBillData.Type == 'BES')
         {
             xml = xml +
-                '<ligne_fact_serv_denta_chirg_denti>' +
+                '<' + ligneFactServDentaChirgTitle + '>' +
                     '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
                     '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
                     '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
                     '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
                     '<cod_role>' + '1' + '</cod_role>' + //TODO: Where from? Constant? Data 1 : Responsable 4 : Assistant
+                    RamqGetDatAutorProthAcryl(pObjBillData.date_autorisation_dentiste)+
                     '<info_serv_denta>' +
-                        '<no_dent>' + RamqGetCurrentDate.Dent + '</no_dent>' +
+                        '<no_dent>' + pObjBillData.Dent + '</no_dent>' +
                         '<liste_surf_dent_trait>' +
-                            RamqGetListe_surf_dent_trait(RamqGetCurrentDate.Surface) +
+                            RamqGetListe_surf_dent_trait(pObjBillData.Surface) +
                         '</liste_surf_dent_trait>' +
                         //optional
                         RamqGetRaisTraitDentaXml(pObjBillData.typ_id_rais_trait_denta, pObjBillData.id_rais_trait_denta) +
@@ -254,8 +278,9 @@ function RamqGetListe_ligne_fact_serv_denta_chirg_denti(pArrBillData)
                     RamqGetListeLieuRefreXml(pObjBillData.identification_lieu_dentiste, pObjBillData.id_lieu_phys, pObjBillData.no_sect_activ, pObjBillData.id_lieu_geo, pObjBillData.lieu_type, pObjBillData.no_bur_dentiste) +
                     //optional
                     RamqGetRefreAutreProfXml(pObjBillData.typ_refre_autre_prof, pObjBillData.typ_id_prof, pObjBillData.id_prof) +
-                  '<mnt_prcu_patnt>' + pObjBillData.mnt_prcu_patnt + '</mnt_prcu_patnt>';
-                 '</ligne_fact_serv_denta_chirg_denti>';
+                    RamqGetMntPrcuPatntXml(pObjBillData.mnt_prcu_patnt)+
+                  
+                 '</' + ligneFactServDentaChirgTitle + '>';
             ligneNum++;
         }
     }
@@ -426,10 +451,21 @@ function RamqGetRefreAutreProfXml(p_typ_refre_autre_prof, p_typ_id_prof, p_id_pr
     return res;
 }
 
+function RamqGetMntPrcuPatntXml(p_mnt_prcu_patnt)
+{
+    var res = '';
+    if (p_mnt_prcu_patnt)
+        res = '<mnt_prcu_patnt>' + p_mnt_prcu_patnt + '</mnt_prcu_patnt>';
+    return res;
+}
 
-
-
-
+function RamqGetDatAutorProthAcryl(p_date_autorisation_dentiste)
+{
+    var res = '';
+    if (p_date_autorisation_dentiste)
+        res = '<dat_autor_proth_acryl>' + p_date_autorisation_dentiste + '</dat_autor_proth_acryl>';
+    return res;
+}
 
 
 function RamqGetListe_surf_dent_trait(strSurf)
@@ -590,9 +626,7 @@ function getSoumissionDemandesAnnulationXML()
 		                '</id_fact_ramq>'+
 	                '</liste_fact_a_annu>'+
                 '</dem_annu>';
-
     return xml;
-
 }
 
 function parseRAMQResponsePaiment(strXml)
@@ -799,10 +833,6 @@ function RamqGetFactNumber()
     //TODO: implement real algorithm.
 }
 
-function SoumissionDemandesPaiementValidation()
-{
-    
-}
 
 
 function RamqSoumissionDemandesPaiementGetData()
@@ -830,22 +860,6 @@ function RamqSoumissionDemandesPaiementGetData()
     return arrData;
 }
 
-function SDPValidation(_objSDP)
-{
-    //var strResult='';
-    //if (_objSDP.NAM == '')
-    //    strResult += 'NAM est requis!';
-
-    //if (strResult != '')
-    //{
-    //    alert(strResult);
-    //    return false;
-    //}
-    //else{
-    //    return true;
-    //}
-    return true;
-}
     
 function SoumissionDemandesAnnulationGetData()
 {
@@ -918,7 +932,7 @@ function RamqGetBillData()
         var arrMoreInfo = RamqGetMoreInfo(arrGrilleDeFacturation[i].row_id)
         if (arrMoreInfo)
         {
-            objRes.no_autorisation_dentiste = RamqGetValueFromArrByName('no_autorisation_dentiste', arrMoreInfo);
+            objRes.no_autorisation_dentiste = RamqGetValueFromArrByName('no_autorisation_dentiste', arrMoreInfo);//TODO: this value isn't used
             objRes.date_autorisation_dentiste = RamqGetValueFromArrByName('date_autorisation_dentiste', arrMoreInfo);
 
             
@@ -991,7 +1005,7 @@ function RamqGetValueFromArrByName(pElementName, pArrMoreInfo)
 {
     for (var i = 0; i < pArrMoreInfo.length; i++)
     {
-        if (pArrMoreInfo[i].name = pElementName)
+        if (pArrMoreInfo[i].name == pElementName)
         {
             return pArrMoreInfo[i].value;
             break;
