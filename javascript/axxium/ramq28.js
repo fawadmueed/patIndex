@@ -20,7 +20,6 @@ function SoumissionDemandesPaiement()
 
             success: function (data, status, jqXHR) {
                 if (data != null && data.substring(0, 5) == 'Error') {
-                    //alert(data.d);
                     displayRamqAnswer("RAMQ", data);
                 }
                 else if (data != null && data.substring(0, 5) != 'Error') {
@@ -40,8 +39,6 @@ function SoumissionDemandesPaiement()
     else {
         alert("There is nothing to send.")
     }
-
-    
 }
 
 function RamqSoumissionDemandesModification()
@@ -64,7 +61,6 @@ function RamqSoumissionDemandesModification()
             else {
                 alert('SoumissionDemandesModification error');
             }
-            
         },
         error: function (xhr) {
             if (xhr.responceJSON != null)
@@ -131,12 +127,9 @@ function RamqGetData(operationName, _objData)
 
 // Create common part for all specialists
 function RamqGetSoumissionDemandesPaimentXML(_arrData) {
-    ////For test only:
-    //var d = new Date();
-    //var n = d.getTime();
+
     var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
     '<dem_paimt xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
-    //'<no_dem_ext>' + $('#no_dem_ext').val() + '</no_dem_ext>' + //?
     '<no_dem_ext>' + RamqGenerateNoDemExt() + '</no_dem_ext>' +
     '<logcl_fact>' +
         '<no_devpr_logcl>' + _arrData[0].NoDevprLogcl + '</no_devpr_logcl>' + //?
@@ -157,38 +150,38 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
         '<typ_moda_paimt>' + _arrData[1].TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
     '</moda_paimt>' +
     '<liste_fact>' +
-        RamqGetListe_factXML(_arrData, dent_Type) +// dent_Type is a global variable : Dentist, Chirurgiens, Denturologiste
+        RamqGetListFact(_arrData, dent_Type) +// dent_Type is a global variable : Dentist, Chirurgiens, Denturologiste
     '</liste_fact>' +
 '</dem_paimt>';
     return xml;
 
 }
 
-function RamqGetListe_factXML(_arrData, dent_Type)
-{
-    var xml = '';
-    switch(dent_Type) {
-        case "Dentiste":
-        case "Chirurgiens":
-            {
-                xml = RamqGetListFactChirg(_arrData, dent_Type);
-            }
-            break;
-        case "Denturologiste":
-            {
-                xml = RamqGetListFactDentu(_arrData);
-            }
-            break;
-        default:
-            {
-                alert("Ramq: dent_Type is not correct!")
-            }
-    }
-    return xml;
-}
+//function RamqGetListe_factXML(_arrData, dent_Type)
+//{
+//    var xml = '';
+//    switch(dent_Type) {
+//        case "Dentiste":
+//        case "Chirurgiens":
+//            {
+//                xml = RamqGetListFactChirg(_arrData, dent_Type);
+//            }
+//            break;
+//        case "Denturologiste":
+//            {
+//                xml = RamqGetListFactDentu(_arrData);
+//            }
+//            break;
+//        default:
+//            {
+//                alert("Ramq: dent_Type is not correct!")
+//            }
+//    }
+//    return xml;
+//}
 
 // Create part of xml for Chirg 
-function RamqGetListFactChirg(_arrData, _dent_Type)
+function RamqGetListFact(_arrData, _dent_Type)
 {
     var objDataFromVisionR = _arrData[1];
     var xml = '';
@@ -203,6 +196,11 @@ function RamqGetListFactChirg(_arrData, _dent_Type)
     {
         factServDentaChirTitle = 'fact_serv_denta_chirg_bucc_1_1_0';
         listeLigneFactServDentaChirgTitle = 'liste_ligne_fact_serv_denta_chirg_bucc';
+    }
+    else if (_dent_Type == 'Denturologiste')
+    {
+        factServDentaChirTitle = 'fact_serv_denta_dentu_1_0_0';
+        listeLigneFactServDentaChirgTitle = 'liste_ligne_fact_serv_denta_dentu';
     }
 
     xml +=
@@ -225,13 +223,32 @@ function RamqGetListFactChirg(_arrData, _dent_Type)
                             '<id_pers>' + objDataFromVisionR.IdPers + '</id_pers>' + // NAM
                         '</pers_patnt_avec_idt>' + //TODO: implement case if user doesn't have NAM
                     '</liste_pers_objet_fact>' +
-                    '<ind_fact_assoc_dr>' + objDataFromVisionR.IndFactAssosDr + '</ind_fact_assoc_dr>' + //? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
+                    RamqGetIndFactAssocDrXml(objDataFromVisionR.IndFactAssosDr, _dent_Type) +//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
                     '<' + listeLigneFactServDentaChirgTitle + '>' +
-                        RamqGetListe_ligne_fact_serv_denta_chirg(_arrData[2], _dent_Type) +
+                        RamqGetListeLigneFactServDenta(_arrData[2], _dent_Type) +
                     '</' + listeLigneFactServDentaChirgTitle + '>' +
                 '</' + factServDentaChirTitle + '>';
     return xml;
 }
+
+function RamqGetIndFactAssocDrXml(p_IndFactAssosDr, p_dent_Type)
+{
+    if (p_dent_Type == 'Denturologiste')
+        return '';
+    else
+        return '<ind_fact_assoc_dr>' + p_IndFactAssosDr + '</ind_fact_assoc_dr>';
+}
+
+function RamqGetListeLigneFactServDenta(pArrBillData, _dent_Type)
+{
+    var xml = '';
+    if (_dent_Type == 'Dentiste' || _dent_Type == 'Chirurgiens')
+        xml = RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type);
+    else if (_dent_Type == 'Denturologiste')
+        xml = RamqGetListe_ligne_fact_serv_denta_dentu(pArrBillData, _dent_Type);
+    return xml;
+}
+
 
 function RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type)
 {
@@ -285,6 +302,35 @@ function RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type)
         }
     }
      return xml;
+}
+
+function RamqGetListe_ligne_fact_serv_denta_dentu(pArrBillData, _dent_Type)
+{
+    var xml = '';
+    var ligneNum = 1;
+
+    for (var i = 0; i < pArrBillData.length; i++) {
+        var pObjBillData = pArrBillData[i];
+        if (pObjBillData.Type == 'AMQ' || pObjBillData.Type == 'BES') {
+            xml = xml +
+                '<ligne_fact_serv_denta_dentu>' +
+                    '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
+                    '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                    '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
+                    '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
+                    RamqGetDatAutorProthAcryl(pObjBillData.date_autorisation_dentiste) +
+                    RamqGetListElmContxXml(pObjBillData.arr_elm_contx) +
+                    //optional
+                    //RamqGetListeLieuRefreXml(pObjBillData.identification_lieu_dentiste, pObjBillData.id_lieu_phys, pObjBillData.no_sect_activ, pObjBillData.id_lieu_geo, pObjBillData.lieu_type, pObjBillData.no_bur_dentiste) +
+                    //optional
+                    //RamqGetRefreAutreProfXml(pObjBillData.typ_refre_autre_prof, pObjBillData.typ_id_prof, pObjBillData.id_prof) +
+                    //RamqGetMntPrcuPatntXml(pObjBillData.mnt_prcu_patnt) +
+
+                 '</ligne_fact_serv_denta_dentu>';
+            ligneNum++;
+        }
+    }
+    return xml;
 }
 
 function RamqGetRaisTraitDentaXml(p_typ_id_rais_trait_denta, p_id_rais_trait_denta )
@@ -466,7 +512,6 @@ function RamqGetDatAutorProthAcryl(p_date_autorisation_dentiste)
         res = '<dat_autor_proth_acryl>' + p_date_autorisation_dentiste + '</dat_autor_proth_acryl>';
     return res;
 }
-
 
 function RamqGetListe_surf_dent_trait(strSurf)
 {
@@ -898,7 +943,7 @@ function RamqGetVisionRData()
     res.ExpedIdIntvn = '18011';//?
     res.TypModaPaimt = '1';//1 : Compte personnel du professionnel 2 : Compte administratif
     res.TypIdProf = '1';//const 1 : Numéro dispensateur RAMQ
-    res.IdProf = '299801';// $('#no_prof').val();
+    res.IdProf = '299801';// 
     res.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
     res.IdLieuPhys = '99999';//?
     res.TypSituConsi = '1';//Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
