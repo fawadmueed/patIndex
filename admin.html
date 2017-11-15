@@ -2,32 +2,178 @@
 <html>
 <head>
 	<title><meta charset="utf-8" />
+  <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>ADMIN | Sans-papier</title>
+  <title>Axxium | Sans-papier</title>
 
   <meta name="description" content="A menu is a collection of elements showing related user actions" />
   <meta name="keywords" content="html5, ui, library, framework, javascript" />
 
-  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' 	rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" class="ui" href="css/dist/semantic.min.css">
-  <link rel="stylesheet" type="text/css" class="ui" href="css/axxium.css"></title>
-  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+  <link rel="stylesheet" type="text/css" class="ui" href="css/axxium.css">
+
+  <script src="javascript/library/jquery.min.js"></script>
+  <script src="javascript/library/tablesort.js"></script>
+  <script src="javascript/dist/semantic.min.js"></script>
+
+  	<script src="javascript/axxium/facture28.js"></script>
+	<script src="javascript/axxium/ramq28.js"></script>
+	<script src="javascript/axxium/ramqCredentials28.js"></script>
+
+
 </head>
 <body>
-	<div ng-app="myApp" ng-init="quantity='1';price='1'">
-		<div class="ui container">
-			<label>PRICE :</label><input type="text" name="" ng-model="price">
-			<label>Quantity :</label><input type="text" name="" ng-model="quantity">
+	<div class="example">
 
-			Total : {{ quantity * price }}
+        <div class="ui borderless large menu">
+     
+              <a class="item"><h3><i class="settings icon"></i>DASHBOARD PANEL</h3>
+              
+              <a class=""></a>
+              <a class=""></a>
 
-		</div>
-	</div>
+              <div class="right menu">
+                  <a class="item" id="patName"></a>
+              </div>
+              <a class="right fitted item" onclick=""><h3><i class="icon"></i></h3></a>
+              <a class="item" ><h3><i class=""></i></h3></a>
+              <a class="item" onclick=""><i class="icon"></i></a>
+          </div>
+           <h4 class="ui center aligned header" id="patNameSub">WELCOME TO ADMIN PANEL </h4></div>
+	
+	<div class="ui grid">
+  	    <div class="three wide column">
+		    <div class="ui vertical fluid tabular menu">
+		      <a class=" item" data-tab="Dashboard">Dashboard</a>
+		      <a class="item" data-tab="Insurances">Insurances</a>
+		      <a class="active item" data-tab="MachindID">RamQ Credentials</a>
+		      <a class="item" data-tab="About">About</a>
+		    </div>
+  		</div>
+		 <div class="twelve wide stretched column">
+
+		  <div class="ui tab teal segment" data-tab="Insurances">
+		  			<table class="ui table">
+		      		<thead>
+		      			<th>Code</th>
+		      			<th>No Id</th>
+		      			<th>Nom</th>
+		      			<th>Adresse</th>
+		      			<th>Ville</th>
+		      			<th>Province</th>
+		      			<th>Code Postal</th>
+		      			<th>Telephone</th>
+		      			<th>Reseau</th>
+		      		</thead>
+		      		<tbody>
+		      			<td></td>
+		      		</tbody>
+		      	</table>
+		      	<div class="ui grid">
+		      		<div class="row">
+		      			<div class="fourteen wide column"></div>
+		      			<div class="column">
+		      				<div class="ui tiny button teal">SUBMIT</div>	
+		      			</div>
+		      		</div>
+		      	</div>
+		    </div>
+
+		    <div class="ui tab teal segment" data-tab="Dashboard">
+		  		hello
+		    </div>
+		    
+		    <div class="ui active tab teal segment" data-tab="MachindID">
+		    	<div class="ui grid">
+		    		<div class="row">
+		    			<div class="seven wide column">
+					  		<div class="ui form segment">
+					  			<h4 class="ui horizontal divider header">
+					  				<i class="tag icon"></i>UPDATE Credentials
+								</h4>
+								<div class="field">
+									<label>Numero de transmission</label>	
+									<input type="text" name="" id="no_trnsm_ramq_upd">
+								</div>
+								<div class="field">
+									<label>Identifiant machine</label>	
+									<input type="text" name="" id="no_identif_ramq_upd">
+								</div>
+								<div class="field">
+									<label>Ancien Mot de Pass</label>	
+									<input type="text" name="" id="acien_mot_ramq_upd">
+								</div>
+								<div class="field">
+									<label>Mot de Pass</label>	
+									<input type="text" name="" id="mot_pass_ramq_upd">
+								</div>
+								<div class="ui grid">
+									<div class="five wide column"></div>
+											<div class="eight wide column">
+												<div class="ui axxium tiny button" onclick="RamqUpdateMachineId()">UPDATE</div>
+												<div class="ui blue tiny button" onclick="">NEW</div>
+											</div>
+								</div>
+					  		</div>
+				  		</div>
+				  		<div class="seven wide column">
+					  		<div class="ui form segment">
+					  			<h4 class="ui horizontal divider header">
+					  				<i class="tag icon"></i>NEW Credentials
+								</h4>
+								<div class="field">
+									<label>Numero de transmission</label>	
+									<input type="text" name="" id="no_trnsm_ramq_new">
+								</div>
+								<div class="field">
+									<label>L'Identifiant TIP-1</label>	
+									<input type="text" name="" id="no_identif_ramq_new">
+								</div>
+								<div class="field">
+									<label>Mot de Pass TIP-1</label>	
+									<input type="text" name="" id="acien_mot_ramq_new">
+								</div>
+								<div class="ui grid">
+									<div class="five wide column"></div>
+											<div class="eight wide column">
+												<div class="ui axxium tiny button" onclick="RamqCreateCredentials()">SUBMIT</div>
+											</div>
+								</div>
+					  		</div>
+				  		</div>
+			  		</div>
+		  		</div>
+		      	
+		    </div>
+
+		  </div>
+		 <!--  	<div class="ui tab segment" data-tab="Insurances">
+		  		hello
+		  	</div>
+		  	<div class="ui tab segment" data-tab="About">
+		  		Welcome
+		  	</div> -->
+
+
+
+  </div>
+</body>
 <script type="text/javascript">
 
-	var app=angular.module("myApp",[]);
+
+$('tabular.menu .item').on('ready', function() {
+    // programmatically activating tab
+    $.tab('change tab', 'Insurances');
+  })
+;
+         
+$('.tabular.menu .item').tab();
+
+
+
 
 </script>
 </body>

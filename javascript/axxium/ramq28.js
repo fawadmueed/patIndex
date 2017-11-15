@@ -1,53 +1,63 @@
-var strServicePath = "http://ramqtest.cloudapp.net/RamqTest.svc/ajaxEndpoint/SoumissionDemandesPaiement";
+
 
 //var arrGrilleDeFacturation = getarrGrilleDeFacturation(); //for test only. in production arrGrilleDeFacturation should be global;
+//TODO:rename SoumissionDemandesPaiement to RamqSoumissionDemandesPaiement;
 function SoumissionDemandesPaiement()
 {
-    var objSoumissionDemandesPaiementData = SoumissionDemandesPaiementGetData();
-    if (objSoumissionDemandesPaiementData != null)
+    var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
+    if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[2].length>0) //TODO: empty line shouldn't be added to an array.
     {
         var operationName = "Paiement";
-        var jsonData = getData(operationName, objSoumissionDemandesPaiementData);
+        var inputXMl = RamqGetData(operationName, objSoumissionDemandesPaiementData);
+        var jsonXMl = {
+                        "request" : inputXMl
+                    }
 
-        $.ajax({
-            type: "POST",
-            url: strServicePath,
-            ProcessData: false,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            data: jsonData,
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: 'AGR18011', patientId: '234577', json: JSON.stringify(jsonXMl)},
+                    function (result) {
+                        alert(result.message);
+                    });
+        //var operationName = "Paiement";
+        //var jsonData = RamqGetData(operationName, objSoumissionDemandesPaiementData);
+        //var methodName = "api/RamqWebApi/PostPaymentRequest";
+        //$.ajax({
+        //    type: "POST",
+        //    url: globRamqApiPath + methodName,
+        //    ProcessData: false,
+        //    contentType: "application/json; charset=utf-8",
+        //    dataType: "json",
+        //    data: jsonData,
 
-            success: function (data, status, jqXHR) {
-                if (data.d != null && data.d.substring(0, 5) == 'Error') {
-                    //alert(data.d);
-                    displayRamqAnswer("RAMQ", data.d);
-                }
-                else if (data.d != null && data.d.substring(0, 5) != 'Error') {
-                    var objResponse = parseRAMQResponsePaiment(data.d);
-                    displayResponsePaiment(objResponse);
-                }
-                else {
-                    displayRamqAnswer("RAMQ", "SoumissionDemandesPaiement Error");
-                }
-                    
-
-            },
-            error: function (xhr) {
-                if (xhr.responceJSON != null)
-                    alert(xhr.responceJSON.Message);
-            }
-        });
+        //    success: function (data, status, jqXHR) {
+        //        if (data != null && data.substring(0, 5) == 'Error') {
+        //            displayRamqAnswer("RAMQ", data);
+        //        }
+        //        else if (data != null && data.substring(0, 5) != 'Error') {
+        //            var objResponse = parseRAMQResponsePaiment(data);
+        //            displayResponsePaiment(objResponse);
+        //        }
+        //        else {
+        //            displayRamqAnswer("RAMQ", "SoumissionDemandesPaiement Error");
+        //        }
+        //    },
+        //    error: function (xhr) {
+        //        if (xhr.responceJSON != null)
+        //            alert(xhr.responceJSON.Message);
+        //    }
+        //});
     }
-    
+    else {
+        alert("There is nothing to send.")
+    }
 }
 
-function SoumissionDemandesModification()
+function RamqSoumissionDemandesModification()
 {
-    var jsonData = getData("Modification");
+    var jsonData = RamqGetData("Modification");
 
     $.ajax({
         type: "POST",
-        url: strServicePath,
+        url: globRamqApiPath,
         ProcessData: false,
         contentType: "application/json; charset=utf-8",
         dataType: "json",
@@ -61,7 +71,6 @@ function SoumissionDemandesModification()
             else {
                 alert('SoumissionDemandesModification error');
             }
-            
         },
         error: function (xhr) {
             if (xhr.responceJSON != null)
@@ -70,15 +79,15 @@ function SoumissionDemandesModification()
     });
 }
 
-function SoumissionDemandesAnnulation() {
+function RamqSoumissionDemandesAnnulation() {
     var objSoumissionDemandesAnnulationData = SoumissionDemandesAnnulationGetData();
     if (objSoumissionDemandesAnnulationData != null)
     {
-        var jsonData = getData("Annulation");
+        var jsonData = RamqGetData("Annulation");
 
         $.ajax({
             type: "POST",
-            url: strServicePath,
+            url: globRamqApiPath,
             ProcessData: false,
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -103,151 +112,419 @@ function SoumissionDemandesAnnulation() {
     }
 }
 
-function getData(operationName, _objData)
+
+function RamqGetData(operationName, _objData)
 {
-    var idUtilisateur, motDePasse, xmlAEnvoyer, data;
-    var arrCredentials = getCredentials();
-    idUtilisateur = arrCredentials[0];
-    motDePasse = arrCredentials[1];
+    var xmlAEnvoyer, data;
 
     if (operationName == 'Paiement')
     {
-        xmlAEnvoyer = getSoumissionDemandesPaimentXML(_objData);
+        xmlAEnvoyer = RamqGetSoumissionDemandesPaimentXML(_objData);
     }
     else if (operationName == 'Modification')
     {
-        xmlAEnvoyer = getSoumissionDemandesModificationXML();
+        xmlAEnvoyer = RamqGetSoumissionDemandesModificationXML();
     }
     else if (operationName == 'Annulation')
     {
-        xmlAEnvoyer = getSoumissionDemandesAnnulationXML();
+        xmlAEnvoyer = RamqGetSoumissionDemandesAnnulationXML();
     }
     
-    data = '{"idUtilisateur":"' + idUtilisateur + '","motDePasse":"' + motDePasse + '","xmlAEnvoyer":"' + xmlAEnvoyer + '"}';
+    //data = '{"UserId":"' + globRamqObjCredentials.MachineId + '","UserPass":"' + globRamqObjCredentials.MachineIdPass + '","XmlToSend":"' + xmlAEnvoyer + '"}';
+    data = xmlAEnvoyer;
     return data;
 }
 
-function getCredentials()
-{
-    var arr = [];
-    var jsonCredentials = '["AGR18011K","rT_Xw^9M"]';// TODO: getCredentials from DB
-    try
-    {
-        arr = JSON.parse(jsonCredentials); 
-    }
-    catch(Exception){
-        return null;
-    }
 
-    if(arr.length == 2)
-        return arr;
-    else 
-        return null;
-}
+// Create common part for all specialists
+function RamqGetSoumissionDemandesPaimentXML(_arrData) {
 
-
-function getSoumissionDemandesPaimentXML(_objData) {
-    ////For test only:
-    //var d = new Date();
-    //var n = d.getTime();
     var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
     '<dem_paimt xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
-    //'<no_dem_ext>' + $('#no_dem_ext').val() + '</no_dem_ext>' + //?
-    '<no_dem_ext>' + new Date().getTime() + '</no_dem_ext>' +// for test only
+    '<no_dem_ext>' + RamqGenerateNoDemExt() + '</no_dem_ext>' +
     '<logcl_fact>' +
-        '<no_devpr_logcl>' + _objData.NoDevprLogcl + '</no_devpr_logcl>' + //?
-        '<nom_devpr_logcl>' + _objData.NomDevprLogcl + '</nom_devpr_logcl>' + //?
-        '<nom_logcl_fact>' + _objData.NomLogclFact + '</nom_logcl_fact>' + //?
-        '<no_versi_logcl_fact>' + _objData.NoVersiLogclFact + '</no_versi_logcl_fact>' + //?
-        '<no_versi_xml_dem>' + _objData.NoVersiXmlDem + '</no_versi_xml_dem>' + //?
+        '<no_devpr_logcl>' + _arrData[0].NoDevprLogcl + '</no_devpr_logcl>' + //?
+        '<nom_devpr_logcl>' + _arrData[0].NomDevprLogcl + '</nom_devpr_logcl>' + //?
+        '<nom_logcl_fact>' + _arrData[0].NomLogclFact + '</nom_logcl_fact>' + //?
+        '<no_versi_logcl_fact>' + _arrData[0].NoVersiLogclFact + '</no_versi_logcl_fact>' + //?
+        '<no_versi_xml_dem>' + _arrData[0].NoVersiXmlDem + '</no_versi_xml_dem>' + //?
     '</logcl_fact>' +
     '<demdr>' +
-        '<typ_id_intvn>' + _objData.DemdrTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _objData.DemdrIdIntvn + '</id_intvn>' + //?
+        '<typ_id_intvn>' + _arrData[1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].DemdrIdIntvn + '</id_intvn>' + //?
     '</demdr>' +
     '<exped_difrn_demdr>' +
-        '<typ_id_intvn>' + _objData.ExpedTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _objData.ExpedIdIntvn + '</id_intvn>' + //?
+        '<typ_id_intvn>' + _arrData[1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].ExpedIdIntvn + '</id_intvn>' + //?
     '</exped_difrn_demdr>' +
     '<moda_paimt>' +
-        '<typ_moda_paimt>' + _objData.TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
+        '<typ_moda_paimt>' + _arrData[1].TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
     '</moda_paimt>' +
     '<liste_fact>' +
-        getListe_factXML(_objData) +
+        RamqGetListFact(_arrData, dent_Type) +// dent_Type is a global variable : Dentist, Chirurgiens, Denturologiste
     '</liste_fact>' +
 '</dem_paimt>';
     return xml;
 
 }
 
-function getListe_factXML(_objData)
+//function RamqGetListe_factXML(_arrData, dent_Type)
+//{
+//    var xml = '';
+//    switch(dent_Type) {
+//        case "Dentiste":
+//        case "Chirurgiens":
+//            {
+//                xml = RamqGetListFactChirg(_arrData, dent_Type);
+//            }
+//            break;
+//        case "Denturologiste":
+//            {
+//                xml = RamqGetListFactDentu(_arrData);
+//            }
+//            break;
+//        default:
+//            {
+//                alert("Ramq: dent_Type is not correct!")
+//            }
+//    }
+//    return xml;
+//}
+
+// Create part of xml for Chirg 
+function RamqGetListFact(_arrData, _dent_Type)
 {
+    var objDataFromVisionR = _arrData[1];
     var xml = '';
-    //var arrGrilleDeFacturation = getarrGrilleDeFacturation(); //for test only. in production arrGrilleDeFacturation should be global;
-    var factQty = Math.ceil(arrGrilleDeFacturation.length / 10);
-    for (var i = 0; i < factQty; i++)
+    var factServDentaChirTitle = '';
+    var listeLigneFactServDentaChirgTitle = '';
+    if (_dent_Type == 'Dentiste')
     {
-        xml += '<fact_serv_denta_chirg_denti_1_1_0>' +
-                    '<no_fact_ext>' + getFactNumber() + '</no_fact_ext>' +  
+        factServDentaChirTitle = 'fact_serv_denta_chirg_denti_1_1_0';
+        listeLigneFactServDentaChirgTitle = 'liste_ligne_fact_serv_denta_chirg_denti';
+    }
+    else if (_dent_Type == 'Chirurgiens')
+    {
+        factServDentaChirTitle = 'fact_serv_denta_chirg_bucc_1_1_0';
+        listeLigneFactServDentaChirgTitle = 'liste_ligne_fact_serv_denta_chirg_bucc';
+    }
+    else if (_dent_Type == 'Denturologiste')
+    {
+        factServDentaChirTitle = 'fact_serv_denta_dentu_1_0_0';
+        listeLigneFactServDentaChirgTitle = 'liste_ligne_fact_serv_denta_dentu';
+    }
+
+    xml +=
+        '<' + factServDentaChirTitle + '>' +
+                    '<no_fact_ext>' + RamqGetFactNumber() + '</no_fact_ext>' +
                     '<prof>' +
-                        '<typ_id_prof>' + _objData.TypIdProf + '</typ_id_prof>' + //const 1 : Numéro dispensateur RAMQ
-                        '<id_prof>' + _objData.IdProf + '</id_prof>' + //?
+                        '<typ_id_prof>' + objDataFromVisionR.TypIdProf + '</typ_id_prof>' + //const 1 : Numéro dispensateur RAMQ
+                        '<id_prof>' + objDataFromVisionR.IdProf + '</id_prof>' + //?
                     '</prof>' +
                     '<lieu_consi>' +
                         '<lieu_phys>' +
-                            '<typ_id_lieu_phys>' + _objData.TypIdLieuPhys + '</typ_id_lieu_phys>' + //1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
-                            '<id_lieu_phys>' + _objData.IdLieuPhys + '</id_lieu_phys>' + //?
+                            '<typ_id_lieu_phys>' + objDataFromVisionR.TypIdLieuPhys + '</typ_id_lieu_phys>' + //1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
+                            '<id_lieu_phys>' + objDataFromVisionR.IdLieuPhys + '</id_lieu_phys>' + //?
                         '</lieu_phys>' +
                     '</lieu_consi>' +
                     '<liste_pers_objet_fact>' +
                         '<pers_patnt_avec_idt>' +
-                            '<typ_situ_consi>' + _objData.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
-                            '<typ_id_pers>' + _objData.TypIdPers + '</typ_id_pers>' + //1 : NAM RAMQ
-                            '<id_pers>' + 'DISL14082210' + '</id_pers>' + // For test Only
-                            //'<id_pers>' + _objData.NAM + '</id_pers>' + //?
-                        '</pers_patnt_avec_idt>' +
+                            '<typ_situ_consi>' + objDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+                            '<typ_id_pers>' + objDataFromVisionR.TypIdPers + '</typ_id_pers>' + //1 : NAM RAMQ
+                            '<id_pers>' + objDataFromVisionR.IdPers + '</id_pers>' + // NAM
+                        '</pers_patnt_avec_idt>' + //TODO: implement case if user doesn't have NAM
                     '</liste_pers_objet_fact>' +
-                    '<ind_fact_assoc_dr>' + _objData.IndFactAssosDr + '</ind_fact_assoc_dr>' + //? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
-                    '<liste_ligne_fact_serv_denta_chirg_denti>' +
-                        getListe_ligne_fact_serv_denta_chirg_denti(i + 1) +
-                    '</liste_ligne_fact_serv_denta_chirg_denti>' +
-                '</fact_serv_denta_chirg_denti_1_1_0>';
-    }
+                    RamqGetIndFactAssocDrXml(objDataFromVisionR.IndFactAssosDr, _dent_Type) +//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
+                    '<' + listeLigneFactServDentaChirgTitle + '>' +
+                        RamqGetListeLigneFactServDenta(_arrData[2], _dent_Type) +
+                    '</' + listeLigneFactServDentaChirgTitle + '>' +
+                '</' + factServDentaChirTitle + '>';
     return xml;
 }
 
-function getListe_ligne_fact_serv_denta_chirg_denti(_noFact)
+function RamqGetIndFactAssocDrXml(p_IndFactAssosDr, p_dent_Type)
 {
-    
+    if (p_dent_Type == 'Denturologiste')
+        return '';
+    else
+        return '<ind_fact_assoc_dr>' + p_IndFactAssosDr + '</ind_fact_assoc_dr>';
+}
+
+function RamqGetListeLigneFactServDenta(pArrBillData, _dent_Type)
+{
     var xml = '';
-    var count = _noFact * 10 - 10;
-    
+    if (_dent_Type == 'Dentiste' || _dent_Type == 'Chirurgiens')
+        xml = RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type);
+    else if (_dent_Type == 'Denturologiste')
+        xml = RamqGetListe_ligne_fact_serv_denta_dentu(pArrBillData, _dent_Type);
+    return xml;
+}
+
+
+function RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type)
+{
+    var xml = '';
+    var ligneFactServDentaChirgTitle = '';
+    if (_dent_Type == 'Dentiste') {
+        ligneFactServDentaChirgTitle = 'ligne_fact_serv_denta_chirg_denti';
+    }
+    else if (_dent_Type =='Chirurgiens') {
+        ligneFactServDentaChirgTitle = 'ligne_fact_serv_denta_chirg_bucc';
+    }
     var ligneNum = 1;
-    for (var i = count; (i < count + 10 && i < arrGrilleDeFacturation.length) ; i++)
+
+    for (var i = 0; i < pArrBillData.length; i++)
     {
-        if (arrGrilleDeFacturation[i].Type == 'AMQ' || arrGrilleDeFacturation[i].Type == 'BES')
+        var pObjBillData = pArrBillData[i];
+        if (pObjBillData.Type == 'AMQ' || pObjBillData.Type == 'BES')
         {
-            xml = xml + '<ligne_fact_serv_denta_chirg_denti>' +
-                            '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
-                            '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
-                            '<id_elm_fact>' + arrGrilleDeFacturation[i].Code + '</id_elm_fact>' + //Code de facturation
-                            '<dat_serv_elm_fact>' + getCurrentDate() + '</dat_serv_elm_fact>' + //Is current date? format YYYY-mm-DD (2017-08-01)
-                            '<cod_role>' + '1' + '</cod_role>' + //1 : Responsable 4 : Assistant
-                            '<info_serv_denta>' +
-                                '<no_dent>' + arrGrilleDeFacturation[i].Dent + '</no_dent>' +
-                                '<liste_surf_dent_trait>' +
-                                    getListe_surf_dent_trait(arrGrilleDeFacturation[i].Surface) +
-                                '</liste_surf_dent_trait>' +
-                            '</info_serv_denta>' +
-                            '<mnt_prcu_patnt>' + "0" + '</mnt_prcu_patnt>' +//?
-                        '</ligne_fact_serv_denta_chirg_denti>';
+            xml = xml +
+                '<' + ligneFactServDentaChirgTitle + '>' +
+                    '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
+                    '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                    '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
+                    '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
+                    '<cod_role>' + '1' + '</cod_role>' + //TODO: Where from? Constant? Data 1 : Responsable 4 : Assistant
+                    RamqGetDatAutorProthAcryl(pObjBillData.date_autorisation_dentiste)+
+                    '<info_serv_denta>' +
+                        '<no_dent>' + pObjBillData.Dent + '</no_dent>' +
+                        '<liste_surf_dent_trait>' +
+                            RamqGetListe_surf_dent_trait(pObjBillData.Surface) +
+                        '</liste_surf_dent_trait>' +
+                        //optional
+                        RamqGetRaisTraitDentaXml(pObjBillData.typ_id_rais_trait_denta, pObjBillData.id_rais_trait_denta) +
+                        //optional
+                        RamqGetSiteTraitDentaXml(pObjBillData.typ_id_site_trait_denta, pObjBillData.id_site_trait_denta) +
+                        //optional
+                        RamqGetInfoMedConsmXml(pObjBillData.typ_med_consm, pObjBillData.arr_med_consm) +
+                    '</info_serv_denta>' +
+                    //optional
+                    RamqGetListeElmMesurXml(pObjBillData.arr_elm_mesur) +
+                    //optional
+                    RamqGetListElmContxXml(pObjBillData.arr_elm_contx) +
+                    //optional
+                    RamqGetListeLieuRefreXml(pObjBillData.identification_lieu_dentiste, pObjBillData.id_lieu_phys, pObjBillData.no_sect_activ, pObjBillData.id_lieu_geo, pObjBillData.lieu_type, pObjBillData.no_bur_dentiste) +
+                    //optional
+                    RamqGetRefreAutreProfXml(pObjBillData.typ_refre_autre_prof, pObjBillData.typ_id_prof, pObjBillData.id_prof) +
+                    RamqGetMntPrcuPatntXml(pObjBillData.mnt_prcu_patnt)+
+                  
+                 '</' + ligneFactServDentaChirgTitle + '>';
+            ligneNum++;
+        }
+    }
+     return xml;
+}
+
+function RamqGetListe_ligne_fact_serv_denta_dentu(pArrBillData, _dent_Type)
+{
+    var xml = '';
+    var ligneNum = 1;
+
+    for (var i = 0; i < pArrBillData.length; i++) {
+        var pObjBillData = pArrBillData[i];
+        if (pObjBillData.Type == 'AMQ' || pObjBillData.Type == 'BES') {
+            xml = xml +
+                '<ligne_fact_serv_denta_dentu>' +
+                    '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
+                    '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                    '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
+                    '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
+                    RamqGetDatAutorProthAcryl(pObjBillData.date_autorisation_dentiste) +
+                    RamqGetListElmContxXml(pObjBillData.arr_elm_contx) +
+                    //optional
+                    //RamqGetListeLieuRefreXml(pObjBillData.identification_lieu_dentiste, pObjBillData.id_lieu_phys, pObjBillData.no_sect_activ, pObjBillData.id_lieu_geo, pObjBillData.lieu_type, pObjBillData.no_bur_dentiste) +
+                    //optional
+                    //RamqGetRefreAutreProfXml(pObjBillData.typ_refre_autre_prof, pObjBillData.typ_id_prof, pObjBillData.id_prof) +
+                    //RamqGetMntPrcuPatntXml(pObjBillData.mnt_prcu_patnt) +
+
+                 '</ligne_fact_serv_denta_dentu>';
             ligneNum++;
         }
     }
     return xml;
 }
 
-function getListe_surf_dent_trait(strSurf)
+function RamqGetRaisTraitDentaXml(p_typ_id_rais_trait_denta, p_id_rais_trait_denta )
+{
+    var res = '';
+    if(p_typ_id_rais_trait_denta &&  p_id_rais_trait_denta)
+    {
+        res =
+            '<rais_trait_denta>' +
+                '<typ_id_rais_trait_denta>' + p_typ_id_rais_trait_denta + '</typ_id_rais_trait_denta>' +
+                '<id_rais_trait_denta>' + p_id_rais_trait_denta + '</id_rais_trait_denta>' +
+            '</rais_trait_denta>';
+    }
+    return res;
+}
+
+function RamqGetSiteTraitDentaXml(p_typ_id_site_trait_denta , p_id_site_trait_denta)
+{
+    var res = '';
+    if (p_typ_id_site_trait_denta && p_id_site_trait_denta)
+    {
+        res =
+            '<site_trait_denta>'
+                '<typ_id_site_trait_denta>' + p_typ_id_site_trait_denta + '</typ_id_site_trait_denta>' +
+                '<id_site_trait_denta>' + p_id_site_trait_denta + '</id_site_trait_denta>' +
+            '</site_trait_denta>';
+    }
+    return res;
+}
+
+function RamqGetInfoMedConsmXml(p_typ_med_consm, p_arr_med_consm)
+{
+    var res = '';
+    if (p_typ_med_consm && p_arr_med_consm && p_arr_med_consm.length > 0)
+    {
+        res =
+            '<info_med_consm>' +
+                '<typ_med_consm>' + p_typ_med_consm + '</typ_med_consm>' + //TODO: is this constant?
+                '<liste_med_consm>';
+                                    
+
+            ;
+        for (var i = 0; i < p_arr_med_consm.length; i++)
+        {
+            res +=
+                '<med_consm>' +
+                    '<typ_id_med_consm>' + p_arr_med_consm[i].typ_id_med_consm + '</typ_id_med_consm>' +//TODO: is this constant?
+                    '<id_med_consm>' + p_arr_med_consm[i].typ_id_med_consm + '</id_med_consm>' +
+                '</med_consm>';
+        }
+        res +=
+            '</liste_med_consm>' +
+        '</info_med_consm>';
+    }
+    return res;
+}
+
+function RamqGetListeElmMesurXml(p_arr_elm_mesur)
+{
+    var res = '';
+    if(p_arr_elm_mesur && p_arr_elm_mesur.length>0)
+    {
+        res +=
+            '<liste_elm_mesur>';
+        for (var i = 0; i < p_arr_elm_mesur.length; i++)
+        {
+            res = 
+                '<elm_mesur>'+
+                    '<cod_elm_mesur>'+p_arr_elm_mesur[i].cod_elm_mesur+'</cod_elm_mesur>'+
+                    '<val_mes>'+ p_arr_elm_mesur[i].val_mes+'</val_mes>'+
+                '</elm_mesur>';
+        }
+        res +=
+            '</liste_elm_mesur>';
+    }
+    return res;
+}
+
+function RamqGetListElmContxXml(p_arr_elm_contx)
+{
+    var res = '';
+    if (p_arr_elm_contx && p_arr_elm_contx.length > 0)
+    {
+        res += 
+            '<liste_elm_contx>';
+        for(var i = 0; i< p_arr_elm_contx.length; i++)
+        {
+            res += 
+                '<elm_contx>'+
+                    '<cod_elm_contx>' + p_arr_elm_contx[i].cod_elm_contx + '</cod_elm_contx>' +
+                '</elm_contx>';
+        }
+        res +=
+            '</liste_elm_contx>';
+    }
+    return res;
+}
+
+function RamqGetListeLieuRefreXml(p_identification_lieu_dentiste, p_id_lieu_phys, p_no_sect_activ, p_id_lieu_geo, p_lieu_type, p_no_bur_dentiste)
+{
+    var res = '';
+    if (p_identification_lieu_dentiste)
+    {
+        res +=
+        '<lieu_en_refre>' +
+            '<typ_refre_lieu>' + '10' + '</typ_refre_lieu>' + //TODO: where  from get this data? 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
+            '<liste_lieu_refre>';
+
+        if (p_identification_lieu_dentiste == 'Lieu codifié á la Régie') {
+            res +=
+                '<lieu_refre_phys>' +
+                    '<typ_id_lieu_phys>' + '1' + '</typ_id_lieu_phys>' + //TODO: is it constant?
+                    '<id_lieu_phys>' + p_id_lieu_phys + '</id_lieu_phys>';
+            if (p_no_sect_activ) {
+                res += '<no_sect_activ>' + p_no_sect_activ + '</no_sect_activ>';
+            }
+            res +=
+                '</lieu_refre_phys>';
+        }
+        else if (p_identification_lieu_dentiste == 'Lieu non codifié') //TODO: 
+        {
+            var lieuType;
+            if (p_lieu_type === "Cabinet")
+                lieuType = 'C';
+            else if (p_lieu_type === "Domicile")
+                lieuType = 'D';
+            else if (p_lieu_type === "Autre")
+                lieuType = 'A';
+
+            res +=
+                '<lieu_refre_geo>' +
+                    '<typ_id_lieu_geo>' + '2' + '</typ_id_lieu_geo>' + //TODO: is it constant?
+                    '<id_lieu_geo>' + p_id_lieu_geo + '</id_lieu_geo>' +
+                    '<typ_lieu_geo>' + lieuType + '</typ_lieu_geo>';
+            if (p_lieu_type === "Cabinet") {
+                res += '<no_bur>' + p_no_bur_dentiste + '</no_bur>';
+            }
+
+            res +=
+                '</lieu_refre_geo>' +
+                '</liste_lieu_refre>';
+        }
+    }
+     
+    return res;
+}
+
+function RamqGetRefreAutreProfXml(p_typ_refre_autre_prof, p_typ_id_prof, p_id_prof)
+{
+    var res = '';
+    if (p_typ_refre_autre_prof && p_typ_id_prof && p_id_prof)
+    {
+        res +=
+            '<refre_autre_prof>' +
+            '<typ_refre_autre_prof>' + p_typ_refre_autre_prof + '</typ_refre_autre_prof>' +
+            '<info_prof_refre>' +
+                '<prof_refre_connu>' +
+                '<typ_id_prof>' + p_typ_id_prof + '</typ_id_prof>' +
+                '<id_prof>' + p_id_prof + '</id_prof>' +
+                '</prof_refre_connu>' +
+            '</info_prof_refre>' +
+            '</refre_autre_prof>';
+    }
+    return res;
+}
+
+function RamqGetMntPrcuPatntXml(p_mnt_prcu_patnt)
+{
+    var res = '';
+    if (p_mnt_prcu_patnt)
+        res = '<mnt_prcu_patnt>' + p_mnt_prcu_patnt + '</mnt_prcu_patnt>';
+    return res;
+}
+
+function RamqGetDatAutorProthAcryl(p_date_autorisation_dentiste)
+{
+    var res = '';
+    if (p_date_autorisation_dentiste)
+        res = '<dat_autor_proth_acryl>' + p_date_autorisation_dentiste + '</dat_autor_proth_acryl>';
+    return res;
+}
+
+function RamqGetListe_surf_dent_trait(strSurf)
 {
     var arrCharSurf = strSurf.split('');
     var xml = '';
@@ -261,286 +538,9 @@ function getListe_surf_dent_trait(strSurf)
     return xml;
 }
 
-// for test only
-function getarrGrilleDeFacturation() {
-    var arr = [];
-    var line = {};
-    //1
-    line.Type = 'AMQ'; //BES
-    line.Dent = '14';
-    line.Surface = 'M';
-    line.Code = '21211';
-    line.Description = '';
-    line.FraisLab = '';
-    line.Honoraires = '';
-    line.Total = '';
-    line.Prod = '';
-    arr.push(line);
 
-    //2
-    var line = {};
-    line.Type = 'AMQ'; //BES
-    line.Dent = '14';
-    line.Surface = '';
-    line.Code = '21211';//21999
-    line.Description = '';
-    line.FraisLab = '';
-    line.Honoraires = '';
-    line.Total = '';
-    line.Prod = '';
-    arr.push(line);
 
-    //3
-    var line = {};
-    line.Type = 'AMQ'; //BES
-    line.Dent = '15';
-    line.Surface = 'M';
-    line.Code = '21211';
-    line.Description = '';
-    line.FraisLab = '';
-    line.Honoraires = '';
-    line.Total = '';
-    line.Prod = '';
-    arr.push(line);
-
-    ////4
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '15';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////5
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '16';
-    //line.Surface = 'O';
-    //line.Code = '21221';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////6
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '16';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////7
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '17';
-    //line.Surface = 'O';
-    //line.Code = '21221';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////8
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '17';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////9
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '24';
-    //line.Surface = 'O';
-    //line.Code = '21211';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////10
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '24';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////11
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '25';
-    //line.Surface = 'O';
-    //line.Code = '21211';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////12
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '25';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////13
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '26';
-    //line.Surface = 'O';
-    //line.Code = '21221';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////14
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '26';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////15
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '27';
-    //line.Surface = 'O';
-    //line.Code = '21221';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////16
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '27';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////17
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '34';
-    //line.Surface = 'O';
-    //line.Code = '21211';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////18
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '34';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////19
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '35';
-    //line.Surface = 'O';
-    //line.Code = '21211';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////20
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '35';
-    //line.Surface = '';
-    //line.Code = '21999';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    ////21
-    //var line = {};
-    //line.Type = 'AMQ'; //BES
-    //line.Dent = '';
-    //line.Surface = '';
-    //line.Code = '94541';
-    //line.Description = '';
-    //line.FraisLab = '';
-    //line.Honoraires = '';
-    //line.Total = '';
-    //line.Prod = '';
-    //arr.push(line);
-
-    return arr;
-}
-
-function getCurrentDate()
+function RamqGetCurrentDate()
 {
     var date = '';
     var d = new Date();
@@ -553,93 +553,7 @@ function getCurrentDate()
     return  y + '-' + m +'-' + day;
 }
 
-function getSoumissionDemandesPaimentXML2()
-{
-    //For test only:
-    var d = new Date();
-    var n = d.getTime();
-    var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
-    '<dem_paimt xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
-    //'<no_dem_ext>' + $('#no_dem_ext').val() + '</no_dem_ext>' +
-    '<no_dem_ext>' + n + '</no_dem_ext>' +// for test only
-    '<logcl_fact>' +
-        '<no_devpr_logcl>' + $('#no_devpr_logcl').val() + '</no_devpr_logcl>' +
-        '<nom_devpr_logcl>' + $('#nom_devpr_logcl').val() + '</nom_devpr_logcl>' +
-        '<nom_logcl_fact>' + $('#nom_logcl_fact').val() + '</nom_logcl_fact>' +
-        '<no_versi_logcl_fact>' + $('#no_versi_logcl_fact').val() + '</no_versi_logcl_fact>' +
-        '<no_versi_xml_dem>' + $('#no_versi_xml_dem').val() + '</no_versi_xml_dem>' +
-    '</logcl_fact>' +
-    '<demdr>' +
-        '<typ_id_intvn>' + $('#demdr_typ_id_intvn').val() + '</typ_id_intvn>' +
-        '<id_intvn>' + $('#demdr_id_intvn').val() + '</id_intvn>' +
-    '</demdr>' +
-    '<exped_difrn_demdr>' +
-        '<typ_id_intvn>' + $('#exped_typ_id_intvn').val() + '</typ_id_intvn>' +
-        '<id_intvn>' + $('#exped_id_intvn').val() + '</id_intvn>' +
-    '</exped_difrn_demdr>' +
-    '<moda_paimt>' +
-        '<typ_moda_paimt>' + $('#typ_moda_paimt').val() + '</typ_moda_paimt>' +
-    '</moda_paimt>' +
-    '<liste_fact>' +
-        '<fact_serv_denta_chirg_denti_1_1_0>' +
-            '<no_fact_ext>' + $('#no_fact_ext').val() + '</no_fact_ext>' +
-            '<prof>' +
-                '<typ_id_prof>' + $('#typ_id_prof').val() + '</typ_id_prof>' +
-                '<id_prof>' + $('#id_prof').val() + '</id_prof>' +
-            '</prof>' +
-            '<lieu_consi>' +
-                '<lieu_phys>' +
-                    '<typ_id_lieu_phys>' + $('#typ_id_lieu_phys').val() + '</typ_id_lieu_phys>' +
-                    '<id_lieu_phys>' + $('#id_lieu_phys').val() + '</id_lieu_phys>' +
-                '</lieu_phys>' +
-            '</lieu_consi>' +
-            '<liste_pers_objet_fact>' +
-                '<pers_patnt_avec_idt>' +
-                    '<typ_situ_consi>' + $('#typ_situ_consi').val() + '</typ_situ_consi>' +
-                    '<typ_id_pers>' + $('#typ_id_pers').val() + '</typ_id_pers>' +
-                    '<id_pers>' + $('#id_pers').val() + '</id_pers>' +
-                '</pers_patnt_avec_idt>' +
-            '</liste_pers_objet_fact>' +
-            '<ind_fact_assoc_dr>true</ind_fact_assoc_dr>' +
-            '<liste_ligne_fact_serv_denta_chirg_denti>' +
-                '<ligne_fact_serv_denta_chirg_denti>' +
-                    '<no_ligne_fact>' + $('#no_ligne_fact').val() + '</no_ligne_fact>' +
-                    '<typ_id_elm_fact>' + $('#typ_id_elm_fact').val() + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
-                    '<id_elm_fact>' + $('#id_elm_fact').val() + '</id_elm_fact>' +
-                    '<dat_serv_elm_fact>' + $('#dat_serv_elm_fact').val() + '</dat_serv_elm_fact>' +
-                    '<cod_role>1</cod_role>' + //1 : Responsable 4 : Assistant
-                    //'<dhd_elm_fact>' + $('#dhd_elm_fact').val() + '</dhd_elm_fact>' +
-                    //'<dat_autor_proth_acryl>' + $('#dat_autor_proth_acryl').val() + '</dat_autor_proth_acryl>' +
-                    '<info_serv_denta>' +
-                        '<no_dent>1</no_dent>' +
-                        '<liste_surf_dent_trait>' +
-                            '<surf_dent>' +
-                                '<cod_surf_dent>' + $('#cod_surf_dent').val() + '</cod_surf_dent>' +
-                            '</surf_dent>' +
-                        '</liste_surf_dent_trait>' +
-                        '<site_trait_denta>' +
-                            '<typ_id_site_trait_denta>' + $('#typ_id_site_trait_denta').val() + '</typ_id_site_trait_denta>' +
-                            '<id_site_trait_denta>' + $('#id_site_trait_denta').val() + '</id_site_trait_denta>' +
-                        '</site_trait_denta>' +
-                    '</info_serv_denta>' +
-                    //'<refre_autre_prof>' +
-                    //    '<typ_refre_autre_prof>' + $('#typ_refre_autre_prof').val() + '</typ_refre_autre_prof>' +
-                    //    '<info_prof_refre>' +
-                    //        '<prof_refre_connu>' +
-                    //            '<typ_id_prof>' + $('#typ_id_prof').val() + '</typ_id_prof>' +
-                    //            '<id_prof>' + $('#id_prof').val() + '</id_prof>' +
-                    //        '</prof_refre_connu>' +
-                    //    '</info_prof_refre>' +
-                    //'</refre_autre_prof>' +
-                    '<mnt_prcu_patnt>' + $('#mnt_prcu_patnt').val() + '</mnt_prcu_patnt>' +
-                '</ligne_fact_serv_denta_chirg_denti>' +
-            '</liste_ligne_fact_serv_denta_chirg_denti>' +
-        '</fact_serv_denta_chirg_denti_1_1_0>' +
-    '</liste_fact>' +
-'</dem_paimt>';
-    return xml;
 
-}
 
 function getSoumissionDemandesModificationXML()
 {
@@ -768,9 +682,7 @@ function getSoumissionDemandesAnnulationXML()
 		                '</id_fact_ramq>'+
 	                '</liste_fact_a_annu>'+
                 '</dem_annu>';
-
     return xml;
-
 }
 
 function parseRAMQResponsePaiment(strXml)
@@ -969,7 +881,7 @@ function removeCDATA(str) {
     return res;
 }
 
-function getFactNumber()
+function RamqGetFactNumber()
 {
     //For Test only
     return 'F' + new Date().getTime();
@@ -977,68 +889,33 @@ function getFactNumber()
     //TODO: implement real algorithm.
 }
 
-function SoumissionDemandesPaiementValidation()
+
+
+function RamqSoumissionDemandesPaiementGetData()
 {
-    
+    /*
+     data source to create an xml :
+     1.Constant data related to application and developer. objConstAppData.
+     2.Data from visioneR objVisionRData.
+     4.Data from UI. objBillData.
+    */
+    /*returns an array of objects:
+    arrData[0] = objConstAppData;
+    arrData[1] = objVisionRData;
+    arrData[2] = objBillData;
+    */
+    var objConstAppData = RamqGetConstAppData();
+    var objVisionRData = RamqGetVisionRData();
+    var objBillData = RamqGetBillData();
+
+    var arrData = [];
+    arrData[0] = objConstAppData;
+    arrData[1] = objVisionRData;
+    arrData[2] = objBillData;
+
+    return arrData;
 }
 
-function SoumissionDemandesPaiementGetData()
-{
-    var objSDP = {};
-    var cPat = 0;
-    var validationResult = false;
-    for (pat in qPAT.patients) 
-    {
-        if (curPatient == qPAT.patients[pat].id)
-        {
-            cPat = pat;
-            break;
-        }
-    }
-    //var nam = qPAT.patients[cPat].NAM; //uncomment for production
-    var nam = 'DISL14082210'; //For test only.
-    objSDP.NAM = nam;
-    objSDP.NoDevprLogcl = '18011';//?
-    objSDP.NomDevprLogcl = 'Développeur';//?
-    objSDP.NomLogclFact = 'Mon logiciel';//?
-    objSDP.NoVersiLogclFact = '1.0.0';//?
-    objSDP.NoVersiXmlDem = 'ACTE';//?
-    objSDP.DemdrTypIdIntvn = '1';//const
-    objSDP.DemdrIdIntvn = '299801';//? looks like Idprof
-    objSDP.ExpedTypIdIntvn = '3';//const
-    objSDP.ExpedIdIntvn = '18011';//?
-    objSDP.TypModaPaimt = '1';//1 : Compte personnel du professionnel 2 : Compte administratif
-    objSDP.TypIdProf = '1';//const 1 : Numéro dispensateur RAMQ
-    objSDP.IdProf = '299801';// $('#no_prof').val();
-    objSDP.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
-    objSDP.IdLieuPhys = '99999';//?
-    objSDP.TypSituConsi = '1';//Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
-    objSDP.TypIdPers = '1';//1 : NAM RAMQ
-    objSDP.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
-
-    validationResult = SDPValidation(objSDP);
-    if (validationResult)
-        return objSDP;
-    else
-        return null;
-}
-
-function SDPValidation(_objSDP)
-{
-    //var strResult='';
-    //if (_objSDP.NAM == '')
-    //    strResult += 'NAM est requis!';
-
-    //if (strResult != '')
-    //{
-    //    alert(strResult);
-    //    return false;
-    //}
-    //else{
-    //    return true;
-    //}
-    return true;
-}
     
 function SoumissionDemandesAnnulationGetData()
 {
@@ -1052,3 +929,531 @@ function displayRamqAnswer(_header, _content)
     var content = modalDiv[0].children[1].innerHTML = _content;
     modFactResponse();
 }
+
+function RamqGetConstAppData()
+{
+    //TODO: Change to real data.
+    var res = {};
+
+    res.NoDevprLogcl = '18011';//?
+    res.NomDevprLogcl = 'Développeur';//?
+    res.NomLogclFact = 'Mon logiciel';//?
+    res.NoVersiLogclFact = '1.0.0';//?
+    res.NoVersiXmlDem = 'ACTE';//?
+    return res;
+}
+
+function RamqGetVisionRData()
+{
+    //TODO: call service to get this parameters
+
+    var res = {};
+    res.DemdrTypIdIntvn = '1';//const
+    res.DemdrIdIntvn = '299801';//? looks like Idprof
+    res.ExpedTypIdIntvn = '3';//const
+    res.ExpedIdIntvn = '18011';//?
+    res.TypModaPaimt = '1';//1 : Compte personnel du professionnel 2 : Compte administratif
+    res.TypIdProf = '1';//const 1 : Numéro dispensateur RAMQ
+    res.IdProf = '299801';// 
+    res.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
+    res.IdLieuPhys = '99999';//?
+    res.TypSituConsi = '1';//Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+    res.TypIdPers = '1';//1 : NAM RAMQ
+    res.IdPers = 'DISL14082210';//NAM
+    res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
+
+    return res;
+}
+
+function RamqGetBillData()
+{
+    /*
+    combine data from two arrays arrGrilleDeFacturation and arrGrilleDeFacturation_forms
+    */
+    var arrRes = [];
+
+    for (var i = 0; i < arrGrilleDeFacturation.length; i++)
+    {
+        var objRes = {};
+        objRes.Code = arrGrilleDeFacturation[i].Code;
+        objRes.Dent = arrGrilleDeFacturation[i].Dent;
+        objRes.Description = arrGrilleDeFacturation[i].Description;
+        objRes.Frais = arrGrilleDeFacturation[i].Frais;
+        objRes.Honoraires = arrGrilleDeFacturation[i].Honoraires;
+        objRes.Prod = arrGrilleDeFacturation[i].Prod;
+        objRes.Surface = arrGrilleDeFacturation[i].Surface;
+        objRes.Total = arrGrilleDeFacturation[i].Total;
+        objRes.Type = arrGrilleDeFacturation[i].Type;
+
+        var arrMoreInfo = RamqGetMoreInfo(arrGrilleDeFacturation[i].row_id)
+        if (arrMoreInfo)
+        {
+            objRes.no_autorisation_dentiste = RamqGetValueFromArrByName('no_autorisation_dentiste', arrMoreInfo);//TODO: this value isn't used
+            objRes.date_autorisation_dentiste = RamqGetValueFromArrByName('date_autorisation_dentiste', arrMoreInfo);
+
+            
+
+            //TODO: we need typ_id_rais_trait_denta and id_rais_trait_denta enstead of type_raison_dentiste
+            //objRes.type_raison_dentiste = arrMoreInfo[3].value;
+            objRes.typ_id_rais_trait_denta = RamqGetValueFromArrByName('typ_id_rais_trait_denta', arrMoreInfo);
+            objRes.id_rais_trait_denta = RamqGetValueFromArrByName('id_rais_trait_denta', arrMoreInfo);
+
+            //TODO: we need typ_id_site_trait_denta and id_site_trait_denta enstead of type_site_dentiste
+            objRes.type_site_dentiste = RamqGetValueFromArrByName('type_site_dentiste', arrMoreInfo);
+            objRes.typ_id_site_trait_denta = RamqGetValueFromArrByName('typ_id_site_trait_denta', arrMoreInfo);
+            objRes.id_site_trait_denta = RamqGetValueFromArrByName('id_site_trait_denta', arrMoreInfo);
+
+            //TODO: we need typ_med_consm, and an ARRAY of med_consm. Each element of array should have two param: typ_id_med_consm and id_med_consm
+            //objRes.medicament_dentiste = arrMoreInfo[5].value;
+            objRes.typ_med_consm = RamqGetValueFromArrByName('typ_med_consm', arrMoreInfo);
+            objRes.arr_med_consm = RamqGetValueFromArrByName('arr_med_consm', arrMoreInfo);
+
+            //TODO: we need an ARRAY arr_elm_contx instead of single value element_contexte_dentiste
+            //objRes.element_contexte_dentiste = arrMoreInfo[6].value;
+            objRes.arr_elm_contx = RamqGetValueFromArrByName('arr_elm_contx', arrMoreInfo);
+
+            //TODO: we need an ARRAY arr_elm_mesur instead of single value mesurables_dentiste
+            //objRes.mesurables_dentiste = arrMoreInfo[7].value;
+            objRes.arr_elm_mesur = objRes.arr_elm_contx = RamqGetValueFromArrByName('arr_elm_mesur', arrMoreInfo);
+
+            objRes.identification_lieu_dentiste = RamqGetValueFromArrByName('identification_lieu_dentiste', arrMoreInfo);
+
+            //TODO: we need id_lieu_phys: 
+            objRes.id_lieu_phys = RamqGetValueFromArrByName('id_lieu_phys', arrMoreInfo);
+
+            //TODO: we need no_sect_activ: 
+            objRes.no_sect_activ = RamqGetValueFromArrByName('no_sect_activ', arrMoreInfo);
+
+            //TODO: we need id_lieu_geo
+            objRes.id_lieu_geo = RamqGetValueFromArrByName('id_lieu_geo', arrMoreInfo);
+
+            objRes.lieu_type = RamqGetValueFromArrByName('lieu_type', arrMoreInfo);
+            objRes.no_bur_dentiste = RamqGetValueFromArrByName('no_bur_dentiste', arrMoreInfo);
+
+            //refre_autre_prof
+            //TODO: we need typ_refre_autre_prof
+            objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_refre_autre_prof', arrMoreInfo);
+            //TODO: we need typ_id_prof
+            objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_id_prof', arrMoreInfo);
+            //TODO: we need id_prof
+            objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('id_prof', arrMoreInfo);
+
+            //TODO: we need mnt_prcu_patnt
+            objRes.mnt_prcu_patnt = RamqGetValueFromArrByName('mnt_prcu_patnt', arrMoreInfo);
+
+
+            objRes.situation_lieu_dentiste = RamqGetValueFromArrByName('situation_lieu_dentiste', arrMoreInfo);// TODO: where put this value?
+            objRes.postal_dentiste = RamqGetValueFromArrByName('postal_dentiste', arrMoreInfo);// TODO: where put this value?
+            objRes.code_localite_dentiste = RamqGetValueFromArrByName('code_localite_dentiste', arrMoreInfo);
+            
+            objRes.no_referant_dentiste = RamqGetValueFromArrByName('no_referant_dentiste', arrMoreInfo);
+            objRes.nom_dentiste = RamqGetValueFromArrByName('nom_dentiste', arrMoreInfo);
+            objRes.prenom_dentiste = RamqGetValueFromArrByName('prenom_dentiste', arrMoreInfo);
+            objRes.type_profession_dentiste = RamqGetValueFromArrByName('type_profession_dentiste', arrMoreInfo);
+        }
+        arrRes.push(objRes);
+    }
+    return arrRes;
+}
+
+//Returns an element from arrMoreInfo by element name
+function RamqGetValueFromArrByName(pElementName, pArrMoreInfo)
+{
+    for (var i = 0; i < pArrMoreInfo.length; i++)
+    {
+        if (pArrMoreInfo[i].name == pElementName)
+        {
+            return pArrMoreInfo[i].value;
+            break;
+        }
+    }
+    return null;
+}
+
+//Returns additional info for the line of Bill.
+function RamqGetMoreInfo(pRowId)
+{
+    for (var i = 0; i < arrGrilleDeFacturation_forms.length; i++)
+    {
+        if (arrGrilleDeFacturation_forms[i][0].value == pRowId)
+        {
+            return arrGrilleDeFacturation_forms[i];
+            break;
+        }
+    }
+    return null;
+}
+
+function RamqGenerateNoDemExt()
+{
+    //TODO:Implement real algorithm
+    return new Date().getTime();
+}
+
+    // for test only
+    function getarrGrilleDeFacturation() {
+        var arr = [];
+        var line = {};
+        //1
+        line.Type = 'AMQ'; //BES
+        line.Dent = '14';
+        line.Surface = 'M';
+        line.Code = '21211';
+        line.Description = '';
+        line.FraisLab = '';
+        line.Honoraires = '';
+        line.Total = '';
+        line.Prod = '';
+        arr.push(line);
+
+        //2
+        var line = {};
+        line.Type = 'AMQ'; //BES
+        line.Dent = '14';
+        line.Surface = '';
+        line.Code = '21211';//21999
+        line.Description = '';
+        line.FraisLab = '';
+        line.Honoraires = '';
+        line.Total = '';
+        line.Prod = '';
+        arr.push(line);
+
+        //3
+        var line = {};
+        line.Type = 'AMQ'; //BES
+        line.Dent = '15';
+        line.Surface = 'M';
+        line.Code = '21211';
+        line.Description = '';
+        line.FraisLab = '';
+        line.Honoraires = '';
+        line.Total = '';
+        line.Prod = '';
+        arr.push(line);
+
+        ////4
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '15';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////5
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '16';
+        //line.Surface = 'O';
+        //line.Code = '21221';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////6
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '16';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////7
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '17';
+        //line.Surface = 'O';
+        //line.Code = '21221';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////8
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '17';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////9
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '24';
+        //line.Surface = 'O';
+        //line.Code = '21211';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////10
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '24';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////11
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '25';
+        //line.Surface = 'O';
+        //line.Code = '21211';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////12
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '25';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////13
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '26';
+        //line.Surface = 'O';
+        //line.Code = '21221';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////14
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '26';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////15
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '27';
+        //line.Surface = 'O';
+        //line.Code = '21221';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////16
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '27';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////17
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '34';
+        //line.Surface = 'O';
+        //line.Code = '21211';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////18
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '34';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////19
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '35';
+        //line.Surface = 'O';
+        //line.Code = '21211';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////20
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '35';
+        //line.Surface = '';
+        //line.Code = '21999';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        ////21
+        //var line = {};
+        //line.Type = 'AMQ'; //BES
+        //line.Dent = '';
+        //line.Surface = '';
+        //line.Code = '94541';
+        //line.Description = '';
+        //line.FraisLab = '';
+        //line.Honoraires = '';
+        //line.Total = '';
+        //line.Prod = '';
+        //arr.push(line);
+
+        return arr;
+    }
+
+    /*
+    function getSoumissionDemandesPaimentXML2() {
+        //For test only:
+        var d = new Date();
+        var n = d.getTime();
+        var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
+        '<dem_paimt xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
+        //'<no_dem_ext>' + $('#no_dem_ext').val() + '</no_dem_ext>' +
+        '<no_dem_ext>' + n + '</no_dem_ext>' +// for test only
+        '<logcl_fact>' +
+            '<no_devpr_logcl>' + $('#no_devpr_logcl').val() + '</no_devpr_logcl>' +
+            '<nom_devpr_logcl>' + $('#nom_devpr_logcl').val() + '</nom_devpr_logcl>' +
+            '<nom_logcl_fact>' + $('#nom_logcl_fact').val() + '</nom_logcl_fact>' +
+            '<no_versi_logcl_fact>' + $('#no_versi_logcl_fact').val() + '</no_versi_logcl_fact>' +
+            '<no_versi_xml_dem>' + $('#no_versi_xml_dem').val() + '</no_versi_xml_dem>' +
+        '</logcl_fact>' +
+        '<demdr>' +
+            '<typ_id_intvn>' + $('#demdr_typ_id_intvn').val() + '</typ_id_intvn>' +
+            '<id_intvn>' + $('#demdr_id_intvn').val() + '</id_intvn>' +
+        '</demdr>' +
+        '<exped_difrn_demdr>' +
+            '<typ_id_intvn>' + $('#exped_typ_id_intvn').val() + '</typ_id_intvn>' +
+            '<id_intvn>' + $('#exped_id_intvn').val() + '</id_intvn>' +
+        '</exped_difrn_demdr>' +
+        '<moda_paimt>' +
+            '<typ_moda_paimt>' + $('#typ_moda_paimt').val() + '</typ_moda_paimt>' +
+        '</moda_paimt>' +
+        '<liste_fact>' +
+            '<fact_serv_denta_chirg_denti_1_1_0>' +
+                '<no_fact_ext>' + $('#no_fact_ext').val() + '</no_fact_ext>' +
+                '<prof>' +
+                    '<typ_id_prof>' + $('#typ_id_prof').val() + '</typ_id_prof>' +
+                    '<id_prof>' + $('#id_prof').val() + '</id_prof>' +
+                '</prof>' +
+                '<lieu_consi>' +
+                    '<lieu_phys>' +
+                        '<typ_id_lieu_phys>' + $('#typ_id_lieu_phys').val() + '</typ_id_lieu_phys>' +
+                        '<id_lieu_phys>' + $('#id_lieu_phys').val() + '</id_lieu_phys>' +
+                    '</lieu_phys>' +
+                '</lieu_consi>' +
+                '<liste_pers_objet_fact>' +
+                    '<pers_patnt_avec_idt>' +
+                        '<typ_situ_consi>' + $('#typ_situ_consi').val() + '</typ_situ_consi>' +
+                        '<typ_id_pers>' + $('#typ_id_pers').val() + '</typ_id_pers>' +
+                        '<id_pers>' + $('#id_pers').val() + '</id_pers>' +
+                    '</pers_patnt_avec_idt>' +
+                '</liste_pers_objet_fact>' +
+                '<ind_fact_assoc_dr>true</ind_fact_assoc_dr>' +
+                '<liste_ligne_fact_serv_denta_chirg_denti>' +
+                    '<ligne_fact_serv_denta_chirg_denti>' +
+                        '<no_ligne_fact>' + $('#no_ligne_fact').val() + '</no_ligne_fact>' +
+                        '<typ_id_elm_fact>' + $('#typ_id_elm_fact').val() + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                        '<id_elm_fact>' + $('#id_elm_fact').val() + '</id_elm_fact>' +
+                        '<dat_serv_elm_fact>' + $('#dat_serv_elm_fact').val() + '</dat_serv_elm_fact>' +
+                        '<cod_role>1</cod_role>' + //1 : Responsable 4 : Assistant
+                        //'<dhd_elm_fact>' + $('#dhd_elm_fact').val() + '</dhd_elm_fact>' +
+                        //'<dat_autor_proth_acryl>' + $('#dat_autor_proth_acryl').val() + '</dat_autor_proth_acryl>' +
+                        '<info_serv_denta>' +
+                            '<no_dent>1</no_dent>' +
+                            '<liste_surf_dent_trait>' +
+                                '<surf_dent>' +
+                                    '<cod_surf_dent>' + $('#cod_surf_dent').val() + '</cod_surf_dent>' +
+                                '</surf_dent>' +
+                            '</liste_surf_dent_trait>' +
+                            '<site_trait_denta>' +
+                                '<typ_id_site_trait_denta>' + $('#typ_id_site_trait_denta').val() + '</typ_id_site_trait_denta>' +
+                                '<id_site_trait_denta>' + $('#id_site_trait_denta').val() + '</id_site_trait_denta>' +
+                            '</site_trait_denta>' +
+                        '</info_serv_denta>' +
+                        //'<refre_autre_prof>' +
+                        //    '<typ_refre_autre_prof>' + $('#typ_refre_autre_prof').val() + '</typ_refre_autre_prof>' +
+                        //    '<info_prof_refre>' +
+                        //        '<prof_refre_connu>' +
+                        //            '<typ_id_prof>' + $('#typ_id_prof').val() + '</typ_id_prof>' +
+                        //            '<id_prof>' + $('#id_prof').val() + '</id_prof>' +
+                        //        '</prof_refre_connu>' +
+                        //    '</info_prof_refre>' +
+                        //'</refre_autre_prof>' +
+                        '<mnt_prcu_patnt>' + $('#mnt_prcu_patnt').val() + '</mnt_prcu_patnt>' +
+                    '</ligne_fact_serv_denta_chirg_denti>' +
+                '</liste_ligne_fact_serv_denta_chirg_denti>' +
+            '</fact_serv_denta_chirg_denti_1_1_0>' +
+        '</liste_fact>' +
+    '</dem_paimt>';
+        return xml;
+    
+    }
+    */

@@ -192,7 +192,8 @@
               <!-- <img src="images/tooth.png"> -->
               <a class="item"><h3><i class="doctor blue icon"></i></h3>MP</a>
               <a class="item" onclick="reOpenSearch();"><h3><i class="user green icon"></i></h3>Change Patient</a>
-              <a class=""></a>
+              <a class="item" href="admin.html"><h3><i class="setting black icon"></i></h3>Admin</a>
+              <a class="item" ></a>
               <a class=""></a>
 
               <div class="right menu">
@@ -432,11 +433,11 @@
                               </div>
                             <div class="field">
                               <label>Sexe</label>
-                              <input type="text" id="">
+                              <input type="text" id="sexe">
                             </div>
                             <div class="five wide field">
                               <label>Age</label>
-                              <input type="text" id="">
+                              <input type="text" id="age">
                             </div>
                           </div>
 
@@ -4498,6 +4499,31 @@
       </div>
     </div>
   </div>
+    
+
+  <div class="ui modRamqCredentialAlert small modal">
+    <i class="close icon"></i>
+    <div class="header">
+      <i class="warning Sign icon"></i>
+      Ramq Credential Expiration
+    </div>
+    <div class="modRamqCredentialAlert content">
+      <div id="message_ramq_credential_alert"> 
+
+      </div>
+       <div class="ui grid">
+        <div class="row">
+          <div class="five wide column"></div>
+          <div class="six wide column">
+           <div class="actions">
+              <a class="ui black deny button">Cancel</a>
+              <a class="ui positive right labeled icon button" href="admin.html">Ok<i class="checkmark icon"></i></a>
+            </div>
+         </div>
+         </div>
+       </div>
+    </div>
+  </div>
 
   <div class="ui modalPIN modal">
     <i class="close icon"></i>
@@ -4586,6 +4612,11 @@
   function modLabo()
   {
     $('.modalLabo.modal').modal('show');
+  }
+
+    function ramqCredentialAlert()
+  {
+    $('.modRamqCredentialAlert.modal').modal('show');
   }
 
     function modCreateDos()

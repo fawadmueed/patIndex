@@ -8,6 +8,10 @@ import time
 from datetime import datetime
 import json
 
+import requests
+import html
+import xml.etree.ElementTree as ET
+
 print 'Content-type: text/json; charset=utf-8\n\n'
 
 form = cgi.FieldStorage()
@@ -415,3 +419,63 @@ if (tx == "uploadDOC"):
 	print '{ "outcome" : "success", "message" : "file uploaded" } '
 	#except:
 	#	print '{ "outcome" : "error", "message" : "uploadDOC error" } '
+
+		# ROBERTO CODE
+def CleanXML(s):
+	s = s.replace("\\r\\n","")
+	s = s.replace("\\n","")
+	s = s.replace("\\r","")
+	s = s.replace("\"<","<")
+	s = s.replace(">\"",">")
+	s = s.replace("  ","")
+	s = s.replace("\\\"","\"")
+	return s
+
+
+if (tx == "getRamqData"):   
+    try:
+        #read parameters from request
+        clinicId = form['clinicId'].value
+        patientId = form['patientId'].value
+        dataJson = json.loads(form['json'].value)
+        xmlreq = dataJson["request"]
+      
+        #read the parameters for credentials
+        json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
+        data = json.load(json_data)
+        json_data.close()
+        UserPass= data["MachineIdPass"]	
+        UserId= data["MachineId"]	
+
+        #send the request to WebApi that calls RAMQ server
+        dataJSON = { 'UserId': UserId, 'UserPass': UserPass, 'XmlToSend': CleanXML(xmlreq)}
+        headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
+        resp = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostPaymentRequest', json=dataJSON, headers=headers).text
+
+        #In case, something happen in server side code 500
+        if(resp.find("Error") > -1):
+            print('{ "outcome" : "error", "message" : ' + resp + ' }')    
+        else:
+            #clean XMl
+            xmlstring = resp
+            #define namespace for read xml       
+            nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
+
+            #Get the tocken from request to create filename later         
+            root = ET.fromstring(CleanXML(xmlreq.encode('utf-8')))
+            nofactext = root.find('n:liste_fact/n:fact_serv_denta_chirg_denti_1_1_0/n:no_fact_ext', namespaces=nsmap).text
+    
+            #verify if the response is ok or not
+            root = ET.fromstring(CleanXML(xmlstring.encode('utf-8')))            
+            nbrerror = root.find('n:sta_recev', namespaces=nsmap).text
+            if(nbrerror == "1"): #1: ok, 2: Fail
+              dataJSON = { 'xmlreq': xmlreq.replace("\"", "\\\"").replace("\r","").replace("\n","").replace("  ",""), 'xmlresp': xmlstring.replace("\"<","<").replace(">\"",">")}
+              logFile = open('json/ramq/'+ patientId + '_' + nofactext + '.json', 'w')
+              logFile.write(json.dumps(dataJSON).decode('unicode-escape').encode('utf8'))
+              logFile.close()
+		                    
+        message = {'outcome' : 'success', 'message': xmlstring}
+        print (json.dumps(message))
+
+    except:
+        print ('{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0])
