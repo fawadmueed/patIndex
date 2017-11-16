@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="javascript/axxium/cdaV4_29.js"></script>
+</head>
+<body>
+    <p>Test adoV4FormatField</p>
+    <input type="text" id="idValue" value="value"/>
+    <input type="text" id="idFormatType" value="D" />
+    <input type="text" id="idRequiredLength" value="5" />
+    
+    <input type="button" onclick="testadoV4FormatField()" value="test" /><br />
+    <input type="button" onclick="CDAV4GetFormatedValues()" value="Test CDAV4GetFormatedValues" />
+
+    <script>
+        function testadoV4FormatField()
+        {
+            var Value = document.getElementById("idValue").value;
+            var FormatType = document.getElementById("idFormatType").value;
+            var RequiredLength = document.getElementById("idRequiredLength").value;
+
+            alert(CDAV4FormatField(Value, FormatType, RequiredLength));
+        }
+        
+    </script>
+</body>
+</html>

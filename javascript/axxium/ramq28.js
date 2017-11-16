@@ -4,37 +4,52 @@
 //TODO:rename SoumissionDemandesPaiement to RamqSoumissionDemandesPaiement;
 function SoumissionDemandesPaiement()
 {
+
+    
+
     var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
     if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[2].length>0) //TODO: empty line shouldn't be added to an array.
     {
-        var operationName = "Paiement";
-        var jsonData = RamqGetData(operationName, objSoumissionDemandesPaiementData);
-        var methodName = "api/RamqWebApi/PostPaymentRequest";
-        $.ajax({
-            type: "POST",
-            url: globRamqApiPath + methodName,
-            ProcessData: false,
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            data: jsonData,
 
-            success: function (data, status, jqXHR) {
-                if (data != null && data.substring(0, 5) == 'Error') {
-                    displayRamqAnswer("RAMQ", data);
-                }
-                else if (data != null && data.substring(0, 5) != 'Error') {
-                    var objResponse = parseRAMQResponsePaiment(data);
-                    displayResponsePaiment(objResponse);
-                }
-                else {
-                    displayRamqAnswer("RAMQ", "SoumissionDemandesPaiement Error");
-                }
-            },
-            error: function (xhr) {
-                if (xhr.responceJSON != null)
-                    alert(xhr.responceJSON.Message);
-            }
-        });
+        var operationName = "Paiement";
+        var inputXMl = RamqGetData(operationName, objSoumissionDemandesPaiementData);
+
+        var jsonXML = {
+            "request": inputXMl
+        }
+
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: 'AGR18011', patientId: '234577', json: JSON.stringify(jsonXML) },
+                    function (result) {
+                        alert(result.message);
+                    });
+        //var operationName = "Paiement";
+        //var jsonData = RamqGetData(operationName, objSoumissionDemandesPaiementData);
+        //var methodName = "api/RamqWebApi/PostPaymentRequest";
+        //$.ajax({
+        //    type: "POST",
+        //    url: globRamqApiPath + methodName,
+        //    ProcessData: false,
+        //    contentType: "application/json; charset=utf-8",
+        //    dataType: "json",
+        //    data: jsonData,
+
+        //    success: function (data, status, jqXHR) {
+        //        if (data != null && data.substring(0, 5) == 'Error') {
+        //            displayRamqAnswer("RAMQ", data);
+        //        }
+        //        else if (data != null && data.substring(0, 5) != 'Error') {
+        //            var objResponse = parseRAMQResponsePaiment(data);
+        //            displayResponsePaiment(objResponse);
+        //        }
+        //        else {
+        //            displayRamqAnswer("RAMQ", "SoumissionDemandesPaiement Error");
+        //        }
+        //    },
+        //    error: function (xhr) {
+        //        if (xhr.responceJSON != null)
+        //            alert(xhr.responceJSON.Message);
+        //    }
+        //});
     }
     else {
         alert("There is nothing to send.")
@@ -120,7 +135,8 @@ function RamqGetData(operationName, _objData)
         xmlAEnvoyer = RamqGetSoumissionDemandesAnnulationXML();
     }
     
-    data = '{"UserId":"' + globRamqObjCredentials.MachineId + '","UserPass":"' + globRamqObjCredentials.MachineIdPass + '","XmlToSend":"' + xmlAEnvoyer + '"}';
+    //data = '{"UserId":"' + globRamqObjCredentials.MachineId + '","UserPass":"' + globRamqObjCredentials.MachineIdPass + '","XmlToSend":"' + xmlAEnvoyer + '"}';
+    data = xmlAEnvoyer;
     return data;
 }
 
@@ -207,23 +223,23 @@ function RamqGetListFact(_arrData, _dent_Type)
         '<' + factServDentaChirTitle + '>' +
                     '<no_fact_ext>' + RamqGetFactNumber() + '</no_fact_ext>' +
                     '<prof>' +
-                        '<typ_id_prof>' + objDataFromVisionR.TypIdProf + '</typ_id_prof>' + //const 1 : Numéro dispensateur RAMQ
+                        '<typ_id_prof>' + objDataFromVisionR.TypIdProf + '</typ_id_prof>' + //const 1 : NumÃ©ro dispensateur RAMQ
                         '<id_prof>' + objDataFromVisionR.IdProf + '</id_prof>' + //?
                     '</prof>' +
                     '<lieu_consi>' +
                         '<lieu_phys>' +
-                            '<typ_id_lieu_phys>' + objDataFromVisionR.TypIdLieuPhys + '</typ_id_lieu_phys>' + //1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
+                            '<typ_id_lieu_phys>' + objDataFromVisionR.TypIdLieuPhys + '</typ_id_lieu_phys>' + //1 : Lieu physique, reconnu et codifiÃ© Ã  la RÃ©gie (Ã©tablissement SSS, Cabinet, etc.)
                             '<id_lieu_phys>' + objDataFromVisionR.IdLieuPhys + '</id_lieu_phys>' + //?
                         '</lieu_phys>' +
                     '</lieu_consi>' +
                     '<liste_pers_objet_fact>' +
                         '<pers_patnt_avec_idt>' +
-                            '<typ_situ_consi>' + objDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+                            '<typ_situ_consi>' + objDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : DÃ©lai de carence, services nÃ©cessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : DÃ©lai de carence, services liÃ©s Ã  la grossesse, Ã  l\'accouchement ou Ã  l'interruption de grossesse 12 : DÃ©lai de carence, services nÃ©cessaires aux personnes aux prises avec problÃ¨mes de santÃ© de nature infectieuse ayant une incidence sur la santÃ© publique
                             '<typ_id_pers>' + objDataFromVisionR.TypIdPers + '</typ_id_pers>' + //1 : NAM RAMQ
                             '<id_pers>' + objDataFromVisionR.IdPers + '</id_pers>' + // NAM
                         '</pers_patnt_avec_idt>' + //TODO: implement case if user doesn't have NAM
                     '</liste_pers_objet_fact>' +
-                    RamqGetIndFactAssocDrXml(objDataFromVisionR.IndFactAssosDr, _dent_Type) +//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
+                    RamqGetIndFactAssocDrXml(objDataFromVisionR.IndFactAssosDr, _dent_Type) +//? Indique si la facture est associÃ©e Ã  une demande de remboursement d'un bÃ©nÃ©ficiare.
                     '<' + listeLigneFactServDentaChirgTitle + '>' +
                         RamqGetListeLigneFactServDenta(_arrData[2], _dent_Type) +
                     '</' + listeLigneFactServDentaChirgTitle + '>' +
@@ -270,7 +286,7 @@ function RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type)
             xml = xml +
                 '<' + ligneFactServDentaChirgTitle + '>' +
                     '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
-                    '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                    '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation Ã©lÃ©ment assurÃ©
                     '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
                     '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
                     '<cod_role>' + '1' + '</cod_role>' + //TODO: Where from? Constant? Data 1 : Responsable 4 : Assistant
@@ -315,7 +331,7 @@ function RamqGetListe_ligne_fact_serv_denta_dentu(pArrBillData, _dent_Type)
             xml = xml +
                 '<ligne_fact_serv_denta_dentu>' +
                     '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
-                    '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                    '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation Ã©lÃ©ment assurÃ©
                     '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
                     '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
                     RamqGetDatAutorProthAcryl(pObjBillData.date_autorisation_dentiste) +
@@ -436,10 +452,10 @@ function RamqGetListeLieuRefreXml(p_identification_lieu_dentiste, p_id_lieu_phys
     {
         res +=
         '<lieu_en_refre>' +
-            '<typ_refre_lieu>' + '10' + '</typ_refre_lieu>' + //TODO: where  from get this data? 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
+            '<typ_refre_lieu>' + '10' + '</typ_refre_lieu>' + //TODO: where  from get this data? 10 : Ã‰tablissement pris en charge lors d'une garde multi-Ã©tablissements 14 : Lieu de dÃ©part pour un dÃ©placement
             '<liste_lieu_refre>';
 
-        if (p_identification_lieu_dentiste == 'Lieu codifié á la Régie') {
+        if (p_identification_lieu_dentiste == 'Lieu codifiÃ© Ã¡ la RÃ©gie') {
             res +=
                 '<lieu_refre_phys>' +
                     '<typ_id_lieu_phys>' + '1' + '</typ_id_lieu_phys>' + //TODO: is it constant?
@@ -450,7 +466,7 @@ function RamqGetListeLieuRefreXml(p_identification_lieu_dentiste, p_id_lieu_phys
             res +=
                 '</lieu_refre_phys>';
         }
-        else if (p_identification_lieu_dentiste == 'Lieu non codifié') //TODO: 
+        else if (p_identification_lieu_dentiste == 'Lieu non codifiÃ©') //TODO: 
         {
             var lieuType;
             if (p_lieu_type === "Cabinet")
@@ -925,7 +941,7 @@ function RamqGetConstAppData()
     var res = {};
 
     res.NoDevprLogcl = '18011';//?
-    res.NomDevprLogcl = 'Développeur';//?
+    res.NomDevprLogcl = 'DÃ©veloppeur';//?
     res.NomLogclFact = 'Mon logiciel';//?
     res.NoVersiLogclFact = '1.0.0';//?
     res.NoVersiXmlDem = 'ACTE';//?
@@ -942,14 +958,14 @@ function RamqGetVisionRData()
     res.ExpedTypIdIntvn = '3';//const
     res.ExpedIdIntvn = '18011';//?
     res.TypModaPaimt = '1';//1 : Compte personnel du professionnel 2 : Compte administratif
-    res.TypIdProf = '1';//const 1 : Numéro dispensateur RAMQ
+    res.TypIdProf = '1';//const 1 : NumÃ©ro dispensateur RAMQ
     res.IdProf = '299801';// 
-    res.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
+    res.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifiÃ© Ã  la RÃ©gie (Ã©tablissement SSS, Cabinet, etc.)
     res.IdLieuPhys = '99999';//?
-    res.TypSituConsi = '1';//Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+    res.TypSituConsi = '1';//Domaine de valeurs 1 : Situation normale 10 : DÃ©lai de carence, services nÃ©cessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : DÃ©lai de carence, services liÃ©s Ã  la grossesse, Ã  l\'accouchement ou Ã  l'interruption de grossesse 12 : DÃ©lai de carence, services nÃ©cessaires aux personnes aux prises avec problÃ¨mes de santÃ© de nature infectieuse ayant une incidence sur la santÃ© publique
     res.TypIdPers = '1';//1 : NAM RAMQ
     res.IdPers = 'DISL14082210';//NAM
-    res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
+    res.IndFactAssosDr = 'true';//? Indique si la facture est associÃ©e Ã  une demande de remboursement d'un bÃ©nÃ©ficiare.
 
     return res;
 }
@@ -1409,7 +1425,7 @@ function RamqGenerateNoDemExt()
                 '<liste_ligne_fact_serv_denta_chirg_denti>' +
                     '<ligne_fact_serv_denta_chirg_denti>' +
                         '<no_ligne_fact>' + $('#no_ligne_fact').val() + '</no_ligne_fact>' +
-                        '<typ_id_elm_fact>' + $('#typ_id_elm_fact').val() + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
+                        '<typ_id_elm_fact>' + $('#typ_id_elm_fact').val() + '</typ_id_elm_fact>' + //1 : Code facturation Ã©lÃ©ment assurÃ©
                         '<id_elm_fact>' + $('#id_elm_fact').val() + '</id_elm_fact>' +
                         '<dat_serv_elm_fact>' + $('#dat_serv_elm_fact').val() + '</dat_serv_elm_fact>' +
                         '<cod_role>1</cod_role>' + //1 : Responsable 4 : Assistant

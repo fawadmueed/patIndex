@@ -5,18 +5,18 @@
     1. When the page is loaded, get ClinicId from url.
     2. Request RamqCredentials (MachineId, MachineIdPass, CreationDate) from our server using ClinicId. (RamqCredentials stored as a json file, one for each clinic at the our server).
         2.1. If request returns null (means MachineId wasn't generated)
-            - open a popup "Demande d’un identifiant machine".
+            - open a popup "Demande dâ€™un identifiant machine".
             - user should put three parameters in the appropriate textboxes (or we can get this parameters from VisionR if they have it in the database):
-                - Numéro de transmission de l’agence;
-                - L’identifiant TIP-I de l’agence;
-                - Mot de passe TIP-I de l’agence;
+                - NumÃ©ro de transmission de lâ€™agence;
+                - Lâ€™identifiant TIP-I de lâ€™agence;
+                - Mot de passe TIP-I de lâ€™agence;
             - send these parameters to RAMQ in order to get MachineId and MachineIdPassword.
             - save MachineId and MachineIdPassword in the json file in our server.
         2.2. If request returns credentials (means MachineId was generated),
             -Check expiration date.
                 - if credentials will be expired soon (less than 5 days), 
                     - show popup that allows user to insert three parameters:
-                        - Numéro de transmission de l’agence (we can get it from VisionR if they have it).
+                        - NumÃ©ro de transmission de lâ€™agence (we can get it from VisionR if they have it).
                         - Identifiant machine (we can get it from Credentials json file from our server).
                         - Ancien Mot De Passe (we can get it from Credentials json file from our server).
                     - send these parameters to RAMQ in order to get new MachineIdPassword
