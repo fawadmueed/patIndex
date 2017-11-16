@@ -68,20 +68,92 @@
   }
 
   function check_Ramq_Num(){
+// RULES
+    // The Health Insurance Number, unique to each person, consisting of:
+    // the first 3 letters of the last name
+    // the first letter of the first name
+    // the last 2 digits of the year of birth
+    // the month of birth (to which 50 is added to indicate female)
+    // the day of birth
+    // an administrative code used by the Régie
+    
     console.log('Checking RAMQ Card Number');
     var ramq_num=$('#ramq_no').val(); //get ramq_number
-    var nthDigit=String(ramq_num).charAt(10); //convert to string and get 11th digit (12th)
-    var nthDigit_number=Number(nthDigit);   //convert back to number 8th digit
-    if(!(nthDigit_number==9))
-    { 
-      return false;
+    var firstName=$('#Elast').val(); 
+    var lastName=$('#Efirst').val();
+    var Sexe=$('#sexe').val();
+    var sexe_factor=0;
+    var formD=$('#Ebirth').val()
+    var formD_comp=formD.split('-');
+    var formD_month=formD_comp[1];
+    var formD_year=formD_comp[0];
+    var formD_day=formD_comp[2];
+
+    lastName=lastName.slice(0,3);
+    firstName=firstName.slice(0,1);
+
+
+    var lastName_ramqNo=ramq_num.slice(0,3);
+    var firstName_ramqNo=ramq_num.slice(3,4);
+    var birthYear_ramqNo=ramq_num.slice(4,6);
+    var birthMonth_ramqNo=ramq_num.slice(6,8);
+    var birthDay_ramqNo=ramq_num.slice(8,10);
+    formD_year=formD_year.slice(2,4);
+    //console.log("here :" + formD_year+50);
+
+    if(Sexe=='F')
+    {
+      formD_month=parseInt(formD_month);
+      sexe_factor=50;
+
     }
     else
     {
-      return true;
-
+      sexe_factor='';
     }
+    console.log(formD_month);
+    var ramqNumber_toBe=lastName+firstName+formD_year+(sexe_factor+formD_month)+formD_day+ramq_num.slice(10);
+    console.log(ramqNumber_toBe);
     
+    if(ramqNumber_toBe==ramq_num)
+    {
+      console.log('Correct Ramq Number');
+      return true;
+    }
+    else
+    {
+      console.log('Wrong Ramq Card number');
+      return false;
+    }
+
+
+    // if((lastName==lastName_ramqNo)&&(firstName==firstName_ramqNo)&&())
+    // {
+    //   console.log(lastName+firstName);
+    //   console.log('Fname and Last name good');
+    // }
+    // else
+    // {
+    //   console.log('Sorry');
+    // }
+
+
+
+   //  var nthDigit_number=ramq_num.slice(10,11);
+
+   //  if(!(nthDigit_number==9))
+    // {  
+   //    alert('Not working');
+    //  return false;
+    // }
+    // else
+    // {
+   //    alert('working');
+    //  return true;
+
+    // }
+    
+
 
   }
 

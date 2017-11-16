@@ -117,8 +117,12 @@ function getAllTrData(){
 function submitForm(thisForm){
     event.preventDefault();
     var moreInfoArray=$(thisForm).serializeArray();
-    arrGrilleDeFacturation_forms.push(moreInfoArray);
+    var checkIfUpdate=updateArray('row_id',moreInfoArray[0].value,moreInfoArray);
     $('.modalFactTableMore').modal('hide');
+    if(checkIfUpdate){
+      arrGrilleDeFacturation_forms.push(moreInfoArray);
+    }
+
                 
 }
 
@@ -215,6 +219,7 @@ function deleteFromArray(toDo,namR,valR){
               arrGrilleDeFacturation_forms.splice([i],1);
               return true;
               }
+            
               
             }
           
@@ -222,15 +227,66 @@ function deleteFromArray(toDo,namR,valR){
         }
 }
 
+function updateArray(namR,valR,newArray){
+   // Update complete array if Matched in its object nameR and valR send i.e : nameR=row_id valR=2
+  var nameD=namR;
+  var valueD=valR;
+  var newArray=newArray;
+
+       if(arrGrilleDeFacturation_forms.length==0)
+       { //first time when form is Empty
+         return true;
+       }
+
+   for(var i=0;i<arrGrilleDeFacturation_forms.length;i++)
+        {
+          for(j=0;j<arrGrilleDeFacturation_forms[i].length;j++)
+          {
+            if(arrGrilleDeFacturation_forms[i][j].name==nameD && arrGrilleDeFacturation_forms[i][j].value==valueD)
+            {
+              arrGrilleDeFacturation_forms[i]=newArray;
+              return false;
+              
+            }
+          }
+        }
+    return true;
+    }
+
+
+    for(var i=0;i<arrGrilleDeFacturation_forms.length;i++)
+        {
+          for(var j=0;j<arrGrilleDeFacturation_forms[i].length;j++)
+          {
+            if((arrGrilleDeFacturation_forms[i][j].name==nameD)&&(arrGrilleDeFacturation_forms[i][j].value==valR))
+            {
+
+              console.log('Old array :');
+              console.log(arrGrilleDeFacturation_forms[i]);
+              arrGrilleDeFacturation_forms[i]=newArray;
+              console.log('new Array');
+              console.log(newArray);
+              // return true;
+              
+            
+              
+            }
+          
+          }
+        }
+
+
+
 function checkDentType(){
-  // will check any type for Dentist Selected - 
   
+  // will check any type for Dentist Selected - 
   if(dent_Type!=''){
     return;
   }
   else{
     $('.dentSelectModal').modal('show');
   }
+  RamqCheckCredentials();
 
 }
 

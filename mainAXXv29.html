@@ -105,6 +105,7 @@
     $('.modalPIN.modal')
     .modal({
       closable  : false,
+      allowMultiple: true, 
       onDeny    : function(){
         return false;
       }
@@ -378,12 +379,12 @@
                         <div class="two fields">
                          <div class="field">
                            <label>Nom </label>
-                           <input id="Elast" readonly="" type="text" >
+                           <input id="Elast"  type="text" >
                          </div>
 
                       <div class="field">
                         <label>Prenom</label>
-                        <input id="Efirst" readonly="" type="text">
+                        <input id="Efirst"  type="text">
                       </div>
                     </div>
                         <div class="two fields">
@@ -429,7 +430,7 @@
                           <div class="three fields">
                               <div class="nine wide field">
                                 <label>Date de nais.</label>
-                                <input type="text" id="Ebirth" readonly="">
+                                <input type="date" id="Ebirth" >
                               </div>
                             <div class="field">
                               <label>Sexe</label>
@@ -1378,7 +1379,7 @@
               <div class="ui selection dropdown fact_regie">
                <input type="hidden" name="gender">
                <i class="dropdown icon"></i>
-               <div class="default text">Gender</div>
+               <div class="default text">Select</div>
                  <div class="menu">
                     <div class="item" data-value="3">Factures</div>
                     <div class="item" data-value="2">Paiements</div>
@@ -3070,18 +3071,21 @@
                     <div class="field">
                         <label>Secteur d'activite</label>
                           <div class="ui fluid selection dropdown">
-                            <input type="hidden" name="gender">
+                            <input type="hidden" name="secteur_active">
                             <i class="dropdown icon"></i>
                             <div class="default text"></div>
                             <div class="menu">
-                              <div class="item" data-value="3">Unité de soins intensifs</div>
-                              <div class="item" data-value="3">Unité de soins généraux et spécialisés</div>
-                              <div class="item" data-value="3">Unité de soins de longue duréé(prolongés)</div>
-                              <div class="item" data-value="3">Unité coronarienne Unité de soins de longue duréé(hébergement)</div>
-                              <div class="item" data-value="3">Section gériatrique Section psychiatrique</div>
-                              <div class="item" data-value="2">Clinique externe Clinique d'urgence</div>
-                              <div class="item" data-value="1">Centre de douleur chronique</div>
-                              <div class="item" data-value="0">Female</div>
+                             
+                                 <div class="item" data-value="01"> Clinique externe </div>
+                                 <div class="item" data-value="35"> Clinique d’urgence  </div>
+                                 <div class="item" data-value="53"> Centre de douleur chronique  </div>
+                                 <div class="item" data-value="02"> Section gériatrique</div>
+                                 <div class="item" data-value="08"> Section psychiatrique </div>
+                                 <div class="item" data-value="15"> Unité coronarienne </div>
+                                 <div class="item" data-value="05"> Unité de soins de longue durée (hébergement) </div>
+                                 <div class="item" data-value="04"> Unité de soins de longue durée (prolongés) </div>
+                                 <div class="item" data-value="03"> Unité de soins généraux et spécialisés </div>
+                                 <div class="item" data-value="16"> Unité de soins intensifs </div>
                             </div>
                             </div>
                     </div>
@@ -3229,7 +3233,7 @@
         <div class="ui form segment">
           <label>Cocher les cases appropriees</label>
           <div class="inline field"><input type="checkbox" name="" id="formlr_asur_check"><label>Formulaire d'assurance</label></div>
-          <div class="inline field"><input type="checkbox" name="" id="fact_rec_check"><label>Formulaire d'assurance</label></div>
+          <div class="inline field"><input type="checkbox" name="" id="fact_rec_check"><label>Formulaire ou un recu</label></div>
           <div class="ui grid">
             <div class="eight wide column"></div>
             <div class="eight wide column">
@@ -3538,6 +3542,10 @@
             <div class="inline field">
               <input type="radio" name="identification_lieu_dentiste" value="Lieu codifié á la Régie">
               <label>Lieu codifié á la Régie</label>
+            </div> 
+            <div class="field">
+              <label>Numéro du lieu</label>
+              <input type="text" name="">
             </div>
             <div class="inline field">
               <input type="radio" name="identification_lieu_dentiste" value="Lieu non codifié">
@@ -5232,6 +5240,9 @@
   $('.modalProts.modal')
       .modal({ allowMultiple: true });
 
+  $('.modRamqCredentialAlert.modal')
+      .modal({ allowMultiple: true });
+
   $('.modalNoteProt.modal')
       .modal({
         allowMultiple: true
@@ -5255,8 +5266,10 @@
   $('.modalSelectMD.modal')
       .modal({
         allowMultiple: true
-      })
-  ;
+      });
+  $('.dentSelectModal').modal({
+        allowMultiple: true
+      });
   $('.modalSelectSurf.modal')
       .modal({
         allowMultiple: true
