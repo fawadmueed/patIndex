@@ -3,8 +3,8 @@
 /*
     Algorithm
     1. When the page is loaded, get ClinicId from url.
-    2. Request RamqCredentials (MachineId, MachineIdPass, CreationDate) from our server using ClinicId. (RamqCredentials stored as a json file, one for each clinic at the our server).
-        2.1. If request returns null (means MachineId wasn't generated)
+    2. When the user goes to Facture tab,  request RamqCredentials (MachineId, MachineIdPass, CreationDate) from our server using ClinicId. (RamqCredentials stored as a json file, one for each clinic at the our server).
+        2.1. If request returns error (means MachineId wasn't generated)
             - open a popup "Demande d’un identifiant machine".
             - user should put three parameters in the appropriate textboxes (or we can get this parameters from VisionR if they have it in the database):
                 - Numéro de transmission de l’agence;
@@ -29,12 +29,26 @@
 var globServerUrl = 'http://144.217.219.194/axxium/';
 var globRamqApiPath = "http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/";
 var globRamqObjCredentials;
+var globClinicId = "";
 //var globClinicId;
 
-//TODO: call this function from PageLoad event.
+
 $(function () {
-    RamqGetClinicIdFromUrl();
+    //Get clinicId from url and put it in global variable
+    globClinicId = RamqGetClinicIdFromUrl();
 });
+
+function RamqCheckCredentials()
+{
+    var clinicId = RamqGetClinicIdFromUrl();
+
+    if (globClinicId != "") {
+        RamqGetCredentials(globClinicId);
+    }
+    else {
+        alert("Clinic Id is not defined!");
+    }
+}
 
 function RamqGetClinicIdFromUrl()
 {
@@ -42,45 +56,28 @@ function RamqGetClinicIdFromUrl()
     // var url = location.href;
     var url = "http://myserver/action?clinicId=AGR18011";// For test only.
     var clinicId = GetParamFromUrl("clinicId", url);
-    if (clinicId != null && clinicId != "") {
-        RamqGetCredentials(clinicId);
-    }
-    else {
-        alert("Clinic Id is not defined!");
-    }
+    return clinicId;
 }
 
 //Get RamqCredentials for the given clinicId from server and put it in global variable.
 function RamqGetCredentials(pClinicId)
 {
-    //TODO: call method on server side to get credentials for clinic.
-    var methodName = "json/ramqCredentials/AGR18011.json";
-    var path = globServerUrl + methodName;
-    var data = new FormData();
-    data.append("clinicId", pClinicId);
+    var sub = "ramqCredentials";
+    //var command = 'allScriptsv1.py?tx=getJSONsub&sub=ramqCreditial&code=' + pClinicId
 
-    $.ajax({
-        type: "POST",
-        url: path,
-        data: data,
-        //contentType: false,
-        processData: false,
-        //contentType: "application/json; charset=utf-8",
-        //dataType: "json",
-        success: function (result) {
-            if (result != null) //Credential file exist
+    $.get("allScriptsv1.py?tx=getJSONsub&sub=ramqCredentials&code=" + pClinicId,
+        function (data, status) {
+            if (data && data.outcome && data.outcome == 'error') //means file doesn't exist
             {
-                globRamqObjCredentials = result;
+                //open a popup "Demande d’un identifiant machine"
+                $('#message_ramq_credential_alert').html("You have not credentials. Please create new Credentials in Admin panel.");
+                ramqCredentialAlert();
+            }
+            else if (data && data.CreationDate)
+            {
+                globRamqObjCredentials = data;
                 RamqCheckIfMachineIdExpired();
             }
-            else //credentials file doesn't exist.
-            {
-                RamqCreateCredentials();
-            }
-        },
-        error: function (xhr) {
-            alert("Error!");
-        }
     });
 }
 
@@ -94,58 +91,38 @@ function RamqCheckIfMachineIdExpired()
         if (dayDiff > 25) {
             var numberDaysUntilExpiration = 30 - dayDiff;
             if (numberDaysUntilExpiration > 0) {
-                // TODO: change alert to popup;
-                alert("Your MachineId will expired in " + numberDaysUntilExpiration + " days. Do you want to update it?");
+                //open a popup "Credentials expired"
+                $('#message_ramq_credential_alert').html("Your MachineId will be expired soon. Do you want to update it?");
+                ramqCredentialAlert();
             }
             else {
-                // TODO: change alert to popup;
-                alert("Your MachineId is expired. Please update it");
+                //open a popup "Credentials expired"
+                $('#message_ramq_credential_alert').html("Your MachineId is expired. Please update it.");
+                ramqCredentialAlert();
             }
             // TODO: Remove after testing.
-            RamqUpdateMachineId();
+            //RamqUpdateMachineId();
         }
     }
 }
 
+
 //Call this function when the button OK is clicked on the module UpdateMachineId.
 function RamqUpdateMachineId() {
     //Populate popup fields from global var.
-    //$("#").val(globRamqObjCredentials.machineId);
-    //$("#").val(globRamqObjCredentials.MotDePasseMachine);
+    var transmissionNumber = '18011';//$("#no_trnsm_ramq_upd").val();
+    //TODO: call the Python method and display message.
 
+}
 
-    //get parameters from popup
-    var transmissionNumber = '18011';//$("#").val();
-    var machineId = "AGR18011K";// $("#").val();
-    var oldPassword = "rT_Xw^9M";// $("#").val();
-    var newPassword = "MyPass1";// $("#").val();
-    var errorMsg = "";
+function RamqCreateCredentials()
+{
+    var clinicId = globClinicId;
+    var pNoIntervenant = $('#no_trnsm_ramq_new').val();//18011
+    var pIdUtilisateur = $('#no_identif_ramq_new').val(); //AGR18011
+    var pMotDePasse = $('#acien_mot_ramq_new').val(); //axxium3800c
 
-    var dataJSON = { CodeErreur: '', NoIntervenant: transmissionNumber, IdMachine: machineId, AncienMotDePasse: oldPassword, MotDePasseMachine: newPassword, ServerError: "" }
-    var _data = JSON.stringify(dataJSON);
-    $.ajax({
-        type: "POST",
-        url: globRamqApiPath + 'api/RamqWebApi/PostChangePassword',
-        data: _data,
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: function (data, status, jqXHR) {
-            if (data.CodeErreur != '')
-            {
-                errorMsg = "Code Erreur: " + data.CodeErreur;
-            }
-            if (data.ServerError != '')
-            {
-                errorMsg += "Server Erreur: " + data.ServerError;
-            }
-            if (errorMsg != "")
-                alert(errorMsg);
-        },
-        error: function (xhr) {
-            if (xhr.responseJSON != null)
-                alert(xhr.responseJSON.ExceptionMessage);
-        }
-    });
+    //TODO: call Python method to generate Id Machine and display result.
 }
 
 //Returns number of days between two dates (date2 - date1)
@@ -155,7 +132,6 @@ function RamqDayDiff(date1, date2)
     var time2 = date2.getTime();
     return Math.round((time2 - time1) / (1000 * 60 * 60 * 24));
 }
-
 
 
 //function GetParamFromUrlTest()

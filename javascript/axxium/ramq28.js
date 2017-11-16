@@ -10,7 +10,6 @@ function SoumissionDemandesPaiement()
     var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
     if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[2].length>0) //TODO: empty line shouldn't be added to an array.
     {
-
         var operationName = "Paiement";
         var inputXMl = RamqGetData(operationName, objSoumissionDemandesPaiementData);
 
@@ -20,8 +19,21 @@ function SoumissionDemandesPaiement()
 
         $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: 'AGR18011', patientId: '234577', json: JSON.stringify(jsonXML) },
                     function (result) {
-                        alert(result.message);
-                    });
+                        if (result.message != null && result.message.substring(0, 5) == 'Error')
+                        {
+                            displayRamqAnswer("RAMQ", result.message);
+                        }
+                        else if (result.message != null && result.message.substring(0, 5) != 'Error') {
+                            var objResponse = parseRAMQResponsePaiment(result.message);
+                            displayResponsePaiment(objResponse);
+                        }
+                        else {
+                            displayRamqAnswer("RAMQ", "SoumissionDemandesPaiement Error");
+                        }
+                    })
+            .fail(function () {
+                alert("Ramq SoumissionDemandesPaiement Error.");
+            });
         //var operationName = "Paiement";
         //var jsonData = RamqGetData(operationName, objSoumissionDemandesPaiementData);
         //var methodName = "api/RamqWebApi/PostPaymentRequest";
