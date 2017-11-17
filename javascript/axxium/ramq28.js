@@ -4,9 +4,6 @@
 //TODO:rename SoumissionDemandesPaiement to RamqSoumissionDemandesPaiement;
 function SoumissionDemandesPaiement()
 {
-
-    
-
     var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
     if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[2].length>0) //TODO: empty line shouldn't be added to an array.
     {
@@ -17,7 +14,7 @@ function SoumissionDemandesPaiement()
             "request": inputXMl
         }
 
-        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: 'AGR18011', patientId: '234577', json: JSON.stringify(jsonXML) },
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: '234577', json: JSON.stringify(jsonXML) },
                     function (result) {
                         if (result.message != null && result.message.substring(0, 5) == 'Error')
                         {

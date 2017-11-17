@@ -30,7 +30,6 @@ var globServerUrl = 'http://144.217.219.194/axxium/';
 var globRamqApiPath = "http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/";
 var globRamqObjCredentials;
 var globClinicId = "";
-//var globClinicId;
 
 
 $(function () {
@@ -42,7 +41,7 @@ function RamqCheckCredentials()
 {
     var clinicId = RamqGetClinicIdFromUrl();
 
-    if (globClinicId != "") {
+    if (globClinicId !== "") {
         RamqGetCredentials(globClinicId);
     }
     else {
@@ -67,7 +66,7 @@ function RamqGetCredentials(pClinicId)
 
     $.get("allScriptsv1.py?tx=getJSONsub&sub=ramqCredentials&code=" + pClinicId,
         function (data, status) {
-            if (data && data.outcome && data.outcome == 'error') //means file doesn't exist
+            if (data && data.outcome && data.outcome === 'error') //means file doesn't exist
             {
                 //open a popup "Demande d’un identifiant machine"
                 $('#message_ramq_credential_alert').html("You have not credentials. Please create new Credentials in Admin panel.");
@@ -151,6 +150,6 @@ function GetParamFromUrl(name, url) {
     var regexS = "[\\?&]" + name + "=([^&#]*)";
     var regex = new RegExp(regexS);
     var results = regex.exec(url);
-    return results == null ? null : results[1];
+    return results === null ? null : results[1];
 }
 
