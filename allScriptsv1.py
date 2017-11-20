@@ -5,12 +5,13 @@ import glob
 import os, sys
 import re
 import time
-from datetime import datetime
+from datetime import datetime, date
 import json
 
 import requests
 import html
 import xml.etree.ElementTree as ET
+import base64
 
 print 'Content-type: text/json; charset=utf-8\n\n'
 
@@ -420,7 +421,8 @@ if (tx == "uploadDOC"):
 	#except:
 	#	print '{ "outcome" : "error", "message" : "uploadDOC error" } '
 
-		# ROBERTO CODE
+	
+# ROBERTO CODE
 def CleanXML(s):
 	s = s.replace("\\r\\n","")
 	s = s.replace("\\n","")
@@ -431,7 +433,11 @@ def CleanXML(s):
 	s = s.replace("\\\"","\"")
 	return s
 
-
+def date(datestr="", format="%Y-%m-%d"):
+    if not datestr:
+        return datetime.today().date()
+    return datetime.strptime(datestr, format).date()
+    
 if (tx == "getRamqData"):   
     try:
         #read parameters from request
@@ -450,32 +456,110 @@ if (tx == "getRamqData"):
         #send the request to WebApi that calls RAMQ server
         dataJSON = { 'UserId': UserId, 'UserPass': UserPass, 'XmlToSend': CleanXML(xmlreq)}
         headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
-        resp = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostPaymentRequest', json=dataJSON, headers=headers).text
+        r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostPaymentRequest', json=dataJSON, headers=headers)
 
-        #In case, something happen in server side code 500
-        if(resp.find("Error") > -1):
-            print('{ "outcome" : "error", "message" : ' + resp + ' }')    
+        if r.status_code != 200:
+            print '{ "outcome" : "error", "message" : "Something was wrong" }'
         else:
-            #clean XMl
-            xmlstring = resp
-            #define namespace for read xml       
-            nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
+            resp = r.text
+            #In case, something happen in server side code 500
+            if(resp is None or resp.find("Error") > -1):
+                print '{ "outcome" : "error", "message" : "%s" }'%resp    
+            else:
+                #clean XMl
+                xmlstring = resp
+                #define namespace for read xml       
+                nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
 
-            #Get the tocken from request to create filename later         
-            root = ET.fromstring(CleanXML(xmlreq.encode('utf-8')))
-            nofactext = root.find('n:liste_fact/n:fact_serv_denta_chirg_denti_1_1_0/n:no_fact_ext', namespaces=nsmap).text
-    
-            #verify if the response is ok or not
-            root = ET.fromstring(CleanXML(xmlstring.encode('utf-8')))            
-            nbrerror = root.find('n:sta_recev', namespaces=nsmap).text
-            if(nbrerror == "1"): #1: ok, 2: Fail
-              dataJSON = { 'xmlreq': xmlreq.replace("\"", "\\\"").replace("\r","").replace("\n","").replace("  ",""), 'xmlresp': xmlstring.replace("\"<","<").replace(">\"",">")}
-              logFile = open('json/ramq/'+ patientId + '_' + nofactext + '.json', 'w')
-              logFile.write(json.dumps(dataJSON).decode('unicode-escape').encode('utf8'))
-              logFile.close()
-		                    
-        message = {'outcome' : 'success', 'message': xmlstring}
-        print (json.dumps(message))
-
+                #Get the tocken from request to create filename later         
+                root = ET.fromstring(CleanXML(xmlreq.encode('utf-8')))
+                nofactext = root.find('n:liste_fact/n:fact_serv_denta_chirg_denti_1_1_0/n:no_fact_ext', namespaces=nsmap).text
+        
+                #verify if the response is ok or not
+                root = ET.fromstring(CleanXML(xmlstring.encode('utf-8')))            
+                nbrerror = root.find('n:sta_recev', namespaces=nsmap).text
+                if(nbrerror == "1"): #1: ok, 2: Fail
+                    dataJSON = { 'xmlreq': xmlreq.replace("\"", "\\\"").replace("\r","").replace("\n","").replace("  ",""), 'xmlresp': xmlstring.replace("\"<","<").replace(">\"",">")}
+                    logFile = open('json/ramq/'+ patientId + '_' + nofactext + '.json', 'w')
+                    logFile.write(json.dumps(dataJSON).decode('unicode-escape').encode('utf8'))
+                    logFile.close()
+                                
+                message = {'outcome' : 'success', 'message': xmlstring}
+                print json.dumps(message)
     except:
-        print ('{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0])
+        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+
+    
+if (tx == "getEtatCompte"):   
+    try:
+        clinicId = form['clinicId'].value
+        TypEntIntvnEchgs = form['TypEntIntvnEchgs'].value
+
+        #verify if folder exists if not, create it
+        if(not os.path.isdir('json/ec/'+ clinicId)):
+            os.makedirs('json/ec/'+ clinicId)
+
+        #read the parameters for credentials
+        json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
+        data = json.load(json_data)
+        json_data.close()
+        UserPass= data["MachineIdPass"]	
+        UserId= data["MachineId"]
+        IdEntIntvnEchg= data["NoIntervenant"]
+
+        #get Etat Compte
+        headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
+        dataJSON = { 'UserId': UserId, 'UserPass': UserPass, 'IdEntIntvnEchg': IdEntIntvnEchg, 'TypEntIntvnEchg': TypEntIntvnEchgs }
+        r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostReceiveEtatDeCompteAsByteArray', json=dataJSON, headers=headers)
+
+        if(r.status_code != 200):
+            print '{ "outcome" : "error", "message" : "Something was wrong" }'
+        else:
+            resp = r.json()
+            ErrorMessage = resp["ErrorMessage"]
+            if(ErrorMessage != ""):
+                message = {'outcome' : 'error', 'message': ErrorMessage}
+                print json.dumps(message)
+            else:        
+                FileData = resp["FileData"]
+                FileName = resp["FileName"]
+                file_64_decode = base64.decodestring(FileData)
+                #write the binary zip file
+                logFile = open('json/ec/'+ clinicId + '/' + FileName, 'wb')
+                logFile.write(file_64_decode)
+                logFile.close()
+                message = {'outcome' : 'success', 'message': 'http://' + os.path.dirname(os.environ['HTTP_HOST'] + os.environ['PATH_INFO']) + '/json/ec/' + FileName}
+                print (json.dumps(message))         
+    except:
+        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+
+
+if (tx == "getECFiles"):   
+    try:
+        clinicId = form['clinicId'].value
+        datefrom = date(form['dFrom'].value)
+        dateto = date(form['dTo'].value)
+            
+        print '{ "files": [ '
+        files = os.listdir("json/ec/"+clinicId)
+        files = ['json/ec/'+clinicId+'/'+elt for elt in files ]
+        files.sort(key=os.path.getmtime)
+        files.reverse()
+        comma = False
+        ctr = 0
+        for filename in files:
+            mdate = os.path.getmtime(filename)
+            datefile = datetime.fromtimestamp(mdate).date()
+            if datefile >= datefrom and datefile <= dateto:
+                if comma:
+                    print ','
+                print '{ "file" : "%s"'%filename.split('/')[3]
+                print ', "url" : "http://%s/%s"'%(os.path.dirname(os.environ['HTTP_HOST'] + os.environ['PATH_INFO']),filename)
+                print ', "date" : "%s"'%time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
+                print " } "
+                comma = True
+                ctr = ctr + 1  
+
+        print '], "count" : '+str(ctr)+' }'        
+    except:
+        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]

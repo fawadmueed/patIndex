@@ -48,6 +48,7 @@
 <script src="javascript/axxium/facture28.js"></script>
 <script src="javascript/axxium/ramq28.js"></script>
 <script src="javascript/axxium/ramqCredentials28.js"></script>
+<script src="javascript/axxium/ramqEC29.js"></script>
 <!-- <script type="text/javascript"> var translator = $('body').translate({lang:"", t:dict});  </script> -->
 <!-- Alexey JS FILE -->
 <style type="text/css">
@@ -379,12 +380,12 @@
                         <div class="two fields">
                          <div class="field">
                            <label>Nom </label>
-                           <input id="Elast"  type="text" >
+                           <input id="Efirst"  type="text" >
                          </div>
 
                       <div class="field">
                         <label>Prenom</label>
-                        <input id="Efirst"  type="text">
+                        <input id="Elast"  type="text">
                       </div>
                     </div>
                         <div class="two fields">
@@ -1387,7 +1388,7 @@
                     <div class="item" data-value="0">État de compte</div>
                 </div>
               </div>
-
+                <div class="ui divider"></div>
               <div id="fact_regie_div">
                 <!-- Content of the Selected Value will appear here -->
               </div>
@@ -1658,28 +1659,31 @@
                 
                 <div class=" field">
                   <label>Date entre</label>
-                  <input type="text"></input>
+                  <input type="date" id="date_entre_etat_compte"></input>
                 </div>
 
                 <div class="three wide field">
                   <label>-</label>
-                  <input type="text"></input>
+                  <input type="date" id="date_entre_etat_compte2"></input>
+                </div>
+                <div class="field">
+                    <div class="ui axxium tiny button" onclick="RamqECGetList()">Search</div>
                 </div>
             </div> 
 
+
           <div class="for_Facture_Drop down">
-            <table class="ui striped  table">
+            <table class="ui striped  table" id="etat_compte_table">
               <thead>
                 <tr>
                   <th>Date</th>
                   <th>#État de compte</th>
-                  <th></th>
-                  <th></th>
+                  
                 </tr>
 
               </thead>
               <tbody>
-                <tr><td></td></tr>
+                
                
               </tbody>
             </table>
@@ -1689,9 +1693,9 @@
           </div>
       
 
-              <div class="ui axxium tiny button">Télé Etat. compte</div>
+              <div class="ui axxium tiny button" onclick="RamqECDownloadNew()">Télé Etat. compte</div>
            
-              <div class="ui axxium tiny button">Imprimer</div>
+              <div class="ui axxium tiny button" style="display: none;">Imprimer</div>
   
             
               </div>
@@ -1699,12 +1703,10 @@
           </div>
           </div>
         </div>
-
-
           </div>
-
         </div>
       </div>
+
 
      <div class="ui bottom attached tab segment" data-tab="documents">
       <div class="ui one column grid">
@@ -2983,7 +2985,7 @@
       <div class="ui three column grid">
         <div class="seven wide column">
           <div class="ui form segment">
-            <p1><strong>Assurance</strong></p1>
+            <div class="ui horizontal divider"> <strong>Assurance</strong></div>
               <p1>Reclamation electronique pour Dr Pierre Laberge Etes-vous sur de vouloir transmettre requete?</p1>
               <div class="two fields">
                 <div class="field"><input type="radio" name="" id="assr1_oui"><label>Oui</label></div>
@@ -3024,7 +3026,7 @@
                 <div class="ui grid">
                  <div class="eight wide column">
                   <div class="ui form segment">
-                    <strong>Professional</strong>
+                    <div class="ui horizontal divider"> <strong>Professional</strong></div>
                     <div class="field">
                       <label>No du professional</label>
                       <input type="text" name="">
@@ -3035,38 +3037,80 @@
                     </div>
                   </div>
                   <div class="ui form segment">
-                    <strong>Événement</strong>
-                    <div class="field">
-                      <label>Code de diagnostic</label>
-                      <input type="text" name="">
+                    <div class="ui horizontal divider"> <strong>Événement</strong></div>
+                    <div class="ui form segment">
+                    <div class="inline field">
+                      <input type="radio" name="">
+                      <label>Carie dentaire</label>
                     </div>
-                    <div class="field">
-                      <label>Date de l'événement</label>
-                      <input type="date" name="">
+                    <div class="inline field">
+                      <input type="radio" name="">
+                      <label>Etat normal</label>
                     </div>
-                    <div class="field">
-                      <label>Période d'hospitalisation</label>
-                      <input type="text" name="">
+                    <div class="two fields">
+                      <div class="inline field">
+                        <input type="radio" name="">
+                        <label>Autre</label>
+                      </div>
+                      <div class="field">
+                        <input type="text" name="">
+                      </div>
                     </div>
                   </div>
-                 </div>
+                    
+                  <div class="field">
+                    <label>Date de lévenement</label>
+                    <input type="date" name="">
+                  </div>
+                  <div class="ui form segment">
+                    <label>Période d'hospitalisation</label>
+                    <div class="field">
+                    <label>Date d'entreé</label>
+                    <input type="date" name="">
+                  </div>
+                  <div class="field">
+                    <label>Date de sortie</label>
+                    <input type="date" name="">
+                  </div>
+                </div>
+                  </div>
+                  </div>
+                 
+
                  <div class="eight wide column">
                   <div class="ui form segment">
-                    <strong>Lieu de dispensation</strong><br>
+                    <div class="ui horizontal divider"> <strong>Lieu de dispensation</strong></div>
                     <strong>Identification du lieu</strong>
                     <div class="inline fields">
                       <div class="field">
-                        <input type="radio" name="">
+                        <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie" >
                         <label>Lieu codifié é la Regie</label>
                       </div>
                       <div class="field">
-                        <input type="radio" name="">
+                        <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie_non">
                         <label>Lieu non codifié</label>
                       </div>
                     </div>
+                   <div class="codif_selection_lieu" style="display: none;">
                     <div class="field">
                         <label>Numéro du lieu</label>
                         <input type="text" name="">
+                    </div>
+                  </div>
+                    
+                    <div class="codif_selection_non" style="display: none;">
+                      <div class=" field">
+                        <label>Code Postal</label>
+                        <input type="text" name="">
+                      </div>
+                      <div class=" field">
+                        <label>Code localité</label>
+                        <input type="text" name="">
+                      </div>
+                      <div class=" field">
+                        <label>No. bur.</label>
+                        <input type="text" name="">
+                      </div>
                     </div>
                     <div class="field">
                         <label>Secteur d'activite</label>
@@ -3092,45 +3136,39 @@
                     <script type="text/javascript">
                       $('.ui.dropdown').dropdown();
                     </script>
-                    <div class="inline field">
-                      <input type="radio" name="">
-                      <label>Liéu codifié é la Régie</label>
-                    </div>
-                    <div class="inline field">
-                      <input type="radio" name="">
-                      <label>Liéu non codifié</label>
-                    </div>
-
-                      <div class="inline field">
-                        <label>Code Postal</label>
-                        <input type="text" name="">
-                      </div>
-                      <div class="inline field">
-                        <label>Code localité</label>
-                        <input type="text" name="">
-                      </div>
-                      <div class="inline field">
-                        <label>No. bur.</label>
-                        <input type="text" name="">
-                      </div>
-
+                    
+                    
+                        <!--  -->
+                        <script type="text/javascript">
+                          $(document).on('change','.lieu',function(){
+                            if($('#lieu_codifie').is(':checked')){
+                              
+                              $('.codif_selection_lieu').show();
+                              $('.codif_selection_non').hide();
+                            };
+                            if($('#lieu_codifie_non').is(':checked')){
+                              $('.codif_selection_non').show();
+                              $('.codif_selection_lieu').hide();
+                            };
+                            // alert($('#lieu_codifie_non').checked());
+                          })
+                        </script>
                     <label>Type de lieu</label>
                     <div class="inline field">
-                    <input type="radio" name="">
-                    <label>Cabinet</label>
+                        <input type="radio" name="">
+                        <label>Cabinet</label>
                     </div>
                     <div class="inline field">
-                    <input type="radio" name="">
-                    <label>Domicile</label>
+                      <input type="radio" name="">
+                      <label>Domicile</label>
                     </div>
                     <div class="inline field">
-                    <input type="radio" name="">
-                    <label>Autre</label>
+                      <input type="radio" name="">
+                      <label>Autre</label>
                     </div>
 
                   </div>
-
-                 </div>
+                  </div>
                 </div>
 
             </div>
@@ -3146,7 +3184,7 @@
 
       <div class="six wide column">
         <div class="ui form segment">
-          <p1><strong>PAIEMENT</strong> </p1>
+          <div class="ui horizontal divider"> <strong>PAIEMENT</strong></div>
           <div class="ui axxium form">
             <div class="ui two column grid">
               <div class="column">
@@ -3233,7 +3271,7 @@
         <div class="ui form segment">
           <label>Cocher les cases appropriees</label>
           <div class="inline field"><input type="checkbox" name="" id="formlr_asur_check"><label>Formulaire d'assurance</label></div>
-          <div class="inline field"><input type="checkbox" name="" id="fact_rec_check"><label>Formulaire ou un recu</label></div>
+          <div class="inline field"><input type="checkbox" name="" class="fact_rec_check"><label>Facture ou un recu</label></div>
           <div class="ui grid">
             <div class="eight wide column"></div>
             <div class="eight wide column">
@@ -3245,8 +3283,25 @@
           </div>
         </div>
       </div>
-
-      <div class="three wide column">
+                      <script type="text/javascript">
+                        $(document).ready(function(){
+                          $('.fact_rec_check').click(function(){
+                          
+                          if($('.fact_rec_check').is(':checked'))
+                          {
+                            
+                            $('#facture_select_check').show();
+                          }
+                          else
+                          { 
+                            
+                            $('#facture_select_check').hide();
+                          }
+                            });
+                        })
+                      </script>
+                      
+      <div class="three wide column" id="facture_select_check" style="display: none;">
         <div class="ui form segment">
           <label>Fractionner Paiement</label>
           <div class="two fields">
@@ -3261,6 +3316,7 @@
           <div class="ui axxium tiny button">Enregistere</div>
         </div>
       </div>
+    
 
       </div>
     </div>
