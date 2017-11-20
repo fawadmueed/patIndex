@@ -39,8 +39,6 @@ $(function () {
 
 function RamqCheckCredentials()
 {
-    var clinicId = RamqGetClinicIdFromUrl();
-
     if (globClinicId !== "") {
         RamqGetCredentials(globClinicId);
     }
@@ -53,7 +51,7 @@ function RamqGetClinicIdFromUrl()
 {
     //TODO: uncomment for production.
     // var url = location.href;
-    var url = "http://myserver/action?clinicId=AGR18011";// For test only.
+    var url = "http://myserver/action?clinicId=AGP18011";// For test only.
     var clinicId = GetParamFromUrl("clinicId", url);
     return clinicId;
 }
@@ -80,6 +78,7 @@ function RamqGetCredentials(pClinicId)
     });
 }
 
+//Check if credentials will expired soon.
 function RamqCheckIfMachineIdExpired()
 {
     if (globRamqObjCredentials.CreationDate && globRamqObjCredentials.CreationDate!=="")
@@ -91,16 +90,14 @@ function RamqCheckIfMachineIdExpired()
             var numberDaysUntilExpiration = 30 - dayDiff;
             if (numberDaysUntilExpiration > 0) {
                 //open a popup "Credentials expired"
-                $('#message_ramq_credential_alert').html("Your MachineId will be expired soon. Do you want to update it?");
+                $('#message_ramq_credential_alert').html("Your Credentials will be expired soon. Do you want to update it?");
                 ramqCredentialAlert();
             }
             else {
                 //open a popup "Credentials expired"
-                $('#message_ramq_credential_alert').html("Your MachineId is expired. Please update it.");
+                $('#message_ramq_credential_alert').html("Your Credentials is expired. Please update it.");
                 ramqCredentialAlert();
             }
-            // TODO: Remove after testing.
-            //RamqUpdateMachineId();
         }
     }
 }
@@ -108,10 +105,13 @@ function RamqCheckIfMachineIdExpired()
 
 //Call this function when the button OK is clicked on the module UpdateMachineId.
 function RamqUpdateMachineId() {
-    //Populate popup fields from global var.
-    var transmissionNumber = '18011';//$("#no_trnsm_ramq_upd").val();
-    //TODO: call the Python method and display message.
-
+    $.post("allScriptsv1.py", { tx: "ChangePassword", clinicId: globClinicId },
+            function (result) {
+                if (result.outcome === 'error')
+                    alert(result.message);
+                else
+                    alert("Credentials were updated successfully.");
+            });
 }
 
 function RamqCreateCredentials()
@@ -121,7 +121,13 @@ function RamqCreateCredentials()
     var pIdUtilisateur = $('#no_identif_ramq_new').val(); //AGR18011
     var pMotDePasse = $('#acien_mot_ramq_new').val(); //axxium3800c
 
-    //TODO: call Python method to generate Id Machine and display result.
+    $.post("allScriptsv1.py", { tx: "GenerIdMachine", clinicId: clinicId, NoIntervenant: pNoIntervenant, IdUtilisateur: pIdUtilisateur, MotDePasse: pMotDePasse },
+            function (result) {
+                if (result.outcome === 'error')
+                    alert(result.message);
+                else
+                    alert("Credentials were created successfully.");
+            });
 }
 
 //Returns number of days between two dates (date2 - date1)

@@ -31,34 +31,6 @@ function SoumissionDemandesPaiement()
             .fail(function () {
                 alert("Ramq SoumissionDemandesPaiement Error.");
             });
-        //var operationName = "Paiement";
-        //var jsonData = RamqGetData(operationName, objSoumissionDemandesPaiementData);
-        //var methodName = "api/RamqWebApi/PostPaymentRequest";
-        //$.ajax({
-        //    type: "POST",
-        //    url: globRamqApiPath + methodName,
-        //    ProcessData: false,
-        //    contentType: "application/json; charset=utf-8",
-        //    dataType: "json",
-        //    data: jsonData,
-
-        //    success: function (data, status, jqXHR) {
-        //        if (data != null && data.substring(0, 5) == 'Error') {
-        //            displayRamqAnswer("RAMQ", data);
-        //        }
-        //        else if (data != null && data.substring(0, 5) != 'Error') {
-        //            var objResponse = parseRAMQResponsePaiment(data);
-        //            displayResponsePaiment(objResponse);
-        //        }
-        //        else {
-        //            displayRamqAnswer("RAMQ", "SoumissionDemandesPaiement Error");
-        //        }
-        //    },
-        //    error: function (xhr) {
-        //        if (xhr.responceJSON != null)
-        //            alert(xhr.responceJSON.Message);
-        //    }
-        //});
     }
     else {
         alert("There is nothing to send.")
@@ -129,7 +101,7 @@ function RamqSoumissionDemandesAnnulation() {
 
 function RamqGetData(operationName, _objData)
 {
-    var xmlAEnvoyer, data;
+    var xmlAEnvoyer = '';
 
     if (operationName == 'Paiement')
     {
@@ -144,9 +116,7 @@ function RamqGetData(operationName, _objData)
         xmlAEnvoyer = RamqGetSoumissionDemandesAnnulationXML();
     }
     
-    //data = '{"UserId":"' + globRamqObjCredentials.MachineId + '","UserPass":"' + globRamqObjCredentials.MachineIdPass + '","XmlToSend":"' + xmlAEnvoyer + '"}';
-    data = xmlAEnvoyer;
-    return data;
+    return xmlAEnvoyer;
 }
 
 
@@ -702,7 +672,9 @@ function getSoumissionDemandesAnnulationXML()
 function parseRAMQResponsePaiment(strXml)
 {
     var parser = new DOMParser();
-    var xmlDoc = parser.parseFromString(strXml, "text/xml");
+    var xml = strXml.replace(/\//g, "");
+    var xmlDoc = parser.parseFromString(xml, "text/xml");
+    
     var response = {};
 
     //Global info
@@ -711,14 +683,15 @@ function parseRAMQResponsePaiment(strXml)
     response.GlobalArrListeMsgExplRecev = [];
     if (response.GlobalStaRecev == "2")
     {
-        var GlobalArrListeMsgExplRecev = xmlDoc.getElementsByTagName('liste_msg_expl_recev')[0].children;
-
-        for (var i = 0; i < GlobalArrListeMsgExplRecev.length; i++)
+        var GlobalArrListeMsgExplRecev =(xmlDoc.getElementsByTagName('liste_msg_expl_recev')[0]!=null)? xmlDoc.getElementsByTagName('liste_msg_expl_recev')[0].children: null;
+        if (!GlobalArrListeMsgExplRecev)
         {
-            var msgExplRecev = {};
-            msgExplRecev.code = GlobalArrListeMsgExplRecev[i].children[0].innerHTML;
-            msgExplRecev.text = GlobalArrListeMsgExplRecev[i].children[1].innerHTML;
-            response.GlobalArrListeMsgExplRecev.push(msgExplRecev);
+            for (var i = 0; i < GlobalArrListeMsgExplRecev.length; i++) {
+                var msgExplRecev = {};
+                msgExplRecev.code = GlobalArrListeMsgExplRecev[i].children[0].innerHTML;
+                msgExplRecev.text = GlobalArrListeMsgExplRecev[i].children[1].innerHTML;
+                response.GlobalArrListeMsgExplRecev.push(msgExplRecev);
+            }
         }
     }
     
