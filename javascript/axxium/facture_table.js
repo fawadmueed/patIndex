@@ -30,22 +30,11 @@ $(document).ready(function(){
               submitForm(this);
               });
  
-  // $(document.body).on("keyup","#form_dentiste", function(e) {
-  //             console.log(e.which);
 
-               
-  //             });
-//   $("#form_dentiste input").bind('keyup', function (e) {
-//     if (e.which >= 97 && e.which <= 122) {
-//         var newKey = e.which - 32;
-//         // I have tried setting those
-//         e.keyCode = newKey;
-//         e.charCode = newKey;
-//     }
-
-//     $("#form_dentiste input").val(($("#form_dentiste input").val()).toUpperCase());
-// });
-
+$(document.body).on('focusout',"form :input",function(){
+                $(this).val($(this).val().toUpperCase());
+              })            
+ 
    });
 
 function newRecordFact(){

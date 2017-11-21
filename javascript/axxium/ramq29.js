@@ -12,10 +12,11 @@ function SoumissionDemandesPaiement()
 
         var jsonDataArray = RamqSoumissionDemandesPaiementGetDataForJSON(); //this data is used to store bill info on the server
         var jsonXML = {
-            "request": inputXMl
+            "request": inputXMl,
+            "info": jsonDataArray // JSON data
         }
 
-        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: '234577', json: JSON.stringify(jsonXML) },
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, json: JSON.stringify(jsonXML) },
                     function (result) {
                         if (result.message != null && result.message.substring(0, 5) == 'Error')
                         {

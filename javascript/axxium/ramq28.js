@@ -672,7 +672,7 @@ function getSoumissionDemandesAnnulationXML()
 function parseRAMQResponsePaiment(strXml)
 {
     var parser = new DOMParser();
-    var xml = strXml.replace(/\//g, "");
+    var xml = strXml.replace(/\\"/g, '"');
     var xmlDoc = parser.parseFromString(xml, "text/xml");
     
     var response = {};
