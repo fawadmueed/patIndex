@@ -13,6 +13,11 @@ $(document).ready(function(){
               };
               return e.which!=13;
             })
+  // $('#factTableBody *td').focusout(function(){
+  //    alert('here');
+  //               console.log($(this).text().toUpperCase());
+  //               $(this).text($(this).text().toUpperCase());
+  // })
   
   $(document.body).on("submit","#form_dentiste", function(event) {
                 submitForm(this);
@@ -24,6 +29,22 @@ $(document).ready(function(){
   $(document.body).on("submit","#form_denturologiste", function(event) {
               submitForm(this);
               });
+ 
+  // $(document.body).on("keyup","#form_dentiste", function(e) {
+  //             console.log(e.which);
+
+               
+  //             });
+//   $("#form_dentiste input").bind('keyup', function (e) {
+//     if (e.which >= 97 && e.which <= 122) {
+//         var newKey = e.which - 32;
+//         // I have tried setting those
+//         e.keyCode = newKey;
+//         e.charCode = newKey;
+//     }
+
+//     $("#form_dentiste input").val(($("#form_dentiste input").val()).toUpperCase());
+// });
 
    });
 
@@ -55,7 +76,7 @@ function newRecordFact(){
        tblData.appendTo(tblRow);
    }
       }
-           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="findTableData(this);" >More</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Delete</div>');
+           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="findTableData(this);" >Plus</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Supprimer</div>');
        tblData.appendTo(tblRow);
 
         tblRow.appendTo(tblBody);
@@ -152,7 +173,8 @@ function modFactTableMore(row_id)
               var data=$('#div_dentiste').html();
               $('#modal_factTbl_more').html(data); 
               $('form #rowId_dent').val(row_id); //Assign id of Row Working - to the Form 
-              
+              var thisFromData=getThisFormData(row_id);
+              populateForm('form_dentiste',thisFromData);
               break;
 
       case 'Chirurgiens':
@@ -160,14 +182,18 @@ function modFactTableMore(row_id)
               var data=$('#div_chirurgiens').html();
               $('#modal_factTbl_more').html(data);
               $('form #rowId_chir').val(row_id); //Assign id of Row Working - to the Form 
-              console.log($('form #rowId_chir').val());
+              var thisFromData=getThisFormData(row_id);
+              populateForm('form_chirurgiens',thisFromData);
+              
               break;
       case 'Denturologiste':
       
               var data=$('#div_denturologiste').html();
               $('#modal_factTbl_more').html(data);
               $('form #rowId_dentu').val(row_id); //Assign id of Row Working - to the Form 
-              console.log($('form #rowId_dentu').val());
+              var thisFromData=getThisFormData(row_id);
+              populateForm('form_denturologiste',thisFromData);
+      
               break;
       default:
               $('#modal_factTbl_more').html('<h1>Error Aquiring the Dentist Type</h1>');
@@ -175,6 +201,28 @@ function modFactTableMore(row_id)
   }
   $('.modalFactTableMore').modal('show');
 }
+
+function getThisFormData(row_id){
+  var arrayToPopulateForm=[];
+
+  $.each(arrGrilleDeFacturation_forms,function(idx,value){
+    $.each(value,function(id,val){
+      if(val.value==row_id){
+        arrayToPopulateForm=value;
+      }
+
+    })
+  })
+  return arrayToPopulateForm;
+}
+
+function populateForm(formname,thisFromData)
+{
+   if(thisFromData!="")
+    {
+      $("#"+formname).deserialize(thisFromData);
+    }
+ }
 
 function emptyTable (){
   //Empty Existing Table and Initialize all parameters of Table

@@ -3,10 +3,10 @@
 function RamqECDownloadNew()
 {
     if (globClinicId !== '') {
-        $.post("RamqService.py", { tx: "getEtatCompte", clinicId: globClinicId, TypEntIntvnEchgs: 'NT' },
+        $.post("allScriptsv1.py", { tx: "getEtatCompte", clinicId: globClinicId, TypEntIntvnEchgs: 'NT' },
             function (result) {
                 if (result.outcome === 'error')
-                    alert(result.message);
+                    alert(RamqECParseErrorMessage(result.message));
                 else
                 {
                     RamqECDownloadFromServer(result.message);
@@ -21,28 +21,26 @@ function RamqECDownloadNew()
 //Returns the list of all EC.zip files from server, for given clinic and period
 function RamqECGetList()
 {
-    var startDate = $('#').val();
-    var endDate = $('#').val();
+    var startDate = $('#date_entre_etat_compte').val();
+    var endDate = $('#date_entre_etat_compte2').val();
     
     $.post("allScriptsv1.py", { tx: "getECFiles", clinicId: globClinicId, dFrom: startDate, dTo: endDate },
             function (result) {
                 if (result.message !== undefined)
                     alert(result.message);
                 else {
-                    //TODO: put real tableId
-                    $('#tableIdXXXXXXXXXXXXXX tbody').empty();
+                    $('#etat_compte_table tbody').empty();
                     var tableContent = "";
                     $.each(result, function (key, val) {
                         if (key == "files") {
-                            items.push("<table>");
+                            //items.push("<table>");
                             $.each(val, function (keyin, valin) {
                                 tableContent += "<tr>";
                                 tableContent += "<td>" + valin.date + "</td>";
                                 tableContent += "<td><a href='" + valin.url + "'>" + valin.file + "</a></td>";
                                 tableContent += "</tr>";
                             });
-                            //TODO: put real tableId
-                            $('#tableIdXXXXXXXXXXXXXX tbody').append(tableContent);
+                            $('#etat_compte_table tbody').append(tableContent);
                         }
                     });
                 }
@@ -59,4 +57,21 @@ function RamqECDownloadFromServer(pFilePath)
     document.body.appendChild(a);
     a.click();
     delete a;
+}
+
+function RamqECParseErrorMessage(pErMes)
+{
+    var parser = new DOMParser();
+    var xmlDoc = parser.parseFromString(pErMes, "text/xml");
+    var response = "";
+    if (xmlDoc.getElementsByTagName("Erreurs_DS")[0] != null) {
+        var errCode = xmlDoc.getElementsByTagName("CodeErreur")[0].childNodes[0].nodeValue;
+        var errMsg = xmlDoc.getElementsByTagName("Erreur")[0].childNodes[0].nodeValue;
+
+        response = "Code Erreur: " + errCode + '\n' + 'Erreur: ' + errMsg;
+
+    }
+    else
+        response = pErMes;
+    return response;
 }

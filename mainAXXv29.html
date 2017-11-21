@@ -36,6 +36,7 @@
   <script src="javascript/axxium/modals-facturation.js"></script>
   <script src="javascript/axxium/factTable_validation.js"></script>
   <script src="javascript/axxium/Fact_Regie.js"></script>
+  <script src="javascript/jquery.deserialize.js"></script>
 
 
   <!-- Translation File & Dictionary English French -->
@@ -46,9 +47,10 @@
   <script src="javascript/pdf/jspdf.min.js"></script>
 <!-- Alex Files -->
 <script src="javascript/axxium/facture28.js"></script>
-<script src="javascript/axxium/ramq28.js"></script>
+<script src="javascript/axxium/ramq29.js"></script>
 <script src="javascript/axxium/ramqCredentials28.js"></script>
 <script src="javascript/axxium/ramqEC29.js"></script>
+<script src="javascript/axxium/ramqBill29.js"></script>
 <!-- <script type="text/javascript"> var translator = $('body').translate({lang:"", t:dict});  </script> -->
 <!-- Alexey JS FILE -->
 <style type="text/css">
@@ -1262,7 +1264,7 @@
            <a class="item" data-tab="RapelFacture-sub">Rappel de facture</a>
            <a class="item" data-tab="FactAnticip-sub">Facturation anticipée</a>
            <a class="item" data-tab="cdanEt-sub">cdanET</a>
-           <a class="item" data-tab="Regie-sub">Regie</a>
+           <a class="item" data-tab="Regie-sub">Régie</a>
 
         </div>
             <!-- ================ -->
@@ -1273,7 +1275,7 @@
               <button class="ui  teal basic button" onclick="modRapelFacture();">Rappel de facture</button>
               <button class="ui  teal basic button" onclick="modFactAnticip();">Facturation anticipée</button>
               <button class="ui  teal basic button" onclick="modCdan();">cdanET</button>
-              <button class="ui  teal basic button" onclick="modRegie();">Regie</button> -->
+              <button class="ui  teal basic button" onclick="modRegie();">Régie</button> -->
               <div class="ui hidden divider"></div>
               <div class="ui form ">
               <div class="ui two column grid">
@@ -1282,21 +1284,21 @@
                   <div class="ui green form segment">
                     <div class="inline field">
                         <input type="radio" name="">
-                          <label>Tarif regulier</label>
+                          <label>Tarif régulier</label>
                     </div>
                     <div class="inline field">
                         <input type="radio" name="">
-                          <label>Tarif special</label>
+                          <label>Tarif spécial</label>
                     </div>
                     <div class="inline field">
                         <input type="radio" name="">
-                          <label>Regie</label>
+                          <label>Régie</label>
                     </div>
                     <div class="inline field">
                         <select class="ui dropdown fluid selection">
                           <option selected="selected" disabled="disabled">Cas hospitalier</option>
-                          <option>Anesthesie Locale</option>
-                          <option>Anesthesie Generale</option>
+                          <option>Anesthésie locale</option>
+                          <option>Anesthésie générale</option>
                           <option>Non applicable</option>
                         </select>
                     </div>
@@ -1353,9 +1355,9 @@
                     </tbody>
                   </table>
                 </div>
-                <div class="ui axxium tiny button" onclick="emptyTable();">New Bill!</div>
-                <div class="ui axxium tiny button" onclick="getAllTrData();">Generer la facture</div>
-                <div class="ui axxium tiny button ok" onclick="">Facturation anticipee</div>
+                <div class="ui axxium tiny button" onclick="emptyTable();">Nlle facture</div>
+                <div class="ui axxium tiny button" onclick="getAllTrData();">Générer la facture</div>
+                <div class="ui axxium tiny button ok" onclick="">Facturation anticipéé</div>
               </div>
                 <div class="two wide column"></div>
               </div>
@@ -1403,25 +1405,26 @@
                 
                 <div class="three wide field">
                   <label>Année</label>
-                  <input type="text"></input>
+                  <input type="date" id="rgie_fact_ane_start"></input>
                 </div>
 
                 <div class="three wide field">
                   <label>-</label>
-                  <input type="text"></input>
+                  <input type="date" id="rgie_fact_ane_end"></input>
                 </div>
-                <div class="four wide field">
+                <div class="ui axxium tiny button" onclick="RamqBillGetList()">Search</div>
+                <!-- <div class="four wide field">
                   <label>No de facture</label>
                   <input type="text"></input>
                 </div>
                 <div class="three wide field">
                   <label>-</label>
                   <input type="text"></input>
-                </div>
+                </div> -->
 
             </div>
           <div class="for_Facture_Drop down">
-            <table class="ui striped  table">
+            <table class="ui striped  table" id="rgie_fact_table">
               <thead>
                 <tr>
                   <th>Dossier</th>
@@ -1445,16 +1448,16 @@
                   
                     <label>Nombre de factures</label>
                     <div class="one wide field">
-                      <input type="text" maxlength="5"></input>
+                      <input type="text" maxlength="5">
                     </div>
                     <label>Montant total:</label>
                     <div class="three wide field">
                       
-                      <input type="text"></input>
+                      <input type="text">
                     </div>
                 </div>
             
-            
+            <!-- 
             <div class="four fields">
                 <div class="inline field">
                   <input type="checkbox" ></input>
@@ -1472,17 +1475,17 @@
                   <input type="checkbox" ></input>
                   <label>Factures en attente</label>
                 </div>
-            </div>
+            </div> -->
         
       </div>
-        <div class="ui grid">
+        <!-- <div class="ui grid">
           <div class="six column row">
             <div class="left floated column"></div>
             <div class="right floated column">
               <div class="ui axxium tiny button">Exporter XLS</div>
             </div>
           </div>
-        </div>
+        </div> -->
             
           </div>
 
@@ -2954,7 +2957,7 @@
  <div class="ui small dentSelectModal modal">
   <i class="close icon"></i>
    <div class="ui header">
-     <i class="user icon"></i>Select Dentiste Type
+     <i class="user icon"></i>Sélectionnez le type de dentiste
    </div>
    <div class="content">
     <div class="inline field">
@@ -2963,13 +2966,13 @@
     </div>
     <div class="inline field">
       <input type="radio" name="dent" value='Chirurgiens'>
-      <label>Chirurgiens</label>
+      <label>Chirurgien dentiste</label>
     </div>
     <div class="inline field">
       <input type="radio" name="dent" value='Denturologiste'>
       <label>Denturologiste</label>
     </div>
-    <div class="ui axxium tiny button" onclick="setDentType();">Save</div>
+    <div class="ui axxium tiny button" onclick="setDentType();">Enregistrer</div>
    </div>
  </div>
 
@@ -2986,21 +2989,21 @@
         <div class="seven wide column">
           <div class="ui form segment">
             <div class="ui horizontal divider"> <strong>Assurance</strong></div>
-              <p1>Reclamation electronique pour Dr Pierre Laberge Etes-vous sur de vouloir transmettre requete?</p1>
+              <p1>Réclamation électronique pour Dr Pierre Laberge Êtes-vous sur de vouloir transmettre la requête?</p1>
               <div class="two fields">
                 <div class="field"><input type="radio" name="" id="assr1_oui"><label>Oui</label></div>
                 <div class="field"><input type="radio" name="" id="assr1_non"><label>Non</label></div>
               </div>
-              <p1>Le patient est-il courvert par une deuxieme assurance ? </p1>
+              <p1>Le patient est-il courvert par une deuxième assurance ? </p1>
               <div class="two fields">
                 <div class="field"><input type="radio" id="assr2_oui"><label>Oui</label></div>
                 <div class="field"><input type="radio" id="assr2_non"><label>Non</label></div>
               </div>
-              <div class="ui axxium button">Transferer a l'assurance</div>
+              <div class="ui axxium button">Transférer à l'assurance</div>
 
           </div>
           <div class="ui form segment">
-                <div class="ui horizontal divider"> <strong>Renseignements Complementaires Regie</strong></div>
+                <div class="ui horizontal divider"> <strong>RENSEIGNEMENTS COMPLÉMENTAIRES RÉGIE</strong></div>
                 <div class="inline fields">
                   <label>Carte d'assurance-maladie</label>
                   <div class="field">
@@ -3084,7 +3087,7 @@
                     <div class="inline fields">
                       <div class="field">
                         <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie" >
-                        <label>Lieu codifié é la Regie</label>
+                        <label>Lieu codifié á la Régie</label>
                       </div>
                       <div class="field">
                         <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie_non">
@@ -3113,7 +3116,7 @@
                       </div>
                     </div>
                     <div class="field">
-                        <label>Secteur d'activite</label>
+                        <label>Secteur d'activité</label>
                           <div class="ui fluid selection dropdown">
                             <input type="hidden" name="secteur_active">
                             <i class="dropdown icon"></i>
@@ -3177,7 +3180,7 @@
               <div class="ui grid">
                 <div class="twelve wide column"></div>
                 <div class="four wide column">
-                  <div class="ui axxium button" onclick="SoumissionDemandesPaiement();"> Transferer a la Regie</div>
+                  <div class="ui axxium button" onclick="SoumissionDemandesPaiement();"> Transférer à la Règie</div>
                 </div>
               </div>
       </div>
@@ -3226,10 +3229,10 @@
           <div class="ui form segment">
             <div class="two fields">
               <div class="inline fields"><label>ARGENT</label> <input type="text" name="" id="argnt_pamnt"></div>
-              <div class="inline field"><label>DEBIT </label> <input type="text" name="" id="debit_pamnt"></div>
+              <div class="inline field"><label>DÉBIT </label> <input type="text" name="" id="debit_pamnt"></div>
             </div>
             <div class="ui form segment">
-              <label>CREDIT</label>
+              <label>CRÉDIT</label>
               <div class="two fields">
                 <div class="inline field"><input type="radio" name="" id="visa_crdt_rad"><label>VISA</label></div>
                 <div class="inline field"> <input type="text" name="" id="visa_crdt_inpt"> </div>
@@ -3269,9 +3272,9 @@
           <div class="five wide field"> <label>Lab %</label><input type="text" name="" id="lab_prcnt"></div>
         </div>
         <div class="ui form segment">
-          <label>Cocher les cases appropriees</label>
+          <label>Cocher les cases appropriées</label>
           <div class="inline field"><input type="checkbox" name="" id="formlr_asur_check"><label>Formulaire d'assurance</label></div>
-          <div class="inline field"><input type="checkbox" name="" class="fact_rec_check"><label>Facture ou un recu</label></div>
+          <div class="inline field"><input type="checkbox" name="" class="fact_rec_check"><label>Facture ou un reçu</label></div>
           <div class="ui grid">
             <div class="eight wide column"></div>
             <div class="eight wide column">
@@ -3521,13 +3524,14 @@
     <form id="form_dentiste" class="dent" method="post">
     <div class="ui axxium form segment">
     <h4 class="ui horizontal divider header">DENTISTE</h4> 
-      <label>Renseignements complémentaires Regie</label>
+      <label>Renseignements complémentaires Régie</label>
       <div class="ui grid">
         <div class="eight wide column">
           <div class="ui segment">
             <input type="text" name="row_id" id="rowId_dent" style="display: none">
 
-            <label>Prothése en acrylique</label>
+            <label>Prothèse en acrylique</label>
+            <div class="two fields">
             <div class="field">
               <label>No d'autorisation</label>
               <input type="text" name="no_autorisation_dentiste">
@@ -3537,17 +3541,30 @@
               <input type="date" name="date_autorisation_dentiste">
             </div>
           </div>
+          </div>
           <div class="ui segment">
-            <label>Traite,emt demtaire</label>
+            <label>Traitement demtaire</label>
+            <div class="two fields">
             <div class="field">
-              <label>Type et raison</label>
-              <input type="text" name="type_raison_dentiste">
+              <label>Type </label>
+              <input type="text" name="type_dentiste">
             </div>
             <div class="field">
-              <label>Type et site</label>
-              <input type="text" name="type_site_dentiste">
+              <label>Raison</label>
+              <input type="text" name="raison_dentiste">
             </div>
           </div>
+          <div class="two fields">
+            <div class="field">
+              <label>Type </label>
+              <input type="text" name="typeS_dentiste">
+            </div>
+            <div class="field">
+              <label>Site</label>
+              <input type="text" name="site_dentiste">
+            </div>
+          </div>
+        </div>
             <div class="field">
               <label>Médicament consommé</label>
               <input type="text" name="medicament_dentiste">
@@ -3580,10 +3597,20 @@
               </select>
 
             </div>
+            <div class="two fields">
             <div class="four wide field">
-              <label>Médicament mesurables</label>
+              <label>Élements mesurables</label>
               <input type="text" name="mesurables_dentiste">
             </div>
+            <div class="four wide field">
+              <label></label>
+              <select name="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
+                <option>Kilomètres</option>
+                <option>Nombre d'injections</option>
+                <option>Durée activités administratives</option>
+              </select>
+            </div>
+          </div>
 
         </div>
         <div class="eight wide column">
@@ -3599,14 +3626,15 @@
               <input type="radio" name="identification_lieu_dentiste" value="Lieu codifié á la Régie">
               <label>Lieu codifié á la Régie</label>
             </div> 
+             <div class="inline field">
+              <input type="radio" name="identification_lieu_dentiste" value="Lieu non codifié">
+              <label>Lieu non codifié</label>
+            </div>
             <div class="field">
               <label>Numéro du lieu</label>
               <input type="text" name="">
             </div>
-            <div class="inline field">
-              <input type="radio" name="identification_lieu_dentiste" value="Lieu non codifié">
-              <label>Lieu non codifié</label>
-            </div>
+           
             <div class="three fields">
               <div class="field">
                 <label>Code postal</label>
@@ -3617,7 +3645,7 @@
                 <input type="text" name="code_localite_dentiste">
               </div>
               <div class="field">
-                <label>No. bur.</label>
+                <label>No. bureau.</label>
                 <input type="text" name="no_bur_dentiste">
               </div>
             </div>
@@ -3659,7 +3687,7 @@
               <input type="text" name="type_profession_dentiste">
             </div>
           </div>
-          <button class="ui axxium button" type="submit" >Submit</button>
+          <button class="ui axxium button" type="submit">Enregistrer</button>
         </form>
           
         </div>
@@ -3675,11 +3703,11 @@
         <div class="ui axxium form segment" >
           <input type="text" name="row_id" id="rowId_chir" style="display: none">
           <h4 class="ui horizontal divider header">CHIRURGIENS</h4>
-      <label>Renseignements complémentaires Regie (Chirguen)</label>
+      <label>Renseignements complémentaires Régie (Chirguen)</label>
       <div class="ui grid">
         <div class="eight wide column">
           <div class="ui segment">
-            <label>Prothése en acrylique</label>
+            <label>Prothèse en acrylique</label>
             <div class="field">
               <label>No d'autorisation</label>
               <input type="text" name="atrsn_chirgien">
@@ -3690,22 +3718,34 @@
             </div>
           </div>
           <div class="ui segment">
-            <label>Traite,emt demtaire</label>
+            <label>Traitement demtaire</label>
+            <div class="two fields">
             <div class="field">
-              <label>Type et raison</label>
-              <input type="text" name="type_rsn_chirgien">
+              <label>Type </label>
+              <input type="text" name="type_reason_chirgien">
             </div>
             <div class="field">
-              <label>Type et site</label>
+              <label>Raison</label>
+              <input type="text" name="reasn_chirgien">
+            </div>
+          </div>
+          <div class="two fields">
+            <div class="field">
+              <label>Type</label>
+              <input type="text" name="type_site_chirgien">
+            </div>
+            <div class="field">
+              <label>Site</label>
               <input type="text" name="site_chirgien">
             </div>
+          </div>
           </div>
             <div class="field">
               <label>Médicament consommé</label>
               <input type="text" name="medicament_chirgien">
             </div>
             <div class="field">
-              <label>Éléments de contexte</label>
+              <label>Élements de contexte</label>
               <select id="dropD_chirurgiens" name="elemnt_contx_chirgien">
 
                 <option value="1735"> Acte posé plus souvent que convenu à l entente (1735)</option>
@@ -3726,10 +3766,20 @@
 
               </select>
             </div>
+            <div class="two fields">
             <div class="four wide field">
               <label>Elements mesurables</label>
               <input type="text" name="elmnt_msrble_chirgien">
             </div>
+            <div class=" four wide field">
+              <label></label>
+              <select name="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
+                <option>Kilomètres</option>
+                <option>Nombre d'injections</option>
+                <option>Durée activités administratives</option>
+              </select>
+            </div>
+          </div>
 
         </div>
         <div class="eight wide column">
@@ -3759,7 +3809,7 @@
                 <input type="text" name="code_chirgien">
               </div>
               <div class="field">
-                <label>No. bur.</label>
+                <label>No. bureau</label>
                 <input type="text" name="no_bur_chirgien">
               </div>
             </div>
@@ -3801,7 +3851,7 @@
               <input type="text" name="type_profession_chirgien">
             </div>
           </div>
-          <button class="ui axxium tiny button" type="submit">Submit</button>
+          <button class="ui axxium tiny button" type="submit">Enregistrer</button>
         </form>
         </div>
       </div>
@@ -4627,11 +4677,13 @@
   </div>
 
   <script>
+    
+ $(document.body).on('focusout',"#factTableBody *td",function(){
+              alert('here');
+                console.log($(this).text().toUpperCase());
+                $(this).text($(this).text().toUpperCase());
+              })
 
-   $(document).ready(function(){
-
-
-});
 
   $('.modNoteProt.content .ui.form')
         .form({
@@ -5520,7 +5572,6 @@ function changeLang(x)
     // $("div").addClass("trn");
     translator.lang(x);
   }
-
 
 
 

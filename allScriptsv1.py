@@ -479,7 +479,9 @@ if (tx == "getRamqData"):
                 root = ET.fromstring(CleanXML(xmlstring.encode('utf-8')))            
                 nbrerror = root.find('n:sta_recev', namespaces=nsmap).text
                 if(nbrerror == "1"): #1: ok, 2: Fail
-                    dataJSON = { 'xmlreq': xmlreq.replace("\"", "\\\"").replace("\r","").replace("\n","").replace("  ",""), 'xmlresp': xmlstring.replace("\"<","<").replace(">\"",">")}
+                    xmlreq = xmlreq.replace("\"", "\\\"").replace("\r","").replace("\n","").replace("  ","")
+                    xmlstring = xmlstring.replace("\"<","<").replace(">\"",">").replace("\r","").replace("\n","").replace("  ","").replace('\\r','').replace('\\n','')
+                    dataJSON = {'xmlreq': xmlreq, 'xmlresp': xmlstring}
                     logFile = open('json/ramq/'+ patientId + '_' + nofactext + '.json', 'w')
                     logFile.write(json.dumps(dataJSON).decode('unicode-escape').encode('utf8'))
                     logFile.close()
@@ -528,17 +530,25 @@ if (tx == "getEtatCompte"):
                 logFile = open('json/ec/'+ clinicId + '/' + FileName, 'wb')
                 logFile.write(file_64_decode)
                 logFile.close()
-                message = {'outcome' : 'success', 'message': 'http://' + os.path.dirname(os.environ['HTTP_HOST'] + os.environ['PATH_INFO']) + '/json/ec/' + FileName}
+                message = {'outcome' : 'success', 'message': 'http://' + os.environ['HTTP_HOST'] + '/axxium/json/ec/' + clinicId + '/' + FileName}
                 print (json.dumps(message))         
     except:
         print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
 
-
 if (tx == "getECFiles"):   
     try:
         clinicId = form['clinicId'].value
-        datefrom = date(form['dFrom'].value)
-        dateto = date(form['dTo'].value)
+
+        #In case, the dates are missing
+        try:
+            datefrom = date(form['dFrom'].value)
+        except:
+            datefrom = date()
+
+        try:
+            dateto = date(form['dTo'].value)  
+        except:
+            dateto = date()
             
         print '{ "files": [ '
         files = os.listdir("json/ec/"+clinicId)
@@ -554,12 +564,89 @@ if (tx == "getECFiles"):
                 if comma:
                     print ','
                 print '{ "file" : "%s"'%filename.split('/')[3]
-                print ', "url" : "http://%s/%s"'%(os.path.dirname(os.environ['HTTP_HOST'] + os.environ['PATH_INFO']),filename)
+                print ', "url" : "http://%s/axxium/%s"'%(os.environ['HTTP_HOST'], filename)
                 print ', "date" : "%s"'%time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
                 print " } "
                 comma = True
                 ctr = ctr + 1  
 
         print '], "count" : '+str(ctr)+' }'        
+    except:
+        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+
+if (tx == "GenerIdMachine"):   
+    try:
+        clinicId = form['clinicId'].value
+        pNoIntervenant = form['NoIntervenant'].value
+        pIdUtilisateur = form['IdUtilisateur'].value
+        pMotDePasse = form['MotDePasse'].value
+
+        headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
+        dataJSON = { 'CodeErreur': None, 'NoIntervenant': pNoIntervenant, 'IdUtilisateur': pIdUtilisateur, 'MotDePasse': pMotDePasse, 'IdMachine': None, 'MotDePasseMachine': None, 'ServerError': None}
+        r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostGenerIdMacine', json=dataJSON, headers=headers)
+
+        if(r.status_code != 200):
+            print '{ "outcome" : "error", "message" : "Something was wrong" }'
+        else:
+            resp = r.json()
+            IdMachine = resp["IdMachine"]
+            MotDePasseMachine = resp["MotDePasseMachine"]
+            CodeErreur = resp["CodeErreur"]
+            ServerError = resp["ServerError"]
+            
+            if not CodeErreur is None:
+                message = {'outcome' : 'error', 'message': '%s'%CodeErreur}
+                print json.dumps(message)
+            else:
+                if not ServerError is None:
+                    message = {'outcome' : 'error', 'message': '%s'%ServerError}
+                    print json.dumps(message)
+                else:        
+                    dataJSON = { 'ClinicId': clinicId, 'MachineId': IdMachine, 'MachineIdPass': MotDePasseMachine, 'NoIntervenant': pNoIntervenant, 'CreationDate' : datetime.now().strftime('%Y-%m-%d') }
+                    logFile = open('json/ramqCredentials/'+ clinicId + '.json', 'w')
+                    logFile.write(json.dumps(dataJSON))
+                    logFile.close()
+                    print '{ "outcome" : "success", "message" : "" }'         
+    except:
+        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+
+if (tx == "ChangePassword"):   
+    try:
+        clinicId = form['clinicId'].value
+
+        #read the parameters for credentials
+        json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
+        data = json.load(json_data)
+        json_data.close()
+        pMachineIdPass= data["MachineIdPass"]	
+        pMachineId= data["MachineId"]
+        pNoIntervenant= data["NoIntervenant"]
+
+        headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
+        dataJSON = { 'CodeErreur': None, 'NoIntervenant': pNoIntervenant, 'IdMachine': pMachineId, 'AncienMotDePasse': pMachineIdPass, 'MotDePasseMachine': '', 'ServerError': None}
+        r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostChangePassword', json=dataJSON, headers=headers)
+
+        if(r.status_code != 200):
+            print '{ "outcome" : "error", "message" : "Something was wrong" }'
+        else:
+            resp = r.json()
+            IdMachine = resp["IdMachine"]
+            MotDePasseMachine = resp["MotDePasseMachine"]
+            CodeErreur = resp["CodeErreur"]
+            ServerError = resp["ServerError"]
+            
+            if not CodeErreur is None:
+                message = {'outcome' : 'error', 'message': '%s'%CodeErreur}
+                print json.dumps(message)
+            else:
+                if not ServerError is None:
+                    message = {'outcome' : 'error', 'message': '%s'%ServerError}
+                    print json.dumps(message)
+                else:        
+                    dataJSON = { 'ClinicId': clinicId, 'MachineId': IdMachine, 'MachineIdPass': MotDePasseMachine, 'NoIntervenant': pNoIntervenant, 'CreationDate' : datetime.now().strftime('%Y-%m-%d') }
+                    logFile = open('json/ramqCredentials/'+ clinicId + '.json', 'w')
+                    logFile.write(json.dumps(dataJSON))
+                    logFile.close()
+                    print '{ "outcome" : "success", "message" : "" }'          
     except:
         print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]

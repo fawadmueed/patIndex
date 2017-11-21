@@ -1,3 +1,4 @@
+ 
  $(document).ready(function(){
 
      // $("#factTableBody td[data-target='Type']").focusout(function(){
