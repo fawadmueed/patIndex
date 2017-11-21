@@ -4,17 +4,19 @@
 //TODO:rename SoumissionDemandesPaiement to RamqSoumissionDemandesPaiement;
 function SoumissionDemandesPaiement()
 {
-    var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
+    var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetDataForXml();
     if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[2].length>0) //TODO: empty line shouldn't be added to an array.
     {
         var operationName = "Paiement";
-        var inputXMl = RamqGetData(operationName, objSoumissionDemandesPaiementData);
+        var inputXMl = RamqGetData(operationName, objSoumissionDemandesPaiementData); //This data is used to send to RAMQ.
 
+        var jsonDataArray = RamqSoumissionDemandesPaiementGetDataForJSON(); //this data is used to store bill info on the server
         var jsonXML = {
-            "request": inputXMl
+            "request": inputXMl,
+            "info": jsonDataArray // JSON data
         }
 
-        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: '234577', json: JSON.stringify(jsonXML) },
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, json: JSON.stringify(jsonXML) },
                     function (result) {
                         if (result.message != null && result.message.substring(0, 5) == 'Error')
                         {
@@ -878,7 +880,7 @@ function RamqGetFactNumber()
 
 
 
-function RamqSoumissionDemandesPaiementGetData()
+function RamqSoumissionDemandesPaiementGetDataForXml()
 {
     /*
      data source to create an xml :
@@ -901,6 +903,32 @@ function RamqSoumissionDemandesPaiementGetData()
     arrData[2] = objBillData;
 
     return arrData;
+}
+
+function RamqSoumissionDemandesPaiementGetDataForJSON()
+{
+    /*
+     data source to create an json :
+     1. Common data (Constant data related to application and developer + Data from visioneR); objCommonData
+     2. Data from arrGrilleDeFacturation array.
+     3. Data from arrGrilleDeFacturation_forms array.
+    
+    returns an json array of objects:
+    arrData[0] = arrCommonData[objConstAppData,objVisionRData];
+    arrData[1] = objGrilleDeFacturationData;
+    arrData[2] = objGrilleDeFacturationFormData;
+    */
+    var objConstAppData = RamqGetConstAppData();
+    var objVisionRData = RamqGetVisionRData();
+    var objBillData = RamqGetBillData();
+
+    var arrCommonData = [objConstAppData, objVisionRData];
+    var arrData = [];
+    arrData[0] = arrCommonData;
+    arrData[1] = arrGrilleDeFacturation;
+    arrData[2] = arrGrilleDeFacturation_forms;
+
+    return JSON.stringify(arrData);
 }
 
     
