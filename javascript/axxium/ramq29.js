@@ -18,7 +18,11 @@ function SoumissionDemandesPaiement()
 
         $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, json: JSON.stringify(jsonXML) },
                     function (result) {
-                        if (result.message != null && result.message.substring(0, 5) == 'Error')
+                        if (result.outcome === 'error')//Display python Error
+                        {
+                            alert(result.message);
+                        }
+                        else if (result.message != null && result.message.substring(0, 5) == 'Error')
                         {
                             displayRamqAnswer("RAMQ", result.message);
                         }
@@ -928,7 +932,8 @@ function RamqSoumissionDemandesPaiementGetDataForJSON()
     arrData[1] = arrGrilleDeFacturation;
     arrData[2] = arrGrilleDeFacturation_forms;
 
-    return JSON.stringify(arrData);
+    //return JSON.stringify(arrData);
+    return arrData;
 }
 
     

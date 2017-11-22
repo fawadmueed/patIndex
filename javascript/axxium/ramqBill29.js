@@ -33,8 +33,9 @@ function RamqBillGetDataForTable(pArrDataFromServer)
         objOutputData.FactureNo = objInputData.facture;
         objOutputData.Nom = "";
         objOutputData.Prenom = "";
-        objOutputData.Montant = RamqBillGetMontant(objInputData.info); //Montant
-        objOutputData.Status = RamqBillGetStatus(objInputData.info)
+        objOutputData.Montant = RamqBillGetMontant(objInputData.xml); //Montant
+        objOutputData.Status = RamqBillGetStatus(objInputData.xml);
+        objOutputData.IfUpdatePossible = RamqBillIfUpdatePossible(objOutputData.Status, objOutputData.Date);
 
         arrData.push(objOutputData);
     }
@@ -45,22 +46,28 @@ function RamqBillPopulateTable(pArrDataForTable)
 {
     $('#rgie_fact_table tbody').empty();
     var tableContent = "";
-
+    var numberOfBills = pArrDataForTable.length;
+    var totalAmount = 0;
     for(var i = 0; i<pArrDataForTable.length; i++)
     {
-        tableContent += '<tr>';
-        //tableContent += '<td onclick = "RamqBillPopulatDetailsArrays(' + pArrDataForTable[i].FactureNo + ')">' + pArrDataForTable[i].Dossier + "</td>"; //Dossier
+        var style = (pArrDataForTable[i].IfUpdatePossible) ? 'style="background-color:lightgreen"' : '';
+        tableContent += '<tr onclick = "RamqBillPopulatDetailsArrays(\'' + pArrDataForTable[i].FactureNo + '\')" '+style+'>';
         tableContent += '<td>' + pArrDataForTable[i].Dossier + "</td>"; //Dossier
+        //tableContent += '<td>' + pArrDataForTable[i].Dossier + "</td>"; //Dossier
         tableContent += "<td>" + pArrDataForTable[i].RamqNo + "</td>"; //#RAMQ
         tableContent += "<td>" + pArrDataForTable[i].Date + "</td>"; //Date
         tableContent += "<td>" + pArrDataForTable[i].FactureNo + "</td>"; //No de Facture
         tableContent += "<td>" + pArrDataForTable[i].Nom + "</td>"; //Nom
         tableContent += "<td>" + pArrDataForTable[i].Prenom + "</td>"; //Prenom
         tableContent += "<td>" + pArrDataForTable[i].Montant + "</td>"; //Montant
-        tableContent += "<td>" + pArrDataForTable[i].Status + "</td>"; //Status
+        tableContent += "<td>" + ((pArrDataForTable[i].Status == 0) ? "Non transmis" : 'Accepté') + "</td>"; //Status
         tableContent += "</tr>";
+        totalAmount += pArrDataForTable[i].Montant;
     }
+
     $('#rgie_fact_table tbody').append(tableContent);
+    $('#nombre_factures_regie').val(numberOfBills);
+    $('#total_factures_regie').val(totalAmount);
 }
 
 function RamqBillGetNoRamq(pObjDataFromServer)
@@ -70,19 +77,66 @@ function RamqBillGetNoRamq(pObjDataFromServer)
 }
 
 
-function RamqBillGetMontant(pObjDataFromServer)
+function RamqBillGetMontant(pXmlResp)
 {
-    return "";
+    var obj = parseRAMQResponsePaiment(pXmlResp);
+    if (obj) {
+        var arrLigneList = obj.arrListeFactRecev[0].ListeLigneFactRecev;
+        if (arrLigneList) {
+            var totalAmount = 0;
+            for (var i = 0; i < arrLigneList.length; i++) {
+                var amount = Number(arrLigneList[i].MntPrel);
+                if (!isNaN(amount)) {
+                    totalAmount += amount;
+                }
+            }
+        }
+    }
+    return totalAmount;
 }
 
-function RamqBillGetStatus(pObjDataFromServer)
+function RamqBillGetStatus(pXmlResp)
 {
-    return "";
+    var status = 0;//"Non transmis"
+    var obj = parseRAMQResponsePaiment(pXmlResp);
+    if (obj && obj.GlobalStaRecev == "1") //bill accepted
+    {
+        status = 1;//"Accepté";
+    }
+    return status;
 }
 
 function RamqBillPopulatDetailsArrays(pBillNumber)
 {
     alert(pBillNumber);
+}
+
+//Check if the bill can be updated.
+// if bill accepted and bill was created less than 24 hours ago, returns true, otherwise false.
+function RamqBillIfUpdatePossible(pStatus, pDate)
+{
+    var res = false;
+    if(pStatus ==1)//Accepte
+    {
+        try
+        {
+            var difHours = 0;
+            var billDate = new Date(pDate);
+            var billTimeMSec = billDate.getTime();
+            var currentTimeMSec = new Date().getTime();
+            difHours = (currentTimeMSec-billTimeMSec)/(1000*60*60);
+            if (difHours<23)
+            {
+                res = true;
+            }
+        }
+        catch(e)
+        {
+            res = false;
+        }
+        
+    }
+    return res;
 }
 
 
