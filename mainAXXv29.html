@@ -338,9 +338,31 @@
                         <div class="seven wide column">
                            <img id="patPhoto" class="ui fluid rounded image patPhoto" src="json/images/square-image.png">
                            <div class="field">
-                              <label>
-                              <input type="file" accept="image/*" id="photoCapture" capture="camera" onchange="uploadPhoto()">
-                              </label>
+                            <div class="file-input-wrapper">
+                              <button class="ui axxium tiny button" style="margin-top:3px"> <i class="photo icon"></i>Changer la photo</button>
+                              <input type="file" name="file" id="photoCapture" capture="camera" accept="image/*" onchange="uploadPhoto()"/>
+                            </div>
+                           <style type="text/css">
+  .file-input-wrapper {
+    width: 200px;
+    height: 40px;
+    overflow: hidden;
+    position: relative;
+  }
+  .file-input-wrapper > input[type="file"] {
+    font-size: 200px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+  }
+  .file-input-wrapper > .btn-file-input {
+    display: inline-block;
+    width: 200px;
+    height: 40px;
+  }
+</style>
+                              
                            </div>
                         </div>
                         <div class="nine wide column">
@@ -590,10 +612,9 @@
                   </div>
                   <!-- <div class="two column row"> -->
                   <div class="ui form segment">
+                    <h4 class="ui horizontal divider">Message R</h4>
                      <div class="inline fields" >
-                        <label>
-                           <h3>Message R</h3>
-                        </label>
+                        
                         <label>Oui</label>
                         <div class="ui checkbox">
                            <input type="checkbox" name="example">
@@ -1147,7 +1168,7 @@
             <a class="active item" data-tab="facturation-sub">Facture</a>
             <a class="item" data-tab="RapelFacture-sub">Rappel de facture</a>
             <a class="item" data-tab="FactAnticip-sub">Facturation anticipée</a>
-            <a class="item" data-tab="cdanEt-sub">cdanET</a>
+            <a class="item" data-tab="cdanEt-sub">CDANET</a>
             <a class="item" data-tab="Regie-sub">Régie</a>
          </div>
          <!-- ================ -->
@@ -1160,7 +1181,18 @@
             <div class="ui hidden divider"></div>
             <div class="ui form ">
                <div class="ui two column grid">
-                  <div class="three wide column">
+                <div class="row">
+                  <div class="eight wide column">
+                     <div class="ui grid">
+                        <div class="sixteen wide column"></div>
+                     </div>
+                     <div class="row">
+                        <canvas class="ui raised segment" id="odonto" width="100%" height="300" style="border:1px solid #c3c3c3;">
+                           Your browser does not support the HTML5 canvas tag.
+                        </canvas>
+                     </div>
+                  </div>
+                   <div class="three wide column">
                      <div class="ui green form segment">
                         <div class="inline field">
                            <input type="radio" name="">
@@ -1184,20 +1216,12 @@
                         </div>
                      </div>
                   </div>
-                  <div class="nine wide column">
-                     <div class="ui grid">
-                        <div class="sixteen wide column"></div>
-                     </div>
-                     <div class="row">
-                        <canvas class="ui raised segment" id="odonto" width="100%" height="300" style="border:1px solid #c3c3c3;">
-                           Your browser does not support the HTML5 canvas tag.
-                        </canvas>
-                     </div>
-                  </div>
                </div>
+             </div>
+
                <div class="ui grid">
-                  <div class="two wide column"></div>
-                  <div class="twelve wide column">
+                  
+                  <div class="sixteen wide column">
                      <div class="ui teal form raised segment">
                         <table id="factureTable" class="ui striped compact table segment" cellspacing="0" width="100%">
                            <thead>
@@ -1234,9 +1258,9 @@
                      </div>
                      <div class="ui axxium tiny button" onclick="emptyTable();">Nlle facture</div>
                      <div class="ui axxium tiny button" onclick="getAllTrData();">Générer la facture</div>
-                     <div class="ui axxium tiny button ok" onclick="">Facturation anticipéé</div>
+                     <div class="ui axxium tiny button ok" onclick="">Facturation anticipée</div>
                   </div>
-                  <div class="two wide column"></div>
+                  
                </div>
             </div>
          </div>
@@ -1311,11 +1335,11 @@
                            <div class="four inline fields">
                               <label>Nombre de factures</label>
                               <div class="one wide field">
-                                 <input type="text" maxlength="5">
+                                 <input type="text" maxlength="5" id="nombre_factures_regie">
                               </div>
                               <label>Montant total:</label>
                               <div class="three wide field">
-                                 <input type="text">
+                                 <input type="text" id="total_factures_regie">
                               </div>
                            </div>
                            <!-- 
@@ -2699,7 +2723,7 @@
       <div class="ui modalPayment fullscreen modal">
          <i class="close icon"></i>
          <div class="header">
-            <i class="user icon"></i>Payment
+            <i class="user icon"></i>Paiement
          </div>
          <div class="content">
             <div class="ui axxium form segment">
@@ -2707,7 +2731,7 @@
                   <div class="seven wide column">
                      <div class="ui form segment">
                         <div class="ui horizontal divider"> <strong>Assurance</strong></div>
-                        <p1>Réclamation électronique pour Dr Pierre Laberge Êtes-vous sur de vouloir transmettre la requête?</p1>
+                        <p1>Réclamation électronique pour Dr Pierre Laberge. Êtes-vous sur de vouloir transmettre la requête?</p1>
                         <div class="two fields">
                            <div class="field"><input type="radio" name="" id="assr1_oui"><label>Oui</label></div>
                            <div class="field"><input type="radio" name="" id="assr1_non"><label>Non</label></div>
@@ -2746,9 +2770,9 @@
                         <div class="ui grid">
                            <div class="eight wide column">
                               <div class="ui form segment">
-                                 <div class="ui horizontal divider"> <strong>Professional</strong></div>
+                                 <div class="ui horizontal divider"> <strong>PROFESSIONEL</strong></div>
                                  <div class="field">
-                                    <label>No du professional</label>
+                                    <label>No du professionel</label>
                                     <input type="text" name="">
                                  </div>
                                  <div class="field">
@@ -2778,13 +2802,13 @@
                                     </div>
                                  </div>
                                  <div class="field">
-                                    <label>Date de lévenement</label>
+                                    <label>Date de lévénement</label>
                                     <input type="date" name="">
                                  </div>
                                  <div class="ui form segment">
-                                    <label>Période d'hospitalisation</label>
+                                    <div class="ui horizontal divider"><label>Période d'hospitalisation</label></div>
                                     <div class="field">
-                                       <label>Date d'entreé</label>
+                                       <label>Date d'entrée</label>
                                        <input type="date" name="">
                                     </div>
                                     <div class="field">
@@ -2798,7 +2822,7 @@
                               <div class="ui form segment">
                                  <div class="ui horizontal divider"> <strong>Lieu de dispensation</strong></div>
                                  <strong>Identification du lieu</strong>
-                                 <div class="inline fields">
+                                 
                                     <div class="field">
                                        <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie" >
                                        <label>Lieu codifié á la Régie</label>
@@ -2807,7 +2831,7 @@
                                        <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie_non">
                                        <label>Lieu non codifié</label>
                                     </div>
-                                 </div>
+                                 
                                  <div class="codif_selection_lieu" style="display: none;">
                                     <div class="field">
                                        <label>Numéro du lieu</label>
@@ -2883,12 +2907,14 @@
                            </div>
                         </div>
                      </div>
+                   
                      <div class="ui grid">
-                        <div class="twelve wide column"></div>
-                        <div class="four wide column">
-                           <div class="ui axxium button" onclick="SoumissionDemandesPaiement();"> Transférer à la Règie</div>
-                        </div>
-                     </div>
+                              <div class="row">
+                                 <div class="column">
+                                    <div class="ui right floated axxium button" onclick="SoumissionDemandesPaiement();"> Transférer à la Règie</div>
+                                  </div>
+                               </div>
+                             </div>
                   </div>
                   <div class="six wide column">
                      <div class="ui form segment">
@@ -2896,6 +2922,7 @@
                         <div class="ui axxium form">
                            <div class="ui two column grid">
                               <div class="column">
+                                <div class="ui segment">
                                  <strong>Solde Actuel</strong>
                                  <div class="field">
                                     <label>PERS</label>
@@ -2910,11 +2937,13 @@
                                     <input type="text" name="" id="ass_solde">
                                  </div>
                                  <div class="field">
-                                    <label>POST</label>
-                                    <input type="text" name="" id=post_solde>
+                                    <label>POST-DATÉS</label>
+                                    <input type="date" name="" id=post_solde>
                                  </div>
+                               </div>
                               </div>
                               <div class="column">
+                                <div class="ui segment">
                                  <strong>Total Facture</strong>
                                  <div class="field">
                                     <label>PERS</label>
@@ -2928,6 +2957,7 @@
                                     <label>ASS</label>
                                     <input type="text" name="" id="ass_total">
                                  </div>
+                               </div>
                               </div>
                            </div>
                         </div>
@@ -2937,7 +2967,7 @@
                               <div class="inline field"><label>DÉBIT </label> <input type="text" name="" id="debit_pamnt"></div>
                            </div>
                            <div class="ui form segment">
-                              <label>CRÉDIT</label>
+                              <div class="ui horizontal divider"><label>CRÉDIT</label></div>
                               <div class="two fields">
                                  <div class="inline field"><input type="radio" name="" id="visa_crdt_rad"><label>VISA</label></div>
                                  <div class="inline field"> <input type="text" name="" id="visa_crdt_inpt"> </div>
@@ -2947,17 +2977,17 @@
                            </div>
                            <div class="ui form segment">
                               <div class="two fields">
-                                 <div class="inline field"> <label>No</label> <input type="text" name="" id="pst_dat_no"></div>
-                                 <div class="inline field"> <label>Montant</label> <input type="text" name="" id="pst_dat_mnt"></div>
+                                 <div class="two wide field"> <label>No</label> <input type="text" name="" id="pst_dat_no"></div>
+                                 <div class=" field"> <label>Montant</label> <input type="text" name="" id="pst_dat_mnt"></div>
                               </div>
                               <div class="two fields">
-                                 <div class="inline field"> <label>Date</label> <input type="text" name="" id="pst_dat"></div>
-                                 <div class="inline field"> <label>Nb</label> <input type="text" name="" id="pst_nb"></div>
+                                 <div class=" field"> <label>Date</label> <input type="date" name="" id="pst_dat"></div>
+                                 <div class="two wide field"> <label>Nb</label> <input type="text" name="" id="pst_nb"></div>
                               </div>
-                              <div class="inline field">
+                              <div class="five wide field">
                                  <label>Type</label>
                                  <select id="pst_type">
-                                    <option disabled="Cheque"></option>
+                                    <option selected="selected">Chéque</option>
                                     <option>MC</option>
                                     <option>VISA</option>
                                     <option>AMEX</option>
@@ -2967,7 +2997,7 @@
                            </div>
                            <div class="inline field">
                               <input type="checkbox" name="" id="fract_pmnt_check">
-                              <label>Fractioner les paierments</label>
+                              <label>Fractioner les paiements</label>
                            </div>
                            <div class="inline field">
                               <label style="color: RED">TOTAL</label>
@@ -2980,19 +3010,20 @@
                         <label>Cocher les cases appropriées</label>
                         <div class="inline field"><input type="checkbox" name="" id="formlr_asur_check"><label>Formulaire d'assurance</label></div>
                         <div class="inline field"><input type="checkbox" name="" class="fact_rec_check"><label>Facture ou un reçu</label></div>
-                        <div class="ui grid">
-                           <div class="eight wide column"></div>
-                           <div class="eight wide column">
-                              <div class="two fields">
-                                 <div class="field">
-                                    <div class="ui axxium tiny button">Envoyer par courriel</div>
-                                 </div>
-                                 <div class="field">
-                                    <div class="ui axxium tiny button">Imprimer</div>
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
+                       
+                           
+                           <div class="ui grid">
+                              <div class="row">
+                                 <div class="column">
+                                    <div class="ui axxium right floated button">Envoyer par courriel</div>
+                                 
+                                    <div class="ui axxium right floated button">Imprimer</div>
+                                  </div>
+                               </div>
+                             </div>
+                              
+                           
+                       
                      </div>
                   </div>
                   <script type="text/javascript">
@@ -3203,7 +3234,7 @@
    <div class="ui modalFactTableMore fullscreen modal">
       <i class="close icon"></i>
       <div class="header">
-         <i class="user icon"></i>More Info
+         <i class="user icon"></i>Informations complementaires Régie
       </div>
       <div class="content">
          <div id="modal_factTbl_more" >
@@ -3214,25 +3245,25 @@
             <form id="form_dentiste" class="dent" method="post">
                <div class="ui axxium form segment">
                   <h4 class="ui horizontal divider header">DENTISTE</h4>
-                  <label>Renseignements complémentaires Régie</label>
+    
                   <div class="ui grid">
                      <div class="eight wide column">
                         <div class="ui segment">
                            <input type="text" name="row_id" id="rowId_dent" style="display: none">
-                           <label>Prothèse en acrylique</label>
+                           <h4 class="ui horizontal divider header">Prothèse en acrylique</h4>
                            <div class="two fields">
                               <div class="field">
                                  <label>No d'autorisation</label>
                                  <input type="text" name="no_autorisation_dentiste">
                               </div>
                               <div class="field">
-                                 <label>Date a'utorisation</label>
+                                 <label>Date d'utorisation</label>
                                  <input type="date" name="date_autorisation_dentiste">
                               </div>
                            </div>
                         </div>
                         <div class="ui segment">
-                           <label>Traitement demtaire</label>
+                           <h4 class="ui horizontal divider header">Traitement dentaire</h4>
                            <div class="two fields">
                               <div class="field">
                                  <label>Type </label>
@@ -3261,25 +3292,25 @@
                         <div class="field">
                            <label>Éléments de contexte</label>
                            <select  id="dropD_dentiste" name="element_contexte_dentiste">
-                              <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
-                              <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
-                              <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
-                              <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
-                              <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
-                              <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
-                              <option value="1724">Patient sous anesthésie générale (1724)</option>
-                              <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
-                              <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
-                              <option value="1746">Séance différente (1746)</option>
-                              <option value="34">Service dont la complexité est inhabituelle (34)</option>
-                              <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
-                              <option value="1749">Site différent (1749)</option>
-                              <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
-                              <option value="1725">Soins d urgence (1725)</option>
-                              <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
-                              <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
-                              <option value="1744">Suite à un traumatisme (1744)</option>
-                              <option value="1729">Suite à une malformation osseuse (1729)</option>
+                              <option value="1727">Acte posé plus souvent que convenu à l'entente </option>
+                              <option value="38">Chirurgie secondaire pratiquée au cours d'une même séance qu une chirurgie principale </option>
+                              <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie </option>
+                              <option value="37">Mise en place de la première plaque de reconstruction</option>
+                              <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d'une même hospitalisation</option>
+                              <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d'une même hospitalisation </option>
+                              <option value="1724">Patient sous anesthésie générale </option>
+                              <option value="41">Remplacement d'une prothèse pour perte ou bris</option>
+                              <option value="1723">Remplacement de deux prothèses pour perte ou bris</option>
+                              <option value="1746">Séance différente </option>
+                              <option value="34">Service dont la complexité est inhabituelle</option>
+                              <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé </option>
+                              <option value="1749">Site différent </option>
+                              <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie </option>
+                              <option value="1725">Soins d'urgence </option>
+                              <option value="35">Soins post-opératoire confiés à un autre dentiste </option>
+                              <option value="36">Soins post-opératoire confiés par un autre dentiste </option>
+                              <option value="1744">Suite à un traumatisme </option>
+                              <option value="1729">Suite à une malformation osseuse</option>
                            </select>
                         </div>
                         <div class="two fields">
@@ -3299,26 +3330,26 @@
                      </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
-                           <label>Lieu de référence</label>
-                           <div class="field">
-                              <label>Situation liée au lieu de réf.</label>
+                           <h4 class="ui horizontal divider header">Lieu de référence</h4>
+                           <div class="eight wide field">
+                              <label>Situation liée au lieu de référence</label>
                               <input type="text" name="situation_lieu_dentiste">
                            </div>
                            <div class="ui form segment">
-                              <label>Identification du lieu</label>
+                              <h4 class="ui horizontal divider header">Identification du lieu</h4>
                               <div class="inline field">
-                                 <input type="radio" name="identification_lieu_dentiste" value="Lieu codifié á la Régie">
-                                 <label>Lieu codifié á la Régie</label>
+                                 <input type="radio" class="lieu" name="lieu_dentiste" id="lieu_codifie_dent" value="Lieu codifié á la Régie">
+                                 <label>Lieu codifié à la Régie</label>
                               </div>
                               <div class="inline field">
-                                 <input type="radio" name="identification_lieu_dentiste" value="Lieu non codifié">
+                                 <input type="radio" class="lieu" name="lieu_dentiste" id="lieu_codifie_non_dent" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
-                              <div class="field">
+                              <div class="three wide field" id="codif_selection_lieu" style="display: none">
                                  <label>Numéro du lieu</label>
                                  <input type="text" name="">
                               </div>
-                              <div class="three fields">
+                              <div class="three fields" id="codif_selection_non" style="display: none">
                                  <div class="field">
                                     <label>Code postal</label>
                                     <input type="text" name="postal_dentiste">
@@ -3333,8 +3364,8 @@
                                  </div>
                               </div>
                            </div>
-                           <label>Type de lieu</label>
-                           <div class="three inline fields">
+                           <strong><label>Type de lieu</label></strong>
+                           <div class="six inline fields">
                               <div class="field">
                                  <input type="radio" name="lieu_type" value="Cabinet">
                                  <label>Cabinet</label>
@@ -3350,8 +3381,8 @@
                            </div>
                         </div>
                         <div class="ui form segment">
-                           <label>Référant</label>
-                           <div class="field">
+                           <h4 class="ui horizontal divider header"><label>Référant</label></h4>
+                           <div class="eight wide field">
                               <label>No du référant</label>
                               <input type="text" name="no_referant_dentiste">
                            </div>
@@ -3365,7 +3396,7 @@
                                  <input type="text" name="prenom_dentiste">
                               </div>
                            </div>
-                           <div class="field">
+                           <div class="eight wide field">
                               <label>Type de profession</label>
                               <input type="text" name="type_profession_dentiste">
                            </div>
@@ -3376,6 +3407,22 @@
             </div>
             </div>
          </div>
+         <script type="text/javascript">
+          $(document).on('change','.lieu',function(){
+            
+                if($('#lieu_codifie_dent').is(':checked')){
+            
+                  $('#codif_selection_lieu').show();
+                  $('#codif_selection_non').hide();
+                };
+                if($('#lieu_codifie_non_dent').is(':checked')){
+            
+                  $('#codif_selection_non').show();
+                  $('#codif_selection_lieu').hide();
+                };
+                // alert($('#lieu_codifie_non').checked());
+              })
+         </script>
          <!-- ===xx dentiste modal -->
          <!-- == Chirugiean -->
          <div id="div_chirurgiens" style="display: none;">
@@ -3387,18 +3434,18 @@
                   <div class="ui grid">
                      <div class="eight wide column">
                         <div class="ui segment">
-                           <label>Prothèse en acrylique</label>
+                           <h4 class="ui horizontal divider header"><label>Prothèse en acrylique</label></h4>
                            <div class="field">
                               <label>No d'autorisation</label>
                               <input type="text" name="atrsn_chirgien">
                            </div>
                            <div class="field">
-                              <label>Date a'utorisation</label>
+                              <label>Date d'utorisation</label>
                               <input type="date" name="date_chirgien">
                            </div>
                         </div>
                         <div class="ui segment">
-                           <label>Traitement demtaire</label>
+                           <h4 class="ui horizontal divider header"><label>Traitement dentaire</label></h4>
                            <div class="two fields">
                               <div class="field">
                                  <label>Type </label>
@@ -3427,21 +3474,21 @@
                         <div class="field">
                            <label>Élements de contexte</label>
                            <select id="dropD_chirurgiens" name="elemnt_contx_chirgien">
-                              <option value="1735"> Acte posé plus souvent que convenu à l entente (1735)</option>
-                              <option value="1734"> Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (1734)</option>
-                              <option value="1733"> Mise en place de la première plaque de reconstruction (1733)</option>
-                              <option value="1751"> Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1751)</option>
-                              <option value="1736"> Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (1736)</option>
-                              <option value="41"> Remplacement d une prothèse pour perte ou bris (41)</option>
-                              <option value="1737"> Remplacement de deux prothèses pour perte ou bris (1737)</option>
-                              <option value="1745"> Séance différente (1745)</option>
-                              <option value="1732"> Patient sous anesthésie générale (1732)</option>
-                              <option value="1731">  Service dont la complexité est inhabituelle (1731)</option>
-                              <option value="1748">  Site différent (1748)</option>
-                              <option value="1739">  Soins d urgence (1739)</option>
-                              <option value="1738">  Soins d urgence pendant l horaire de garde (1738)</option>
-                              <option value="1743">  Suite à un traumatisme (1743)</option>
-                              <option value="1730">  Suite à une malformation osseuse (1730)</option>
+                              <option value="1735"> Acte posé plus souvent que convenu à l'entente </option>
+                              <option value="1734"> Chirurgie secondaire pratiquée au cours d'une même séance qu une chirurgie principale </option>
+                              <option value="1733"> Mise en place de la première plaque de reconstruction </option>
+                              <option value="1751"> Nouvelle intervention qui est reliée à la première ou en résulte lors d'une même hospitalisation</option>
+                              <option value="1736"> Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d'une même hospitalisation </option>
+                              <option value="41"> Remplacement d'une prothèse pour perte ou bris </option>
+                              <option value="1737"> Remplacement de deux prothèses pour perte ou bris </option>
+                              <option value="1745"> Séance différente</option>
+                              <option value="1732"> Patient sous anesthésie générale </option>
+                              <option value="1731">  Service dont la complexité est inhabituelle </option>
+                              <option value="1748">  Site différent</option>
+                              <option value="1739">  Soins d'urgence </option>
+                              <option value="1738">  Soins d'urgence pendant l'horaire de garde </option>
+                              <option value="1743">  Suite à un traumatisme </option>
+                              <option value="1730">  Suite à une malformation osseuse</option>
                            </select>
                         </div>
                         <div class="two fields">
@@ -3461,22 +3508,26 @@
                      </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
-                           <label>Lieu de référence</label>
-                           <div class="field">
-                              <label>Situation liée au lieu de réf.</label>
+                           <h4 class="ui horizontal divider header"><label>Lieu de référence</label></h4>
+                           <div class="eight wide field">
+                              <label>Situation liée au lieu de référence</label>
                               <input type="text" name="situatn_lie_chirgien">
                            </div>
                            <div class="ui form segment">
-                              <label>Identification du lieu</label>
+                              <h4 class="ui horizontal divider header"><label>Identification du lieu</label></h4>
                               <div class="inline field">
-                                 <input type="radio" name="lieu_chirgien" value="Lieu codifié á la Régie">
-                                 <label>Lieu codifié á la Régie</label>
+                                 <input type="radio" class="lieu" name="lieu_chirgien" id="lieu_codifie_chir" value="Lieu codifié á la Régie">
+                                 <label>Lieu codifié à la Régie</label>
                               </div>
                               <div class="inline field">
-                                 <input type="radio" name="lieu_chirgien" value="Lieu non codifié">
+                                 <input type="radio" class="lieu" name="lieu_chirgien" id="lieu_codifie_non_chir" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
-                              <div class="three fields">
+                               <div class="three wide field" id="codif_selection_lieu" style="display: none">
+                                 <label>Numéro du lieu</label>
+                                 <input type="text" name="">
+                              </div>
+                              <div class="three fields" style="display: none" id="codif_selection_non">
                                  <div class="field">
                                     <label>Code postal</label>
                                     <input type="text" name="postal_chirgien">
@@ -3491,7 +3542,7 @@
                                  </div>
                               </div>
                            </div>
-                           <label>Type de lieu</label>
+                           <strong><label>Type de lieu</label></strong>
                            <div class="three inline fields">
                               <div class="field">
                                  <input type="radio" name="type_lieu" value="Cabinet">
@@ -3508,8 +3559,8 @@
                            </div>
                         </div>
                         <div class="ui form segment">
-                           <label>Référant</label>
-                           <div class="field">
+                           <h4 class="ui horizontal divider header"><label>Référant</label></h4>
+                           <div class="eight wide field">
                               <label>No du référant</label>
                               <input type="text" name="referamt_chirgien">
                            </div>
@@ -3523,7 +3574,7 @@
                                  <input type="text" name="prenom_chirgien">
                               </div>
                            </div>
-                           <div class="field">
+                           <div class="eight wide field">
                               <label>Type de profession</label>
                               <input type="text" name="type_profession_chirgien">
                            </div>
@@ -3534,6 +3585,22 @@
             </div>
             </div>
          </div>
+         <script type="text/javascript">
+          $(document).on('change','.lieu',function(){
+            
+                if($('#lieu_codifie_chir').is(':checked')){
+            
+                  $('#codif_selection_lieu').show();
+                  $('#codif_selection_non').hide();
+                };
+                if($('#lieu_codifie_non_chir').is(':checked')){
+            
+                  $('#codif_selection_non').show();
+                  $('#codif_selection_lieu').hide();
+                };
+                // alert($('#lieu_codifie_non').checked());
+              })
+         </script>
          <!-- ===xx Chirguein -->
          <!--  Denturologiste-->
          <div id="div_denturologiste" style="display: none;">

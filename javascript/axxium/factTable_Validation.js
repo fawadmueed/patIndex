@@ -3,11 +3,12 @@
 
      // $("#factTableBody td[data-target='Type']").focusout(function(){
      $(document.body).on('focusout', "#factTableBody td[data-target='Type']", function(){
+
     var valid;
     var val=$(this).text();
     if(val=="")
     { // Condition 1 : If no entries , type CAS
-      alert("Selecing Default Type:CAS");
+      // alert("Selecing Default Type:CAS");
       $(this).text('CAS');
       valid=true;
     }
@@ -23,11 +24,47 @@
     }
      });
 
+    $(document.body).on('focusout', "#factTableBody td[data-target='Dent']", function(){
+
+  console.log('dent focus out called');
+  var valid;
+  var val=$(this).text();
+  
+  console.log(val);
+
+  valid=validation('Dent',val);
+  console.log(valid);
+
+
+   if((val=="")||(val==null))
+    { // Condition 1 : If no entries , type CAS
+      alert("No Value, Selecting default Val :1");
+      $(this).text('1');
+      valid=true;
+    }
+    else
+    {
+      valid=validation('Dent',val);
+    }
+  
+
+ if(!valid){
+      valid=true;
+      alert('Wrong Range! Please Enter Correct value.');
+      $(this).text('');
+      
+    }
+});
+
    });
+
+
 
 
   function validation(type,val)
   {
+    console.log(type);
+    // =========== TYPE VALIDATION==============
     if(type=="Type")
     { 
       //Condition 2: If none of AMQ BES HOP and CAS and Selected DrpDown Value - MESSAGE ERROR
@@ -63,10 +100,63 @@
   
   else{
       return true;
-    }
+      }
 
   }
+  // =========== DENT VALIDATION==============
+
+  if(type=='Dent'){
+    if((val=='')||(val==null)){
+      valid=true;
+      
+    }
+    console.log(dent_Type);
+
+    val=parseInt(val);
+    switch(dent_Type){
+  
+    case 'Denturologiste':
+      if((val>=11 && val<=18)||(val>=21 && val<=28)||(val>=31 && val<=38)||(val>=41 && val<=48)||(val>=51 && val<=55)||(val>=61 && val<=65)||(val>=71 && val<=75)||(val>=81 && val<=88))
+      {
+        
+        return true
+      }
+      else
+      {
+        
+        return false;
+      }
+      break;
+
+    case 'Dentiste':
+
+      if((val>=0 && val<=8)||(val>=10 && val<=20)||(val>=21 && val<=28)||(val>=30 && val<=38)||(val>=40 && val<=48)||(val>=51 && val<=55)||(val>=61 && val<=65)||(val>=71 && val<=75)||(val>=81 && val<=85)||(val==99))
+       {
+        
+        return true;
+      }
+      else
+      {
+        
+        return false;
+      }
+      break;
+      
+    default:
+       if((val<1)||(val>85))
+    { 
+      
+      return false;
+    }
+else{
+    return true;
+    }
+
+
   }
+
+ }
+}
 
   function check_Ramq_Num(){
 // RULES

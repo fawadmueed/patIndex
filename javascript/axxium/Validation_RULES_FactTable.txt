@@ -1,0 +1,6 @@
+Information on Validation
+
+1) Type
+
+2)Dent
+-Should not be <1 or >85
