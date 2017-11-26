@@ -1,5 +1,6 @@
 function RamqBillGetList()
 {
+    RamqBillClearTable();
     RamqBillGetDataFromServer();
 }
 
@@ -29,13 +30,13 @@ function RamqBillGetDataForTable(pArrDataFromServer)
         var objOutputData = {};
         objOutputData.Dossier = objInputData.nodossier;//Dossier
         objOutputData.RamqNo = RamqBillGetNoRamq(objInputData.info); //#RAMQ
-        objOutputData.Date = objInputData.date;
+        objOutputData.Date = objInputData.datecreation;
         objOutputData.FactureNo = objInputData.facture;
         objOutputData.Nom = "";
         objOutputData.Prenom = "";
-        objOutputData.Montant = RamqBillGetMontant(objInputData.xml); //Montant
-        objOutputData.Status = RamqBillGetStatus(objInputData.xml);
-        objOutputData.IfUpdatePossible = RamqBillIfUpdatePossible(objOutputData.Status, objOutputData.Date);
+        objOutputData.Montant = (objInputData.xml)?RamqBillGetMontant(objInputData.xml):0;
+        objOutputData.Status = (objInputData.xml)?RamqBillGetStatus(objInputData.xml):0;
+        objOutputData.IfUpdatePossible = RamqBillIfUpdatePossible(objOutputData.Status, objInputData.dateregie);
 
         arrData.push(objOutputData);
     }
@@ -44,7 +45,7 @@ function RamqBillGetDataForTable(pArrDataFromServer)
 
 function RamqBillPopulateTable(pArrDataForTable)
 {
-    $('#rgie_fact_table tbody').empty();
+    
     var tableContent = "";
     var numberOfBills = pArrDataForTable.length;
     var totalAmount = 0;
@@ -79,6 +80,11 @@ function RamqBillGetNoRamq(pObjDataFromServer)
 
 function RamqBillGetMontant(pXmlResp)
 {
+
+    if (pXmlResp)
+    {
+
+    }
     var obj = parseRAMQResponsePaiment(pXmlResp);
     if (obj) {
         var arrLigneList = obj.arrListeFactRecev[0].ListeLigneFactRecev;
@@ -139,7 +145,14 @@ function RamqBillIfUpdatePossible(pStatus, pDate)
     return res;
 }
 
-
+function RamqBillClearTable()
+{
+    $('#rgie_fact_table tbody').empty();
+    $('#nombre_factures_regie').val('');
+    $('#total_factures_regie').val('');
+    
+    
+}
 
 
 
