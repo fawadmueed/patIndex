@@ -164,6 +164,7 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
 function RamqGetListFact(_arrData, _dent_Type)
 {
     var objDataFromVisionR = _arrData[1];
+    var objAdditionalData = _arrData[3];
     var xml = '';
     var factServDentaChirTitle = '';
     var listeLigneFactServDentaChirgTitle = '';
@@ -191,17 +192,19 @@ function RamqGetListFact(_arrData, _dent_Type)
                         '<id_prof>' + objDataFromVisionR.IdProf + '</id_prof>' + //?
                     '</prof>' +
                     '<lieu_consi>' +
-                        '<lieu_phys>' +
-                            '<typ_id_lieu_phys>' + objDataFromVisionR.TypIdLieuPhys + '</typ_id_lieu_phys>' + //1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
-                            '<id_lieu_phys>' + objDataFromVisionR.IdLieuPhys + '</id_lieu_phys>' + //?
-                        '</lieu_phys>' +
+                        RamqGetLieuConsiXml(objAdditionalData) + 
+                        //'<lieu_phys>' +
+                        //    '<typ_id_lieu_phys>' + objDataFromVisionR.TypIdLieuPhys + '</typ_id_lieu_phys>' + //1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
+                        //    '<id_lieu_phys>' + objDataFromVisionR.IdLieuPhys + '</id_lieu_phys>' + //?
+                        //'</lieu_phys>' +
                     '</lieu_consi>' +
                     '<liste_pers_objet_fact>' +
-                        '<pers_patnt_avec_idt>' +
-                            '<typ_situ_consi>' + objDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
-                            '<typ_id_pers>' + objDataFromVisionR.TypIdPers + '</typ_id_pers>' + //1 : NAM RAMQ
-                            '<id_pers>' + objDataFromVisionR.IdPers + '</id_pers>' + // NAM
-                        '</pers_patnt_avec_idt>' + //TODO: implement case if user doesn't have NAM
+                    RamqGetListePersObjetFact(objDataFromVisionR, objAdditionalData)+
+                        //'<pers_patnt_avec_idt>' +
+                        //    '<typ_situ_consi>' + objDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+                        //    '<typ_id_pers>' + objDataFromVisionR.TypIdPers + '</typ_id_pers>' + //1 : NAM RAMQ
+                        //    '<id_pers>' + objDataFromVisionR.IdPers + '</id_pers>' + // NAM
+                        //'</pers_patnt_avec_idt>' + //TODO: implement case if user doesn't have NAM
                     '</liste_pers_objet_fact>' +
                     RamqGetIndFactAssocDrXml(objDataFromVisionR.IndFactAssosDr, _dent_Type) +//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
                     '<' + listeLigneFactServDentaChirgTitle + '>' +
@@ -211,6 +214,117 @@ function RamqGetListFact(_arrData, _dent_Type)
     return xml;
 }
 
+function RamqGetListePersObjetFact(pObjDataFromVisionR, pObjAdditionalData)
+{
+    var xml = '';
+    if (pObjDataFromVisionR.IdPers) {
+        xml +=
+                '<pers_patnt_avec_idt>' +
+                    '<typ_situ_consi>' + pObjDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+                    '<typ_id_pers>1</typ_id_pers>' + //1 : NAM RAMQ
+                    '<id_pers>' + pObjDataFromVisionR.IdPers + '</id_pers>'+ //NAM
+                    RamqGetInfoMdcalPers(pObjAdditionalData)+
+                   '</pers_patnt_avec_idt>';
+        }
+    else //patient without id
+    {
+        xml +=
+            '<pers_patnt_sans_idt>' +
+              '<typ_situ_consi>2</typ_situ_consi>' +
+              '<info_pers_patnt>' +
+                  '<nom_pers>' + pObjDataFromVisionR.NomPers + '</nom_pers>' +
+                  (pObjDataFromVisionR.PrePers) ? '<pre_pers>' + pObjDataFromVisionR.PrePers + '</pre_pers>' : '' +
+                  '<dat_naiss_pers>' + pObjDataFromVisionR.DatNaissPers + '</dat_naiss_pers>' +
+                  '<cod_sexe_pers>' + pObjDataFromVisionR.CodSexPers + '</cod_sexe_pers>' +
+                  (pObjDataFromVisionR.NoOrdreNaissPers) ? '<no_ordre_naiss_pers>' + pObjDataFromVisionR.NoOrdreNaissPers + '<no_ordre_naiss_pers/>' : '' +
+                  (pObjDataFromVisionR.NoOrdreNaissPers) ? '<nas>' + pObjDataFromVisionR.Nas + '</nas>' : '' +
+              '</info_pers_patnt>' +
+            (pObjDataFromVisionR.AdrPersPatnt) ? '<adr_pers_patnt>' + pObjDataFromVisionR.AdrPersPatnt + '<adr_pers_patnt/>' : '' +
+            RamqGetInfoMdcalPers(pObjAdditionalData);
+        if(pObjDataFromVisionR.RepdnIdPers)
+        {
+            xml+=
+                '<pers_repdn>'+
+                '<repdn_avec_idt>'+
+                  '<typ_id_pers>1</typ_id_pers>'+
+                  '<id_pers>'+pObjDataFromVisionR.RepdnIdPers+'</id_pers>'+
+                '</repdn_avec_idt>'+
+              '</pers_repdn>';
+        }
+        xml+='</pers_patnt_sans_idt>';
+    }
+    return xml;
+}
+
+function RamqGetInfoMdcalPers(pObjAdditionalData)
+{
+    var xml ='';
+
+    if ((pObjAdditionalData.TypEvenePers && pObjAdditionalData.DatEvenePers) || pObjAdditionalData.DatEntrePersLieu && pObjAdditionalData.DatSortiPersLieu)
+    {
+        xml += '<info_mdcal_pers>';
+        if (pObjAdditionalData.TypEvenePers && pObjAdditionalData.DatEvenePers)
+        {
+            xml+=
+                '<evene_pers_objet_fact>' +
+                    '<typ_evene_pers>' + pObjAdditionalData.TypEvenePers + '</typ_evene_pers>' +
+                    '<dat_evene_pers>' + pObjAdditionalData.DatEvenePers + '</dat_evene_pers>' +
+                '</evene_pers_objet_fact>';
+        }
+        if (pObjAdditionalData.DatEntrePersLieu && pObjAdditionalData.DatSortiPersLieu)
+        {
+            xml +=
+                '<per_sej_pers_lieu>' +
+                    '<dat_entre_pers_lieu>' + pObjAdditionalData.DatEntrePersLieu + '</dat_entre_pers_lieu>' +
+                    '<dat_sorti_pers_lieu>' + pObjAdditionalData.DatSortiPersLieu + '</dat_sorti_pers_lieu>' +
+                '</per_sej_pers_lieu>';
+        }
+        xml+='</info_mdcal_pers>';
+    }
+    return xml;
+}
+
+function RamqGetLieuConsiXml(pObjAdditionalData)
+{
+    var xml = '';
+    if (pObjAdditionalData.LieuCodifieRegie && pObjAdditionalData.IdLieuPhys)
+    {
+        xml +=
+                '<lieu_phys>'+
+					'<typ_id_lieu_phys>1</typ_id_lieu_phys>'+
+					'<id_lieu_phys>'+ pObjAdditionalData.IdLieuPhys+'</id_lieu_phys>'+
+					//(pObjAdditionalData.NoSectActiv)?'<no_sect_activ>'+pObjAdditionalData.NoSectActiv+'</no_sect_activ>':''+ //TODO:
+				'</lieu_phys>';
+    }
+    else if (pObjAdditionalData.LieuNonCodifieRegie)
+    {
+        var typ_id_lieu_geo = -1;
+        var id_lieu_geo = "";
+        if (pObjAdditionalData.CodePostal) {
+            typ_id_lieu_geo = 2;
+            id_lieu_geo = pObjAdditionalData.CodePostal;
+        }
+
+        if (pObjAdditionalData.CodeLocalite) {
+            typ_id_lieu_geo = 3;
+            id_lieu_geo = pObjAdditionalData.CodeLocalite;
+        }
+
+
+        xml +=
+            '<lieu_geo>' +
+                '<typ_id_lieu_geo>' + typ_id_lieu_geo + '</typ_id_lieu_geo>' + //Domaine de valeurs 2 : Code postal 3 : Code localité
+                '<id_lieu_geo>' + id_lieu_geo + '</id_lieu_geo>' +
+                '<typ_lieu_geo>' + pObjAdditionalData.TypeDeLieu + '</typ_lieu_geo>';
+        if (pObjAdditionalData.TypeDeLieu === "C") {
+            xml += '<no_bur>' + pObjAdditionalData.NoBur + '</no_bur>';
+        }
+
+        xml +=
+            '</lieu_geo>';
+    }
+    return xml;
+}
 function RamqGetIndFactAssocDrXml(p_IndFactAssosDr, p_dent_Type)
 {
     if (p_dent_Type == 'Denturologiste')
@@ -353,8 +467,6 @@ function RamqGetInfoMedConsmXml(p_liste_med_consm)
             '<info_med_consm>' +
                 '<typ_med_consm>' + '1' + '</typ_med_consm>' + //TODO: is this constant?
                 '<liste_med_consm>';
-                                    
-
             ;
         for (var i = 0; i < p_liste_med_consm.length; i++)
         {
@@ -901,12 +1013,13 @@ function RamqSoumissionDemandesPaiementGetDataForXml()
     var objConstAppData = RamqGetConstAppData();
     var objVisionRData = RamqGetVisionRData();
     var objBillData = RamqGetBillData();
+    var objAdditionalData = RamqGetAdditionalData(); //Data from Payment form "Renseignements complementaires Regie"
 
     var arrData = [];
     arrData[0] = objConstAppData;
     arrData[1] = objVisionRData;
     arrData[2] = objBillData;
-
+    arrData[3] = objAdditionalData;
     return arrData;
 }
 
@@ -926,12 +1039,15 @@ function RamqSoumissionDemandesPaiementGetDataForJSON()
     var objConstAppData = RamqGetConstAppData();
     var objVisionRData = RamqGetVisionRData();
     var objBillData = RamqGetBillData();
+    var objAdditionalData = RamqGetAdditionalData(); //Data from Payment form "Renseignements complementaires Regie"
 
-    var arrCommonData = [objConstAppData, objVisionRData];
+    var arrCommonData = [objConstAppData, objVisionRData, objAdditionalData];
+    
     var arrData = [];
     arrData[0] = arrCommonData;
     arrData[1] = arrGrilleDeFacturation;
     arrData[2] = arrGrilleDeFacturation_forms;
+
 
     //return JSON.stringify(arrData);
     return arrData;
@@ -982,6 +1098,17 @@ function RamqGetVisionRData()
     res.TypIdPers = '1';//1 : NAM RAMQ
     res.IdPers = 'DISL14082210';//NAM
     res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
+
+    //Patient without NAM
+    res.NomPers='Alex';
+    res.PrePers ='Smith';
+    res.DatNaissPers ='2001-01-01';
+    res.CodSexPers = 1;            
+    res.NoOrdreNaissPers =1;      //1 pour le premier bébé, 2 pour le deuxième bébé.       
+    res.Nas ='123456789123'; 
+    res.AdrPersPatnt='333 Place de la Belle-rive, Laval, QC, H7X3R5';
+    res.RepdnIdPers = 'DISL14082217';
+
 
     return res;
 }
@@ -1055,6 +1182,43 @@ function RamqGetBillData()
         arrRes.push(objRes);
     }
     return arrRes;
+}
+
+function RamqGetAdditionalData()//Data from Payment form "Renseignements complementaires Regie"
+{
+    var res = {};
+    if ($('#even_carie').is(':checked'))
+        res.TypEvenePers = 0; //TODO: add real code.
+    else if ($('#even_etat').is(':checked'))
+        res.TypEvenePers = 0; //TODO: add real code.
+    else if ($('#even_autre_rad').is(':checked'))
+        res.TypEvenePers = $('#even_autre_cont').val();
+
+    res.DatEvenePers = $('#pamnt_even_date').val();
+
+    res.DatEntrePersLieu = $('#pamnt_date_entre').val();
+    res.DatSortiPersLieu = $('#pamnt_date_sorti').val();
+
+
+    res.LieuCodifieRegie = $('#lieu_codifie').is(':checked');
+
+    res.LieuNonCodifieRegie = $('#lieu_codifie_non').is(':checked');
+    res.IdLieuPhys = '99999';//$('#').val //TODO: add Id
+    //res.NoSectActiv = $('#secteur_active').dropdown('get value'); //TODO: implement
+
+    res.CodePostal = "";//$('#').val();//TODO: add Id
+    res.CodeLocalite = "";//$('#').val();//TODO: add Id
+    res.NoBur = "";//$('#').val();//TODO: add Id
+
+    res.TypeDeLieu = null;
+    if ($('#type_lieu_cab').is(':checked'))
+        res.TypeDeLieu = "C";
+    if ($('#type_lieu_dom').is(':checked'))
+        res.TypeDeLieu = "D";
+    if ($('#type_lieu_aut').is(':checked'))
+        res.TypeDeLieu = "A";
+
+    return res;
 }
 
 //Returns an element from arrMoreInfo by element name
