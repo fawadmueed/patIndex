@@ -390,7 +390,7 @@ function RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type)
                     //optional
                     RamqGetRefreAutreProfXml(pObjBillData.typ_refre_autre_prof, pObjBillData.typ_id_prof, pObjBillData.id_prof) +
 
-                    RamqGetMntPrcuPatntXml(pObjBillData.Prod)+
+                    RamqGetMntPrcuPatntXml(pObjBillData.Total)+
                   
                  '</' + ligneFactServDentaChirgTitle + '>';
             ligneNum++;
@@ -1165,9 +1165,9 @@ function RamqGetBillData()
                 objRes.lieu_type = RamqGetValueFromArrByName('lieu_type', arrMoreInfo);
 
                 //Referant
-                objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('', arrMoreInfo); //TODO:
-                objRes.typ_id_prof = RamqGetValueFromArrByName('', arrMoreInfo); //TODO:
-                objRes.id_prof = RamqGetValueFromArrByName('', arrMoreInfo);//TODO:
+                objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('type_profession_dentiste', arrMoreInfo); //Type de profession
+                objRes.typ_id_prof = '1' //1 : Numéro dispensateur RAMQ
+                objRes.id_prof = RamqGetValueFromArrByName('no_referant_dentiste', arrMoreInfo);//No du Referant
 
             }
             else if (dent_Type == 'Chirurgiens') {//TODO: 
@@ -1177,7 +1177,6 @@ function RamqGetBillData()
                 objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('autrstn_dentur', arrMoreInfo);
                 objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('element_context_dentur', arrMoreInfo);
             }
-
         }
         arrRes.push(objRes);
     }
@@ -1203,12 +1202,12 @@ function RamqGetAdditionalData()//Data from Payment form "Renseignements complem
     res.LieuCodifieRegie = $('#lieu_codifie').is(':checked');
 
     res.LieuNonCodifieRegie = $('#lieu_codifie_non').is(':checked');
-    res.IdLieuPhys = '99999';//$('#').val //TODO: add Id
-    //res.NoSectActiv = $('#secteur_active').dropdown('get value'); //TODO: implement
+    res.IdLieuPhys = $('#num_lieu_genr_fact').val();
+    res.NoSectActiv = $('#secteur_active').val();
 
-    res.CodePostal = "";//$('#').val();//TODO: add Id
-    res.CodeLocalite = "";//$('#').val();//TODO: add Id
-    res.NoBur = "";//$('#').val();//TODO: add Id
+    res.CodePostal = $('#cod_postal_facture').val();
+    res.CodeLocalite = $('#cod_local_facture').val();
+    res.NoBur = $('#no_bur_facture').val();
 
     res.TypeDeLieu = null;
     if ($('#type_lieu_cab').is(':checked'))

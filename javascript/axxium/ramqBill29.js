@@ -1,3 +1,7 @@
+var globRamqBillArrListBill;
+var globRamqBillInfo;
+var arrGrilleDeFacturation_update;
+var arrGrilleDeFacturation_forms_update;
 function RamqBillGetList()
 {
     RamqBillClearTable();
@@ -23,6 +27,7 @@ function RamqBillGetDataFromServer()
 
 function RamqBillGetDataForTable(pArrDataFromServer)
 {
+    globRamqBillArrListBill = pArrDataFromServer;
     var arrData = [];
     for (var i = 0; i < pArrDataFromServer.length; i++)
     {
@@ -115,7 +120,26 @@ function RamqBillGetStatus(pXmlResp)
 function RamqBillPopulatDetailsArrays(pBillNumber)
 {
     alert(pBillNumber);
+    var billInfo;
+    for (var i = 0; i < globRamqBillArrListBill.length; i++)
+    {
+        if (globRamqBillArrListBill[i].facture == pBillNumber)
+        {
+            
+            RamqBillPopulateBillDetails(globRamqBillArrListBill[i]);
+            
+            break;
+        }
+    }
 }
+
+function RamqBillPopulateBillDetails(pArrBilldata)
+{
+    globArrGrilleDeFacturation_update = pArrBilldata.info[1];
+    globArrGrilleDeFacturation_forms_update = pArrBilldata.info[2];
+}
+
+
 
 //Check if the bill can be updated.
 // if bill accepted and bill was created less than 24 hours ago, returns true, otherwise false.
