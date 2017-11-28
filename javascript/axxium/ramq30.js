@@ -45,30 +45,42 @@ function SoumissionDemandesPaiement()
 
 function RamqSoumissionDemandesModification()
 {
-    var jsonData = RamqGetData("Modification");
+    var objSoumissionDemandesModification = RamqSoumissionDemandesModificationGetDataForXml();
+    if (objSoumissionDemandesModificationData != null && objSoumissionDemandesModificationData[2].length > 0) 
+    {
+        var operationName = "Modification";
+        var inputXMl = RamqGetData(operationName, objSoumissionDemandesModification); //This data is used to send to RAMQ.
 
-    $.ajax({
-        type: "POST",
-        url: globRamqApiPath,
-        ProcessData: false,
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        data: jsonData,
-
-        success: function (data, status, jqXHR) {
-            if (data.d != null) {
-                var objResponse = parseRAMQResponseModification(data.d);
-                displayResponseModification(objResponse);
-            }
-            else {
-                alert('SoumissionDemandesModification error');
-            }
-        },
-        error: function (xhr) {
-            if (xhr.responceJSON != null)
-                alert(xhr.responceJSON.Message);
+        var jsonDataArray = RamqSoumissionDemandesModificationGetDataForJSON(); //this data is used to store bill info on the server
+        var jsonXML = {
+            "request": inputXMl,
+            "info": jsonDataArray // JSON data
         }
-    });
+
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, json: JSON.stringify(jsonXML) },
+                    function (result) {
+                        if (result.outcome === 'error')//Display python Error
+                        {
+                            alert(result.message);
+                        }
+                        else if (result.message != null && result.message.substring(0, 5) == 'Error') {
+                            displayRamqAnswer("RAMQ", result.message);
+                        }
+                        else if (result.message != null && result.message.substring(0, 5) != 'Error') {
+                            var objResponse = parseRAMQResponseModification(result.message);
+                            displayResponseModification(objResponse);
+                        }
+                        else {
+                            displayRamqAnswer("RAMQ", "SoumissionDemandesModification Error");
+                        }
+                    })
+            .fail(function () {
+                alert("Ramq SoumissionDemandesModification Error.");
+            });
+    }
+    else {
+        alert("There is nothing to send.")
+    }
 }
 
 function RamqSoumissionDemandesAnnulation() {
@@ -155,7 +167,38 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
     '</liste_fact>' +
 '</dem_paimt>';
     return xml;
+}
 
+// Create common part for all specialists
+function RamqGetSoumissionDemandesModificationXML(_arrData) {
+
+    var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
+    '<dem_modif xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
+    '<no_dem_ext>' + RamqGenerateNoDemExt() + '</no_dem_ext>' +
+    '<logcl_fact>' +
+        '<no_devpr_logcl>' + _arrData[0].NoDevprLogcl + '</no_devpr_logcl>' + //?
+        '<nom_devpr_logcl>' + _arrData[0].NomDevprLogcl + '</nom_devpr_logcl>' + //?
+        '<nom_logcl_fact>' + _arrData[0].NomLogclFact + '</nom_logcl_fact>' + //?
+        '<no_versi_logcl_fact>' + _arrData[0].NoVersiLogclFact + '</no_versi_logcl_fact>' + //?
+        '<no_versi_xml_dem>' + _arrData[0].NoVersiXmlDem + '</no_versi_xml_dem>' + //?
+    '</logcl_fact>' +
+    '<demdr>' +
+        '<typ_id_intvn>' + _arrData[1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].DemdrIdIntvn + '</id_intvn>' + //?
+    '</demdr>' +
+    '<exped_difrn_demdr>' +
+        '<typ_id_intvn>' + _arrData[1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].ExpedIdIntvn + '</id_intvn>' + //?
+    '</exped_difrn_demdr>' +
+    '<id_fact_ramq>'+
+		'<no_fact_ramq>' + globRamqNoFactRamq + '</no_fact_ramq>' +
+		'<jeton_comm>'+ globRamqJetonComm +'</jeton_comm>'+
+	'</id_fact_ramq>'+
+    '<fact_a_modif>' +
+        RamqGetListFact(_arrData, dent_Type) +// dent_Type is a global variable : Dentist, Chirurgiens, Denturologiste
+    '</fact_a_modif>' +
+'</dem_modif>';
+    return xml;
 }
 
 
@@ -969,8 +1012,6 @@ function displayResponsePaiment(_response)
     //TODO:
 }
 
-
-
 function displayResponseModification(_response)
 {
     //TODO:
@@ -1010,6 +1051,24 @@ function RamqSoumissionDemandesPaiementGetDataForXml()
     arrData[1] = objVisionRData;
     arrData[2] = objBillData;
     */
+    var objConstAppData = RamqGetConstAppData();
+    var objVisionRData = RamqGetVisionRData();
+    var objBillData = RamqGetBillData();
+    var objAdditionalData = RamqGetAdditionalData(); //Data from Payment form "Renseignements complementaires Regie"
+
+    var arrData = [];
+    arrData[0] = objConstAppData;
+    arrData[1] = objVisionRData;
+    arrData[2] = objBillData;
+    arrData[3] = objAdditionalData;
+    return arrData;
+}
+
+function RamqSoumissionDemandesModificationGetDataForXml()
+{
+
+    //TODO: Start here
+    //globRamqBillInfo
     var objConstAppData = RamqGetConstAppData();
     var objVisionRData = RamqGetVisionRData();
     var objBillData = RamqGetBillData();
@@ -1097,11 +1156,14 @@ function RamqGetVisionRData()
     res.TypSituConsi = '1';//Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
     res.TypIdPers = '1';//1 : NAM RAMQ
     res.IdPers = 'DISL14082210';//NAM
+    res.NamExpDate = '2018-01-01';
     res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
 
+    res.TypProf = dent_Type; //TODO: For test only
+
     //Patient without NAM
-    res.NomPers='Alex';
-    res.PrePers ='Smith';
+    res.NomPers='Smith';
+    res.PrePers = 'Alex';
     res.DatNaissPers ='2001-01-01';
     res.CodSexPers = 1;            
     res.NoOrdreNaissPers =1;      //1 pour le premier bébé, 2 pour le deuxième bébé.       
@@ -1193,6 +1255,8 @@ function RamqGetAdditionalData()//Data from Payment form "Renseignements complem
     else if ($('#even_autre_rad').is(':checked'))
         res.TypEvenePers = $('#even_autre_cont').val();
 
+    res.RembDemParPatient = $('#remb_dem_oui').is(':checked');
+
     res.DatEvenePers = $('#pamnt_even_date').val();
 
     res.DatEntrePersLieu = $('#pamnt_date_entre').val();
@@ -1201,7 +1265,7 @@ function RamqGetAdditionalData()//Data from Payment form "Renseignements complem
 
     res.LieuCodifieRegie = $('#lieu_codifie').is(':checked');
 
-    res.LieuNonCodifieRegie = $('#lieu_codifie_non').is(':checked');
+    res.LieuNonCodifieRegie = $('#lieu_codifie_non').is(':checked'); 
     res.IdLieuPhys = $('#num_lieu_genr_fact').val();
     res.NoSectActiv = $('#secteur_active').val();
 
