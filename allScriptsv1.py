@@ -354,7 +354,18 @@ if (tx == "updatePrix"):
 	except:
 		print '{ In the EXCEPT - Hello Fadi }'	
 		
+if (tx == "translator"):
+	try:
+		import json
 
+		data=form["thisTag"].value
+		json_file_write=open("json/translator.json",'w')
+		print data;
+		json_file_write.write(data)
+		json_file_write.close()
+
+	except:
+		print '{ Error file not written with data }'	
 
 if (tx == "getFile"):
 	try:

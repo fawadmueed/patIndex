@@ -1,65 +1,74 @@
  
  $(document).ready(function(){
 
-     // $("#factTableBody td[data-target='Type']").focusout(function(){
-     $(document.body).on('focusout', "#factTableBody td[data-target='Type']", function(){
+     
+    // ======= Valiation BYPASS for TESTING =========================================
+//      $(document.body).on('focusout', "#factTableBody td[data-target='Type']", function(){
 
-    var valid;
-    var val=$(this).text();
-    if(val=="")
-    { // Condition 1 : If no entries , type CAS
-      // alert("Selecing Default Type:CAS");
-      $(this).text('CAS');
-      valid=true;
-    }
-    else
-    {
-      valid=validation('Type',val);
-    }
+//     var valid;
+//     var val=$(this).text();
+//     if(val=="")
+//     { // Condition 1 : If no entries , type CAS
+//       // alert("Selecing Default Type:CAS");
+//       $(this).text('CAS');
+//       valid=true;
+//     }
+//     else
+//     {
+//       valid=validation('Type',val);
+//     }
 
-    if(!valid){
-      $(this).focus();
-      $(this).text('');
+//     if(!valid){
+//       $(this).focus();
+//       $(this).text('');
       
-    }
-     });
+//     }
+//      });
 
-    $(document.body).on('focusout', "#factTableBody td[data-target='Dent']", function(){
+//     $(document.body).on('focusout', "#factTableBody td[data-target='Dent']", function(){
 
-  console.log('dent focus out called');
-  var valid;
-  var val=$(this).text();
+//   console.log('dent focus out called');
+//   var valid;
+//   var val=$(this).text();
   
-  console.log(val);
+//   console.log(val);
 
-  valid=validation('Dent',val);
-  console.log(valid);
+//   valid=validation('Dent',val);
+//   console.log(valid);
 
 
-   if((val=="")||(val==null))
-    { // Condition 1 : If no entries , type CAS
-      alert("No Value, Selecting default Val :1");
-      $(this).text('1');
-      valid=true;
-    }
-    else
-    {
-      valid=validation('Dent',val);
-    }
+//    if((val=="")||(val==null))
+//     { 
+//       warnMsg('No Value, Selecting default Val :1')
+//       // alert("No Value, Selecting default Val :1");
+//       $(this).text('1');
+//       valid=true;
+//     }
+//     else
+//     {
+//       valid=validation('Dent',val);
+//     }
   
 
- if(!valid){
-      valid=true;
-      alert('Wrong Range! Please Enter Correct value.');
-      $(this).text('');
+//  if(!valid){
+//       valid=true;
+//       alert('Wrong Range! Please Enter Correct value.');
+//       $(this).text('');
       
-    }
-});
+//     }
+// });
 
-   });
+//    });
 
-
-
+// =====================================================================
+}); 
+ function warnMsg(msg)
+ {  console.log(msg);
+    $('#warn_msg_fact_content').text('<p>'+msg+'</p>')
+    $('#wrn_msg_fact_tbl').removeClass('hidden');
+    $('#wrn_msg_fact_tbl').addClass('visible');
+    // $('#wrn_msg_fact_tbl').transition({duration:'1s'});
+ }
 
   function validation(type,val)
   {

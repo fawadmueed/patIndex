@@ -2,22 +2,12 @@
   var arrGrilleDeFacturation=[];
   var arrGrilleDeFacturation_forms=[];
 
+  // set TYPE from here globVisionRData.InsTypeList[0]
+
 $(document).ready(function(){
 
   newRecordFact();
-  $('.firstTdProd').keypress(function (e)
-            {
-              if(e.which == 13)
-              {
-                newRecordFact();
-              };
-              return e.which!=13;
-            })
-  // $('#factTableBody *td').focusout(function(){
-  //    alert('here');
-  //               console.log($(this).text().toUpperCase());
-  //               $(this).text($(this).text().toUpperCase());
-  // })
+  
   
   $(document.body).on("submit","#form_dentiste", function(event) {
                 submitForm(this);
@@ -31,7 +21,7 @@ $(document).ready(function(){
               });
  
 
-$(document.body).on('focusout',"form :input",function(){
+$(document.body).on('focusout',"form :text",function(){
                 $(this).val($(this).val().toUpperCase());
               })            
  
@@ -42,10 +32,28 @@ function newRecordFact(){
     var tblBody=$('#factTableBody');
     fact_tbl_row_id=fact_tbl_row_id+1;
     tblRow=$('<tr>').attr('id',fact_tbl_row_id);
-    var fields=['id','Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod'];
-    for(i=0;i<9;i++)
+
+    var fields=['id','Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod','codeRole'];
+    for(i=0;i<10;i++)
       {
-        if(i==8)
+        if(i==0){
+
+              if(fact_tbl_row_id==1)
+                {
+                
+                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]).text('AMQ'); 
+                // globVisionRData.InsTypeList[0]
+                tblData.appendTo(tblRow);
+                }
+            else{
+                //typeOfLastRow
+                prevRowId=fact_tbl_row_id-1;
+                prevsRowType=getPrevRowType(prevRowId);
+                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]).text(prevsRowType);
+                tblData.appendTo(tblRow);
+                } 
+            }
+        else if(i==9)
         {
           tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1])
           .bind('keypress', function (e)
@@ -65,16 +73,32 @@ function newRecordFact(){
        tblData.appendTo(tblRow);
    }
       }
-           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="findTableData(this);" >Plus</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Supprimer</div>');
+           tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="modFactTableMore(this);" >Plus</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Supprimer</div>');
        tblData.appendTo(tblRow);
 
         tblRow.appendTo(tblBody);
 }
 
+function getPrevRowType(idPrev){
+
+  
+  var factBody=$('#factTableBody tr[id='+idPrev+']');
+  var prevType;
+  $.each(factBody,function(id,val){
+  prevType=$(val).find('td[data-target=Type]').text();
+  
+
+  })
+
+  return prevType; 
+
+}
 
 function getAllTrData(){
+
   var count_ramq=0;
   var count_insur=0;
+
   arrGrilleDeFacturation=[]
   var mytrs=$('#factTableBody tr');
 // console.log(mytrs);
@@ -96,6 +120,9 @@ function getAllTrData(){
       if(key=='Type'&&(value=='AMQ'||value=='BES'||value=='HOP')) {
         // Count Table Row entries for type RAMQ
         count_ramq=count_ramq+1;
+        var ramqId='ramq_id';
+        var valID=count_ramq;
+        myObjects[ramqId]=valID;
       }
       if(key=='Type'&&((!(value=='AMQ'||value=='BES'||value=='HOP'))&&(!(value=='CAS')) )) {
         // Count Table Row entries for type Insurance
@@ -114,8 +141,11 @@ function getAllTrData(){
     alert('Limit Exceeded! Allow Limit : RamQ Bill = 10 Lines , Insurance Bill = 7 Lines. Delete few entries to proceed');
    }
    else{
+
     console.log(arrGrilleDeFacturation); 
-    console.log(arrGrilleDeFacturation_forms); 
+    arrGrilleDeFacturation_update=arrGrilleDeFacturation;
+    // 
+
     // console.log(moreInfoArray_glbl  )
     modPayment();
     // getMoreInfo();
@@ -136,11 +166,11 @@ function submitForm(thisForm){
                 
 }
 
-function findTableData(x){
-  //Get id of the Row Working
-  var row_id=$(x).closest('tr').attr('id'); 
-  modFactTableMore(row_id);  
-}
+// function findTableData(x){
+//   //Get id of the Row Working
+//   var row_id=$(x).closest('tr').attr('id'); 
+//   modFactTableMore(row_id);  
+// }
 
 function getMoreInfo(){
   
@@ -153,8 +183,9 @@ function getMoreInfo(){
 
 //===Modal
 
-function modFactTableMore(row_id)
+function modFactTableMore(x)
 { 
+  var row_id=$(x).closest('tr').attr('id');
    
    switch(dent_Type){
       
@@ -162,7 +193,7 @@ function modFactTableMore(row_id)
               var data=$('#div_dentiste').html();
               $('#modal_factTbl_more').html(data); 
               $('form #rowId_dent').val(row_id); //Assign id of Row Working - to the Form 
-              var thisFromData=getThisFormData(row_id);
+              var thisFromData=getThisFormData(row_id);  //gets the Complete Array of FORM Data to populate 
               populateForm('form_dentiste',thisFromData);
               break;
 
@@ -206,11 +237,52 @@ function getThisFormData(row_id){
 }
 
 function populateForm(formname,thisFromData)
-{
+{ 
    if(thisFromData!="")
     {
       $("#"+formname).deserialize(thisFromData);
+
+      if(formname=='form_dentiste'){
+        
+        $.each(thisFromData,function(id,val){
+        
+        if(val.name=='medi_com_list'){
+        console.log(val.value);
+        $('#medi_com_list').append('<option selected="selected">'+val.value+'</option>')
+        }
+        
+        if(val.name=='elem_meas_list'){
+        console.log(val.value);
+        $('#elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
+        }
+
+
+     })
+  
+      }
+      else if(formname=='form_chirurgiens'){
+
+         $.each(thisFromData,function(id,val){
+        
+        if(val.name=='medi_com_list_chir'){
+        console.log(val.value);
+        $('#medi_com_list_chir').append('<option selected="selected">'+val.value+'</option>')
+        }
+        
+        if(val.name=='elem_meas_list'){
+        console.log(val.value);
+        $('#elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
+        }
+
+
+     })
+
+      }
+      else if(formname=='form_denturologiste'){
+
+      }
     }
+
  }
 
 function emptyTable (){

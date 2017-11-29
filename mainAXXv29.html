@@ -37,10 +37,14 @@
    <script src="javascript/pdf/jspdf.min.js"></script>
    <!-- Alex Files -->
    <script src="javascript/axxium/facture28.js"></script>
-   <script src="javascript/axxium/ramq29.js"></script>
+   <script src="javascript/axxium/ramq30.js"></script>
    <script src="javascript/axxium/ramqCredentials28.js"></script>
    <script src="javascript/axxium/ramqEC29.js"></script>
    <script src="javascript/axxium/ramqBill29.js"></script>
+   <script src="javascript/axxium/fact_detail_regi_table.js"></script>
+
+  
+
    <!-- <script type="text/javascript"> var translator = $('body').translate({lang:"", t:dict});  </script> -->
    <!-- Alexey JS FILE -->
    <style type="text/css">
@@ -159,6 +163,7 @@
    <script src="javascript/axxium/facture_table.js"></script>
 </head>
 <body id="example">
+  
    <div class="example">
       <!--     <div class="ui top fixed borderless large menu">
          <div class="item">
@@ -1218,7 +1223,12 @@
                   </div>
                </div>
              </div>
-
+              <div class="ui negative message hidden" id="wrn_msg_fact_tbl">
+                <i class="close icon"></i>
+                <div class="header">
+                  Wrong Selection!
+                </div >
+                </div id="warn_msg_fact_content">
                <div class="ui grid">
                   
                   <div class="sixteen wide column">
@@ -1235,6 +1245,7 @@
                                  <th>Honoraires</th>
                                  <th>Total</th>
                                  <th>Prod</th>
+                                 <th>Role</th>
                                  <th></th>
                               </tr>
                               <!-- NOTE : Role : By default 1 In every field -->
@@ -1258,6 +1269,7 @@
                      </div>
                      <div class="ui axxium tiny button" onclick="emptyTable();">Nlle facture</div>
                      <div class="ui axxium tiny button" onclick="getAllTrData();">Générer la facture</div>
+                     <div class="ui axxium tiny button" onclick="populate_fact_update(arrGrilleDeFacturation_update)">TestUpdate</div>
                      <div class="ui axxium tiny button ok" onclick="">Facturation anticipée</div>
                   </div>
                   
@@ -1302,6 +1314,7 @@
                            <input type="date" id="rgie_fact_ane_end"></input>
                         </div>
                         <div class="ui axxium tiny button" onclick="RamqBillGetList()">Search</div>
+                        <div class="ui axxium tiny button" onclick="Regie_fact_modal()">TestModal</div>
                         <!-- <div class="four wide field">
                            <label>No de facture</label>
                            <input type="text"></input>
@@ -1715,6 +1728,7 @@
          </div>
       </div>
    </div>
+
    <div class="ui modalSign1 modal">
       <i class="close icon"></i>
       <div class="header" id="signHeader1">
@@ -1771,6 +1785,7 @@
          <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
       </div>
    </div>
+
    <div class="ui modalSearch modal">
       <div class="header">
          <i class="user icon"></i>Rechercher un patient
@@ -2733,13 +2748,13 @@
                         <div class="ui horizontal divider"> <strong>Assurance</strong></div>
                         <p1>Réclamation électronique pour Dr Pierre Laberge. Êtes-vous sur de vouloir transmettre la requête?</p1>
                         <div class="two fields">
-                           <div class="field"><input type="radio" name="" id="assr1_oui"><label>Oui</label></div>
-                           <div class="field"><input type="radio" name="" id="assr1_non"><label>Non</label></div>
+                           <div class="field"><input type="radio" name="asur_1"  id="assr1_oui"><label>Oui</label></div>
+                           <div class="field"><input type="radio" name="asur_1"  id="asur_1_non"><label>Non</label></div>
                         </div>
                         <p1>Le patient est-il courvert par une deuxième assurance ? </p1>
                         <div class="two fields">
-                           <div class="field"><input type="radio" id="assr2_oui"><label>Oui</label></div>
-                           <div class="field"><input type="radio" id="assr2_non"><label>Non</label></div>
+                           <div class="field"><input type="radio"  name="asur_2" id="asur_2_oui"><label>Oui</label></div>
+                           <div class="field"><input type="radio" name="asur_2" id="asur_2_non"><label>Non</label></div>
                         </div>
                         <div class="ui axxium button">Transférer à l'assurance</div>
                      </div>
@@ -2748,22 +2763,22 @@
                         <div class="inline fields">
                            <label>Carte d'assurance-maladie</label>
                            <div class="field">
-                              <input type="radio" name="">
+                              <input type="radio" id="carte_as_malad_oui" name="cart_malad" >
                               <label>Oui</label>
                            </div>
                            <div class="field">
-                              <input type="radio" name="">
+                              <input type="radio" id="carte_as_malad_non" name="cart_malad">
                               <label>Non</label>
                            </div>
                         </div>
                         <div class="inline fields">
                            <label>Remboursement demandé par Patient</label>
                            <div class="field">
-                              <input type="radio" name="">
+                              <input type="radio" id="remb_dem_oui" name="cart_malad">
                               <label>Oui</label>
                            </div>
                            <div class="field">
-                              <input type="radio" name="">
+                              <input type="radio"  id="remb_dem_non" name="cart_malad">
                               <label>Non</label>
                            </div>
                         </div>
@@ -2773,61 +2788,22 @@
                                  <div class="ui horizontal divider"> <strong>PROFESSIONEL</strong></div>
                                  <div class="field">
                                     <label>No du professionel</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="" id="pamnt_no_prof">
                                  </div>
                                  <div class="field">
                                     <label>No du groupe</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="" id="pamnt_no_grp">
                                  </div>
                               </div>
-                              <div class="ui form segment">
-                                 <div class="ui horizontal divider"> <strong>Événement</strong></div>
-                                 <div class="ui form segment">
-                                    <div class="inline field">
-                                       <input type="radio" name="">
-                                       <label>Carie dentaire</label>
-                                    </div>
-                                    <div class="inline field">
-                                       <input type="radio" name="">
-                                       <label>Etat normal</label>
-                                    </div>
-                                    <div class="two fields">
-                                       <div class="inline field">
-                                          <input type="radio" name="">
-                                          <label>Autre</label>
-                                       </div>
-                                       <div class="field">
-                                          <input type="text" name="">
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <div class="field">
-                                    <label>Date de lévénement</label>
-                                    <input type="date" name="">
-                                 </div>
-                                 <div class="ui form segment">
-                                    <div class="ui horizontal divider"><label>Période d'hospitalisation</label></div>
-                                    <div class="field">
-                                       <label>Date d'entrée</label>
-                                       <input type="date" name="">
-                                    </div>
-                                    <div class="field">
-                                       <label>Date de sortie</label>
-                                       <input type="date" name="">
-                                    </div>
-                                 </div>
-                              </div>
-                           </div>
-                           <div class="eight wide column">
                               <div class="ui form segment">
                                  <div class="ui horizontal divider"> <strong>Lieu de dispensation</strong></div>
                                  <strong>Identification du lieu</strong>
                                  
-                                    <div class="field">
+                                    <div class="inline field">
                                        <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie" >
                                        <label>Lieu codifié á la Régie</label>
                                     </div>
-                                    <div class="field">
+                                    <div class="inline field">
                                        <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie_non">
                                        <label>Lieu non codifié</label>
                                     </div>
@@ -2835,50 +2811,46 @@
                                  <div class="codif_selection_lieu" style="display: none;">
                                     <div class="field">
                                        <label>Numéro du lieu</label>
-                                       <input type="text" name="">
+                                       <input type="text" name="" id="num_lieu_genr_fact">
                                     </div>
                                  </div>
                                  <div class="codif_selection_non" style="display: none;">
                                     <div class=" field">
                                        <label>Code Postal</label>
-                                       <input type="text" name="">
+                                       <input type="text" name="" id="cod_postal_facture">
                                     </div>
                                     <div class=" field">
                                        <label>Code localité</label>
-                                       <input type="text" name="">
+                                       <input type="text" name="" id="cod_local_facture">
                                     </div>
                                     <div class=" field">
-                                       <label>No. bur.</label>
-                                       <input type="text" name="">
+                                       <label>No. bureau</label>
+                                       <input type="text" name="" id="no_bur_facture">
                                     </div>
                                  </div>
                                  <div class="field">
                                     <label>Secteur d'activité</label>
-                                    <div class="ui fluid selection dropdown">
-                                       <input type="hidden" name="secteur_active">
-                                       <i class="dropdown icon"></i>
-                                       <div class="default text"></div>
-                                       <div class="menu">
-                                          <div class="item" data-value="01"> Clinique externe </div>
-                                          <div class="item" data-value="35"> Clinique d’urgence  </div>
-                                          <div class="item" data-value="53"> Centre de douleur chronique  </div>
-                                          <div class="item" data-value="02"> Section gériatrique</div>
-                                          <div class="item" data-value="08"> Section psychiatrique </div>
-                                          <div class="item" data-value="15"> Unité coronarienne </div>
-                                          <div class="item" data-value="05"> Unité de soins de longue durée (hébergement) </div>
-                                          <div class="item" data-value="04"> Unité de soins de longue durée (prolongés) </div>
-                                          <div class="item" data-value="03"> Unité de soins généraux et spécialisés </div>
-                                          <div class="item" data-value="16"> Unité de soins intensifs </div>
-                                       </div>
-                                    </div>
-                                 </div>
-                                 <script type="text/javascript">
-                                    $('.ui.dropdown').dropdown();
-                                 </script>
-                                 <!--  -->
-                                 <script type="text/javascript">
-                                    $(document).on('change','.lieu',function(){
-                                      if($('#lieu_codifie').is(':checked')){
+                                    
+                                       <select class="" type="hidden" name="secteur_active" id="secteur_active">
+                                          <option selected="selected"></option>
+                                          <option class="item" data-value="01"> Clinique externe </option>
+                                          <option class="item" data-value="35"> Clinique d’urgence  </option>
+                                          <option class="item" data-value="53"> Centre de douleur chronique  </option>
+                                          <option class="item" data-value="02"> Section gériatrique</option>
+                                          <option class="item" data-value="08"> Section psychiatrique </option>
+                                          <option class="item" data-value="15"> Unité coronarienne </option>
+                                          <option class="item" data-value="05"> Unité de soins de longue durée (hébergement) </option>
+                                          <option class="item" data-value="04"> Unité de soins de longue durée (prolongés) </option>
+                                          <option class="item" data-value="03"> Unité de soins généraux et spécialisés </option>
+                                          <option class="item" data-value="16"> Unité de soins intensifs </option>
+                                       
+                                    
+                                 </select>
+</div>                                  <script type="text/javascript">
+$('.ui.dropdown').dropdown();                                  </script>
+<!--  -->                                  <script type="text/javascript">
+$(document).on('change','.lieu',function(){
+if($('#lieu_codifie').is(':checked')){
                                         
                                         $('.codif_selection_lieu').show();
                                         $('.codif_selection_non').hide();
@@ -2892,21 +2864,62 @@
                                  </script>
                                  <label>Type de lieu</label>
                                  <div class="inline field">
-                                    <input type="radio" name="">
+                                    <input type="radio" name="type_lieu_pamnt" id="type_lieu_cab">
                                     <label>Cabinet</label>
                                  </div>
                                  <div class="inline field">
-                                    <input type="radio" name="">
+                                    <input type="radio" name="type_lieu_pamnt" id="type_lieu_dom">
                                     <label>Domicile</label>
                                  </div>
                                  <div class="inline field">
-                                    <input type="radio" name="">
+                                    <input type="radio" name="type_lieu_pamnt" id="type_lieu_aut">
                                     <label>Autre</label>
                                  </div>
                               </div>
                            </div>
+                           
+                           <div class="eight wide column">
+                             <div class="ui form segment">
+                                 <div class="ui horizontal divider"> <strong>Événement</strong></div>
+                                 <div class="ui form segment">
+                                    <div class="inline field">
+                                       <input type="radio" name="evenement" id="even_carie">
+                                       <label>Carie dentaire</label>
+                                    </div>
+                                    <div class="inline field">
+                                       <input type="radio" name="evenement" id="even_etat">
+                                       <label>Etat normal</label>
+                                    </div>
+                                    <div class="two fields">
+                                       <div class="inline field">
+                                          <input type="radio" name="evenement" id="even_autre_rad">
+                                          <label>Autre</label>
+                                       </div>
+                                       <div class="field">
+                                          <input type="text" name="" id="even_autre_cont">
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="field">
+                                    <label>Date de l'événement</label>
+                                    <input type="date" name="" id="pamnt_even_date">
+                                 </div>
+                                 <div class="ui form segment">
+                                    <div class="ui horizontal divider"><label>Période d'hospi.</label></div>
+                                    <div class="field">
+                                       <label>Date d'entrée</label>
+                                       <input type="date" name="" id="pamnt_date_entre">
+                                    </div>
+                                    <div class="field">
+                                       <label>Date de sortie</label>
+                                       <input type="date" name="" id="pamnt_date_sorti">
+                                    </div>
+                                 </div>
+                              </div>  
                         </div>
                      </div>
+                   </div>
+
                    
                      <div class="ui grid">
                               <div class="row">
@@ -3080,6 +3093,298 @@
          </div>
       </div>
    </div>
+
+      <div class="ui modal_regie_fact_modal modal">
+      <div class="header">
+         <i class="money icon"></i>Regie Facture Modal
+      </div>
+      <div class="content">
+         
+            <div class="ui two column grid">
+              <div class="eight wide column">
+                <div class="ui form segment">
+                  <h4 class="ui horizontal divider header">Identification du patient</h4>
+                <div class="field">
+                  <label>No dossier</label>
+                  <input type="text" name="" id="no_dosir_regie_fact">
+                </div>
+                <div class="two fields">
+                  <div class="field">
+                    <label>Prénom</label>
+                    <input type="text" name="" id="prenom_regie_fact">
+                  </div>
+                  <div class="field">
+                    <label>Nom</label>
+                    <input type="text" name="" id="nom_regie_fact">
+                  </div>
+                </div>
+                <div class="field">
+                    <label>#AMQ</label>
+                    <input type="text" name="" id="amq_regie_fact">
+                </div>
+                <div class="two fields">
+                <div class="field" >
+                  <label>Sexe</label>
+                  <input type="text" name="" id="sexe_regie_fact">
+                </div>
+                <div class="field" >
+                  <label>Exp</label>
+                  <input type="date" name="" id="exp_regie_fact">
+                </div>
+                </div>  
+              </div>
+            </div>
+              <div class="eight wide column">
+                
+                    <div class="ui form segment">
+                      <h4 class="ui horizontal divider header">Ancienne facture</h4>
+                      <div class="two fields">
+                        <div class="field">
+                          <label>No facture</label>
+                          <input type="text" name="" id="no_facture_regie_fact">
+                        </div>
+                        <div class="field">
+                          <label>No reçu</label>
+                          <input type="text" name="" id="no_recu_regie_fact">
+                        </div>
+                      </div>
+                      <div class="two fields">
+                        <div class="field">
+                          <label>No code</label>
+                          <input type="text" name="" id="no_code_regie_fact">
+                        </div>
+                        <div class="field">
+                          <label>Montant</label>
+                          <input type="text" name="" id="ancienne_montant_regie_fact">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="ui form segment">
+                      <h4 class="ui horizontal divider header">Nouvelle facture</h4>
+                      <div class="two fields">
+                        <div class="field">
+                          <label>No facture</label>
+                          <input type="text" name="" id="nouvel_no_facture">
+                        </div>
+                        <div class="field">
+                          <label>Montant</label>
+                          <input type="text" name="" id="novl_montant_regie_fact">
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                <div class="ui form segment">
+                        <div class="ui horizontal divider"> <strong>RENSEIGNEMENTS COMPLÉMENTAIRES RÉGIE</strong></div>
+                        <div class="inline fields">
+                           <label>Carte d'assurance-maladie</label>
+                           <div class="field">
+                              <input type="radio" id="carte_as_malad_oui_regie_fact" name="cart_malad_regie_fact" >
+                              <label>Oui</label>
+                           </div>
+                           <div class="field">
+                              <input type="radio" id="carte_as_malad_non_regie_fact" name="cart_malad_regie_fact">
+                              <label>Non</label>
+                           </div>
+                        </div>
+                        <div class="inline fields">
+                           <label>Remboursement demandé par Patient</label>
+                           <div class="field">
+                              <input type="radio" id="remb_dem_oui_regie_fact" name="remb_demnd_regie_fact">
+                              <label>Oui</label>
+                           </div>
+                           <div class="field">
+                              <input type="radio"  id="remb_dem_non_regie_fact" name="remb_demnd_regie_fact">
+                              <label>Non</label>
+                           </div>
+                        </div>
+                        <div class="ui grid">
+                           <div class="eight wide column">
+                              <div class="ui form segment">
+                                 <div class="ui horizontal divider"> <strong>PROFESSIONEL</strong></div>
+                                 <div class="field">
+                                    <label>No du professionel</label>
+                                    <input type="text" name="" id="pamnt_no_prof_regie_fact">
+                                 </div>
+                                 <div class="field">
+                                    <label>No du groupe</label>
+                                    <input type="text" name="" id="pamnt_no_grp_regie_fact">
+                                 </div>
+                              </div>
+                              <div class="ui form segment">
+                                 <div class="ui horizontal divider"> <strong>Événement</strong></div>
+                                 <div class="ui form segment">
+                                    <div class="inline field">
+                                       <input type="radio" name="evenement_regie_fact" id="even_carie_regie_fact">
+                                       <label>Carie dentaire</label>
+                                    </div>
+                                    <div class="inline field">
+                                       <input type="radio" name="evenement_regie_fact" id="even_etat_regie_fact">
+                                       <label>Etat normal</label>
+                                    </div>
+                                    <div class="two fields">
+                                       <div class="inline field">
+                                          <input type="radio" name="evenement_regie_fact" id="even_autre_rad_regie_fact">
+                                          <label>Autre</label>
+                                       </div>
+                                       <div class="field">
+                                          <input type="text" name="" id="even_autre_cont_regie_fact">
+                                       </div>
+                                    </div>
+                                 </div>
+                                 <div class="field">
+                                    <label>Date de l'événement</label>
+                                    <input type="date" name="" id="pamnt_even_date_regie_fact">
+                                 </div>
+                                 <div class="ui form segment">
+                                    <div class="ui horizontal divider"><label>Période d'hospi.</label></div>
+                                    <div class="field">
+                                       <label>Date d'entrée</label>
+                                       <input type="date" name="" id="pamnt_date_entre_regie_fact">
+                                    </div>
+                                    <div class="field">
+                                       <label>Date de sortie</label>
+                                       <input type="date" name="" id="pamnt_date_sorti_regie_fact">
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                           <div class="eight wide column">
+                              <div class="ui form segment">
+                                 <div class="ui horizontal divider"> <strong>Lieu de dispensation</strong></div>
+                                 <strong>Identification du lieu</strong>
+                                 
+                                    <div class="inline field">
+                                       <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie_regie_fact" >
+                                       <label>Lieu codifié á la Régie</label>
+                                    </div>
+                                    <div class="inline field">
+                                       <input type="radio" class="lieu" name="lieu_codifie" id="lieu_codifie_non_regie_fact">
+                                       <label>Lieu non codifié</label>
+                                    </div>
+                                 
+                                 <div class="codif_selection_lieu" style="display: none;">
+                                    <div class="field">
+                                       <label>Numéro du lieu</label>
+                                       <input type="text" name="" id='num_lieu_regie_fact'>
+                                    </div>
+                                 </div>
+                                 <div class="codif_selection_non" style="display: none;">
+                                    <div class=" field">
+                                       <label>Code Postal</label>
+                                       <input type="text" name="" id="cod_post_lieu_regie_fact">
+                                    </div>
+                                    <div class=" field">
+                                       <label>Code localité</label>
+                                       <input type="text" name="" id="cod_loc_regie_fact">
+                                    </div>
+                                    <div class=" field">
+                                       <label>No. bureau.</label>
+                                       <input type="text" name="" id="no_bur_regie_fact">
+                                    </div>
+                                 </div>
+                                 <div class="field">
+                                    <label>Secteur d'activité</label>
+                                   
+                                       <select type="hidden" name="secteur_active" id="secteur_active_regie_fact">
+                                       
+                                          <option></option>
+                                          <option class="item" data-value="01"> Clinique externe </option>
+                                          <option class="item" data-value="35"> Clinique d’urgence  </option>
+                                          <option class="item" data-value="53"> Centre de douleur chronique  </option>
+                                          <option class="item" data-value="02"> Section gériatrique</option>
+                                          <option class="item" data-value="08"> Section psychiatrique </option>
+                                          <option class="item" data-value="15"> Unité coronarienne </option>
+                                          <option class="item" data-value="05"> Unité de soins de longue durée (hébergement) </option>
+                                          <option class="item" data-value="04"> Unité de soins de longue durée (prolongés) </option>
+                                          <option class="item" data-value="03"> Unité de soins généraux et spécialisés </option>
+                                          <option class="item" data-value="16"> Unité de soins intensifs </option>
+                                       
+                                       </select>
+                                    
+                                 </div>
+                                 <script type="text/javascript">
+                                    $('.ui.dropdown').dropdown();
+                                 </script>
+                                 <!--  -->
+                                 <script type="text/javascript">
+                                    $(document).on('change','.lieu',function(){
+                                      if($('#lieu_codifie_regie_fact').is(':checked')){
+                                        
+                                        $('.codif_selection_lieu').show();
+                                        $('.codif_selection_non').hide();
+                                      };
+                                      if($('#lieu_codifie_non_regie_fact').is(':checked')){
+                                        $('.codif_selection_non').show();
+                                        $('.codif_selection_lieu').hide();
+                                      };
+                                      // alert($('#lieu_codifie_non').checked());
+                                    })
+                                 </script>
+                                 <label>Type de lieu</label>
+                                 <div class="inline field">
+                                    <input type="radio" name="type_lieu_pamnt" id="type_lieu_cab_regie_fact">
+                                    <label>Cabinet</label>
+                                 </div>
+                                 <div class="inline field">
+                                    <input type="radio" name="type_lieu_pamnt" id="type_lieu_dom_regie_fact">
+                                    <label>Domicile</label>
+                                 </div>
+                                 <div class="inline field">
+                                    <input type="radio" name="type_lieu_pamnt" id="type_lieu_aut_regie_fact">
+                                    <label>Autre</label>
+                                 </div>
+                              </div>
+                              <div class="ui axxium right floated tiny button" onclick="">Transférer à la Régie</div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="ui form segment sixteen wide column">
+                     <div class="ui teal form raised segment">
+                      <h4 class="ui horizontal divider header">Detail facture</h4>
+                      <div class="ui grid">
+                        <div class="column">
+                          <div class="ui axxium right floated button" onclick="">Liste des codes et tarifs</div>
+                        </div>
+                      </div>  
+                        <table id="factureTable_regie" class="ui striped compact table segment" cellspacing="0" width="100%">
+                           <thead>
+                              <tr>
+                                 <th>Type</th>
+                                 <th>Dent</th>
+                                 <th>Surface</th>
+                                 <th>Code</th>
+                                 <th>Description</th>
+                                 <th>Frais Lab.</th>
+                                 <th>Honoraires</th>
+                                 <th>Total</th>
+                                 <th>Prod</th>
+                                 <th>Role</th>
+                                 <th></th>
+                                 
+                              </tr>
+                           </thead>
+                           <tbody id="factTableBody_regie">
+                             
+                           </tbody>
+                        </table>
+                     </div>
+                     <div class="ui seven column grid">
+                      <div class="seven column centered row">
+                        <div class="nine wide column">
+                         <div class="ui axxium tiny button" onclick="RamqSoumissionDemandedAnnulation()">Annuler fact. à la Régie</div>
+                         <div class="ui axxium  tiny button" onclick="RamqBillReSendToRamq()">Transférer à la Régie</div>
+                         <div class="ui axxium  tiny button" onclick="">Quitter</div>
+                        </div>
+                     </div>
+                      </div>
+                  </div>
+            </div>
+         
+      </div>
+   </div>
+
+
    <div class="ui modalCdan modal">
    <i class="close icon"></i>
    <div class="header">
@@ -3257,7 +3562,7 @@
                                  <input type="text" name="no_autorisation_dentiste">
                               </div>
                               <div class="field">
-                                 <label>Date d'utorisation</label>
+                                 <label>Date d'autorisation</label>
                                  <input type="date" name="date_autorisation_dentiste">
                               </div>
                            </div>
@@ -3285,49 +3590,95 @@
                               </div>
                            </div>
                         </div>
-                        <div class="field">
-                           <label>Médicament consommé</label>
-                           <input type="text" name="medicament_dentiste">
-                        </div>
-                        <div class="field">
-                           <label>Éléments de contexte</label>
-                           <select  id="dropD_dentiste" name="element_contexte_dentiste">
-                              <option value="1727">Acte posé plus souvent que convenu à l'entente </option>
-                              <option value="38">Chirurgie secondaire pratiquée au cours d'une même séance qu une chirurgie principale </option>
-                              <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie </option>
-                              <option value="37">Mise en place de la première plaque de reconstruction</option>
-                              <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d'une même hospitalisation</option>
-                              <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d'une même hospitalisation </option>
-                              <option value="1724">Patient sous anesthésie générale </option>
-                              <option value="41">Remplacement d'une prothèse pour perte ou bris</option>
-                              <option value="1723">Remplacement de deux prothèses pour perte ou bris</option>
-                              <option value="1746">Séance différente </option>
-                              <option value="34">Service dont la complexité est inhabituelle</option>
-                              <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé </option>
-                              <option value="1749">Site différent </option>
-                              <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie </option>
-                              <option value="1725">Soins d'urgence </option>
-                              <option value="35">Soins post-opératoire confiés à un autre dentiste </option>
-                              <option value="36">Soins post-opératoire confiés par un autre dentiste </option>
-                              <option value="1744">Suite à un traumatisme </option>
-                              <option value="1729">Suite à une malformation osseuse</option>
-                           </select>
-                        </div>
-                        <div class="two fields">
+                        <div class="six fields">
+            <div class="five  wide field">
+              <label>Médicament consommé</label>
+              <input type="text" id="medicam_dent_field">
+            </div>
+            <div class="four wide field"><div class="ui teal tiny button" onclick="add_list_medi_com()" style="margin-top: 23px">+</div>
+            <div class="ui teal tiny button" onclick="add_list_medi_del()" style="margin-top: 23px">-</div>
+          </div>
+            
+            <div class="field">
+              <select id="medi_com_list" name="medi_com_list" multiple="">
+                
+              </select>
+            </div>
+          </div>
+          <script type="text/javascript">
+            function add_list_medi_com(){
+              $('#medi_com_list').append('<option selected="selected">'+ $('#medicam_dent_field').val()+'</option>');
+            }
+             function add_list_medi_del(){
+              $('#medi_com_list option:selected').remove();
+            }
+
+          </script>
+            <div class="field">
+              <label>Éléments de contexte</label>
+             
+              <select  id="dropD_dentiste" name="element_contexte_dentiste" multiple="multiple">
+                
+                <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
+                <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
+                <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                <option value="1724">Patient sous anesthésie générale (1724)</option>
+                <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                <option value="1746">Séance différente (1746)</option>
+                <option value="34">Service dont la complexité est inhabituelle (34)</option>
+                <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                <option value="1749">Site différent (1749)</option>
+                <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                <option value="1725">Soins d urgence (1725)</option>
+                <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
+                <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
+                <option value="1744">Suite à un traumatisme (1744)</option>
+                <option value="1729">Suite à une malformation osseuse (1729)</option>
+
+              </select>
+
+            </div>
+               <div class="four fields">
                            <div class="four wide field">
                               <label>Élements mesurables</label>
-                              <input type="text" name="mesurables_dentiste">
+                              <input type="text" id="mesurables_dentiste">
                            </div>
                            <div class="four wide field">
                               <label></label>
-                              <select name="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
+                              <select id="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
                                  <option>Kilomètres</option>
                                  <option>Nombre d'injections</option>
                                  <option>Durée activités administratives</option>
                               </select>
                            </div>
+                        
+                        <div class="field">
+                          <div class="ui teal tiny button" onclick="add_list_elem_meas()" style="margin-top: 23px">+</div>
+                          <div class="ui teal tiny button" onclick="del_list_elem_meas()" style="margin-top: 23px">-</div>
                         </div>
-                     </div>
+                        <div class="field">
+                          <select id="elem_meas_list" name="elem_meas_list" multiple="">
+                            
+                          </select>
+                        </div>
+                        </div>
+                        <script type="text/javascript">
+                          function add_list_elem_meas(){
+                            $('#elem_meas_list').append('<option selected="selected">'+ 
+                              $('#mesurables_dentiste').val()+'/'+$('#medicmnt_msrbles_options_dentiste').val()+'</option>');
+                          }
+                           function del_list_elem_meas(){
+                            $('#elem_meas_list option:selected').remove();
+                          }
+
+                        </script>
+
+
+        </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
                            <h4 class="ui horizontal divider header">Lieu de référence</h4>
@@ -3347,7 +3698,7 @@
                               </div>
                               <div class="three wide field" id="codif_selection_lieu" style="display: none">
                                  <label>Numéro du lieu</label>
-                                 <input type="text" name="">
+                                 <input type="text" name="numero_lieu">
                               </div>
                               <div class="three fields" id="codif_selection_non" style="display: none">
                                  <div class="field">
@@ -3363,22 +3714,25 @@
                                     <input type="text" name="no_bur_dentiste">
                                  </div>
                               </div>
+                                <div class="" id="type_lieu_cont" style="display: none">
+                                   <strong><label>Type de lieu</label></strong>
+                                   <div class="six inline fields">
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Cabinet">
+                                         <label>Cabinet</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Domicile">
+                                         <label>Domicile</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Autre">
+                                         <label>Autre</label>
+                                      </div>
+                                   </div>
+                                 </div>
                            </div>
-                           <strong><label>Type de lieu</label></strong>
-                           <div class="six inline fields">
-                              <div class="field">
-                                 <input type="radio" name="lieu_type" value="Cabinet">
-                                 <label>Cabinet</label>
-                              </div>
-                              <div class="field">
-                                 <input type="radio" name="lieu_type" value="Domicile">
-                                 <label>Domicile</label>
-                              </div>
-                              <div class="field">
-                                 <input type="radio" name="lieu_type" value="Autre">
-                                 <label>Autre</label>
-                              </div>
-                           </div>
+                      
                         </div>
                         <div class="ui form segment">
                            <h4 class="ui horizontal divider header"><label>Référant</label></h4>
@@ -3414,10 +3768,12 @@
             
                   $('#codif_selection_lieu').show();
                   $('#codif_selection_non').hide();
+                  $('#type_lieu_cont').hide();
                 };
                 if($('#lieu_codifie_non_dent').is(':checked')){
             
                   $('#codif_selection_non').show();
+                  $('#type_lieu_cont').show();
                   $('#codif_selection_lieu').hide();
                 };
                 // alert($('#lieu_codifie_non').checked());
@@ -3440,7 +3796,7 @@
                               <input type="text" name="atrsn_chirgien">
                            </div>
                            <div class="field">
-                              <label>Date d'utorisation</label>
+                              <label>Date d'autorisation</label>
                               <input type="date" name="date_chirgien">
                            </div>
                         </div>
@@ -3467,45 +3823,93 @@
                               </div>
                            </div>
                         </div>
-                        <div class="field">
-                           <label>Médicament consommé</label>
-                           <input type="text" name="medicament_chirgien">
-                        </div>
-                        <div class="field">
-                           <label>Élements de contexte</label>
-                           <select id="dropD_chirurgiens" name="elemnt_contx_chirgien">
-                              <option value="1735"> Acte posé plus souvent que convenu à l'entente </option>
-                              <option value="1734"> Chirurgie secondaire pratiquée au cours d'une même séance qu une chirurgie principale </option>
-                              <option value="1733"> Mise en place de la première plaque de reconstruction </option>
-                              <option value="1751"> Nouvelle intervention qui est reliée à la première ou en résulte lors d'une même hospitalisation</option>
-                              <option value="1736"> Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d'une même hospitalisation </option>
-                              <option value="41"> Remplacement d'une prothèse pour perte ou bris </option>
-                              <option value="1737"> Remplacement de deux prothèses pour perte ou bris </option>
-                              <option value="1745"> Séance différente</option>
-                              <option value="1732"> Patient sous anesthésie générale </option>
-                              <option value="1731">  Service dont la complexité est inhabituelle </option>
-                              <option value="1748">  Site différent</option>
-                              <option value="1739">  Soins d'urgence </option>
-                              <option value="1738">  Soins d'urgence pendant l'horaire de garde </option>
-                              <option value="1743">  Suite à un traumatisme </option>
-                              <option value="1730">  Suite à une malformation osseuse</option>
-                           </select>
-                        </div>
-                        <div class="two fields">
+                                                <div class="six fields">
+            <div class="five  wide field">
+              <label>Médicament consommé</label>
+              <input type="text" id="medicam_chir_field">
+            </div>
+            <div class="four wide field"><div class="ui teal tiny button" onclick="add_list_medi_com()" style="margin-top: 23px">+</div>
+            <div class="ui teal tiny button" onclick="add_list_medi_del()" style="margin-top: 23px">-</div>
+          </div>
+            
+            <div class="field">
+              <select id="medi_com_list_chir" name="medi_com_list_chir" multiple="">
+                
+              </select>
+            </div>
+          </div>
+          <script type="text/javascript">
+            function add_list_medi_com(){
+              $('#medi_com_list_chir').append('<option selected="selected">'+ $('#medicam_chir_field').val()+'</option>');
+            }
+             function add_list_medi_del(){
+              $('#medi_com_list_chir option:selected').remove();
+            }
+
+          </script>
+            <div class="field">
+              <label>Éléments de contexte</label>
+             
+              <select  id="dropD_chir" name="element_contexte_chir" multiple="multiple">
+                
+                <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
+                <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
+                <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                <option value="1724">Patient sous anesthésie générale (1724)</option>
+                <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                <option value="1746">Séance différente (1746)</option>
+                <option value="34">Service dont la complexité est inhabituelle (34)</option>
+                <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                <option value="1749">Site différent (1749)</option>
+                <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                <option value="1725">Soins d urgence (1725)</option>
+                <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
+                <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
+                <option value="1744">Suite à un traumatisme (1744)</option>
+                <option value="1729">Suite à une malformation osseuse (1729)</option>
+
+              </select>
+
+            </div>
+               <div class="four fields">
                            <div class="four wide field">
-                              <label>Elements mesurables</label>
-                              <input type="text" name="elmnt_msrble_chirgien">
+                              <label>Élements mesurables</label>
+                              <input type="text" id="mesurables_chir">
                            </div>
-                           <div class=" four wide field">
+                           <div class="four wide field">
                               <label></label>
-                              <select name="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
+                              <select id="medicmnt_msrbles_options_chir" style="margin-top: 20px">
                                  <option>Kilomètres</option>
                                  <option>Nombre d'injections</option>
                                  <option>Durée activités administratives</option>
                               </select>
                            </div>
+                        
+                        <div class="field">
+                          <div class="ui teal tiny button" onclick="add_list_elem_meas_chir()" style="margin-top: 23px">+</div>
+                          <div class="ui teal tiny button" onclick="del_list_elem_meas_chir()" style="margin-top: 23px">-</div>
                         </div>
-                     </div>
+                        <div class="field">
+                          <select id="elem_meas_list" name="elem_meas_list" multiple="">
+                            
+                          </select>
+                        </div>
+                        </div>
+                        <script type="text/javascript">
+                          function add_list_elem_meas_chir(){
+                            $('#elem_meas_list').append('<option selected="selected">'+ 
+                              $('#mesurables_chir').val()+'/'+$('#medicmnt_msrbles_options_chir').val()+'</option>');
+                          }
+                           function del_list_elem_meas_chir(){
+                            $('#elem_meas_list option:selected').remove();
+                          }
+
+                        </script>
+                      </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
                            <h4 class="ui horizontal divider header"><label>Lieu de référence</label></h4>
@@ -3525,7 +3929,7 @@
                               </div>
                                <div class="three wide field" id="codif_selection_lieu" style="display: none">
                                  <label>Numéro du lieu</label>
-                                 <input type="text" name="">
+                                 <input type="text" name="" id="num_lieu_chirr_fact">
                               </div>
                               <div class="three fields" style="display: none" id="codif_selection_non">
                                  <div class="field">
@@ -3541,22 +3945,25 @@
                                     <input type="text" name="no_bur_chirgien">
                                  </div>
                               </div>
+                              <div class="" id="type_lieu_cont" style="display: none">
+                                   <strong><label>Type de lieu</label></strong>
+                                   <div class="six inline fields">
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Cabinet">
+                                         <label>Cabinet</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Domicile">
+                                         <label>Domicile</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Autre">
+                                         <label>Autre</label>
+                                      </div>
+                                   </div>
+                                 </div>
                            </div>
-                           <strong><label>Type de lieu</label></strong>
-                           <div class="three inline fields">
-                              <div class="field">
-                                 <input type="radio" name="type_lieu" value="Cabinet">
-                                 <label>Cabinet</label>
-                              </div>
-                              <div class="field">
-                                 <input type="radio" name="type_lieu" value="Domicile">
-                                 <label>Domicile</label>
-                              </div>
-                              <div class="field">
-                                 <input type="radio" name="type_lieu" value="Autre">
-                                 <label>Autre</label>
-                              </div>
-                           </div>
+                         
                         </div>
                         <div class="ui form segment">
                            <h4 class="ui horizontal divider header"><label>Référant</label></h4>
@@ -3592,10 +3999,12 @@
             
                   $('#codif_selection_lieu').show();
                   $('#codif_selection_non').hide();
+                  $('#type_lieu_cont').hide();
                 };
                 if($('#lieu_codifie_non_chir').is(':checked')){
             
                   $('#codif_selection_non').show();
+                  $('#type_lieu_cont').show();
                   $('#codif_selection_lieu').hide();
                 };
                 // alert($('#lieu_codifie_non').checked());
@@ -4458,6 +4867,12 @@
        {
          $('.modalPayment.modal').modal('show');
        }
+       
+       function Regie_fact_modal()
+       {
+        populate_fact_update(arrGrilleDeFacturation_update);
+        $('.modal_regie_fact_modal').modal('show');
+       }
        function modLabo()
        {
          $('.modalLabo.modal').modal('show');
@@ -4959,6 +5374,8 @@
       var fact_tbl_row_id=0;
       var arrGrilleDeFacturation=[]; 
       var arrGrilleDeFacturation_forms=[]; 
+      var arrGrilleDeFacturation_update=[];
+      var arrGrilleDeFacturation_forms_update=[];
       var lang = getLang();
       var translator = $('body').translate({lang:"", t:dict});
       var curPatient = "";
@@ -5299,10 +5716,48 @@
           // $("div").addClass("trn");
           translator.lang(x);
         }
+
+   $(document).ready(function(){
       
-      
-      
+    //   var thisTag = [];
+
+    // $('table th, table td,label,h4,h3,select option,a,div .item,div .button,div .header,strong,div .divider').each(function(){
+
+    //   var words=$(this).text();
+
+    //   if(words!=""  ){
+
+    //     var found=$.inArray(words,thisTag);
+    //     if(found <0){
+    //       thisTag.push($.trim(words));
+          
+    //       }
+    // else{
+    //         // console.log('repeated:'+ $(this).text());
+    //      }
         
+    //   }
+
+    // });
+
+    // var thisData=[];
+    
+    // $.each(thisTag,function(idx,val){
+      
+    //   thisData.push('"'+val+ '"'+' : { en:" " },' );
+
+    // });
+    
+    
+    // // thisData=JSON.stringify(thisData);
+    // console.log(thisData);
+    // $.post("allScriptsv1.py",{tx: "translator", thisData: 'hyeeeeeee'},function(result){
+    //     console.log(result);
+    //     });
+    
+    
+
+   });
    </script>
 </body>
 </html>
