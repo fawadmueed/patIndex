@@ -133,6 +133,7 @@ function RamqBillPopulatDetailsArrays(pBillNumber)
 
 function RamqBillPopulateBillDetails(pArrBilldata)
 {
+    globRamqBillInfo = pArrBilldata;
     globArrGrilleDeFacturation_update = pArrBilldata.info[1];
     globArrGrilleDeFacturation_forms_update = pArrBilldata.info[2];
     
@@ -142,7 +143,7 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     var objAdditionalData = pArrBilldata.info[0][2];
 
     globRamqJetonComm = RamqBillGetJetonComm(pArrBilldata.xml);
-    globRamqNoFactRamq = RamqBillGetMontant(pArrBilldata.xml)
+    globRamqNoFactRamq = RamqBillGetNoFactRamq(pArrBilldata.xml);
     //Identification du patient
     $('#no_dosir_regie_fact').val((pArrBilldata.nodossier) ? pArrBilldata.nodossier : '');
     $('#prenom_regie_fact').val((objVisionRData.PrePers) ? objVisionRData.PrePers : '');
@@ -196,7 +197,7 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     $('#secteur_active_regie_fact').val((objAdditionalData.NoSectActiv) ? objAdditionalData.NoSectActiv : '');//ddl
     $('#cod_post_lieu_regie_fact').val((objAdditionalData.CodePostal) ? objAdditionalData.CodePostal : '');
     $('#cod_loc_regie_fact').val((objAdditionalData.CodeLocalite) ? objAdditionalData.CodeLocalite : '');
-    $('#no_bur_regie_fact').val((objAdditionalData.NoBur) ? objCommonBillData.NoBur : '');
+    $('#no_bur_regie_fact').val((objAdditionalData.NoBur) ? objAdditionalData.NoBur : '');
 
     if(objAdditionalData.TypeDeLieu = "C")
     {
@@ -213,6 +214,80 @@ function RamqBillPopulateBillDetails(pArrBilldata)
 
     dent_Type = objVisionRData.TypProf;
     Regie_fact_modal();
+}
+
+function RamqBillUpdateBillInfo() {
+    /*
+        update global variable globRamqBillInfo before send update request to Ramq
+    */
+
+    //globArrGrilleDeFacturation_update = pArrBilldata.info[1];
+    //globArrGrilleDeFacturation_forms_update = pArrBilldata.info[2];
+    var objVisionRData = globRamqBillInfo.info[0][1];
+    var objAdditionalData = globRamqBillInfo.info[0][2];
+
+    //globRamqJetonComm = RamqBillGetJetonComm(pArrBilldata.xml);
+    //globRamqNoFactRamq = RamqBillGetMontant(pArrBilldata.xml);
+    //Identification du patient
+    globRamqBillInfo.nodossier = $('#no_dosir_regie_fact').val();
+
+    objVisionRData.PrePers = $('#prenom_regie_fact').val();
+    objVisionRData.NomPers = $('#nom_regie_fact').val();
+    objVisionRData.IdPers = $('#amq_regie_fact').val();
+    objVisionRData.CodSexPers = $('#sexe_regie_fact').val();
+    objVisionRData.NamExpDate = $('#exp_regie_fact').val();
+
+    //ancienne facture
+    globRamqBillInfo.facture = $('#no_facture_regie_fact').val();
+    //$('#no_recu_regie_fact').val(globRamqNoFactRamq);
+    //$('#no_code_regie_fact').val(globRamqJetonComm);
+    //$('#ancienne_montant_regie_fact').val(RamqBillGetMontant(pArrBilldata.xml));
+
+    ////Nouvelle facture
+    //$('#nouvel_no_facture').val(''); //TODO:
+    //$('#novl_montant_regie_fact').val(''); //TODO:
+
+    //renseignements complementaires regie
+
+    //if (objVisionRData.IdPers) {
+    //    $('#carte_as_malad_oui_regie_fact').prop('checked', true);
+    //}
+    //else {
+    //    $('#carte_as_malad_non_regie_fact').prop('checked', true);
+    //}
+    objAdditionalData.RembDemParPatient = $('#remb_dem_oui_regie_fact').is(':checked');
+    
+
+    //professionel
+    objVisionRData.IdProf = $('#pamnt_no_prof_regie_fact').val();
+    //$('#pamnt_no_grp_regie_fact').val('');//TODO:
+
+    //evenement //TODO: Josee should change layout
+    objAdditionalData.DatEvenePers = $('#pamnt_even_date_regie_fact').val();
+    //period d'hospital.
+    objAdditionalData.DatEntrePersLieu = $('#pamnt_date_entre_regie_fact').val();
+    objAdditionalData.DatSortiPersLieu = $('#pamnt_date_sorti_regie_fact').val();
+
+    //Lieu de dispensation
+    objAdditionalData.LieuCodifieRegie = $('#lieu_codifie_regie_fact').is(':checked');
+    objAdditionalData.LieuNonCodifieRegie = $('#lieu_codifie_non_regie_fact').is(':checked');
+
+    objAdditionalData.IdLieuPhys = $('#num_lieu_regie_fact').val();
+    objAdditionalData.NoSectActiv = $('#secteur_active_regie_fact').val();
+    objAdditionalData.CodePostal = $('#cod_post_lieu_regie_fact').val();
+    objAdditionalData.CodeLocalite = $('#cod_loc_regie_fact').val();
+    objAdditionalData.NoBur = $('#no_bur_regie_fact').val();
+
+    if ($('#type_lieu_cab_regie_fact').is(':checked'))
+        objAdditionalData.TypeDeLieu = "C";
+    else if ($('#type_lieu_dom_regie_fact').is(':checked'))
+        objAdditionalData.TypeDeLieu = "D";
+    else if ($('#type_lieu_aut_regie_fact').is(':checked'))
+        objAdditionalData.TypeDeLieu = "A";
+
+    globRamqBillInfo.info[0][1] = objVisionRData;
+    globRamqBillInfo.info[0][2] = objAdditionalData;
+
 }
 
 //Check if the bill can be updated.
@@ -301,5 +376,9 @@ function RamqBillGetJetonComm(pXml)
     return jeton;
 }
 
+function RamqBillReSendToRamq()
+{
+    RamqSoumissionDemandesModification();
+}
 
     

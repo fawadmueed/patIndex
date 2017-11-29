@@ -1,21 +1,16 @@
 
 
-var globVisionRData;
 //var arrGrilleDeFacturation = getarrGrilleDeFacturation(); //for test only. in production arrGrilleDeFacturation should be global;
 //TODO:rename SoumissionDemandesPaiement to RamqSoumissionDemandesPaiement;
-
-$(document).ready(function () {
-    globVisionRData = RamqGetVisionRData();
-});
 function SoumissionDemandesPaiement()
 {
-    var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
-    if (objSoumissionDemandesPaiementData != null) //TODO: empty line shouldn't be added to an array.
+    var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetDataForXml();
+    if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[2].length>0) //TODO: empty line shouldn't be added to an array.
     {
         var operationName = "Paiement";
-        var inputXMl = RamqGetXmlToSend(operationName, objSoumissionDemandesPaiementData); //This data is used to send to RAMQ.
+        var inputXMl = RamqGetData(operationName, objSoumissionDemandesPaiementData); //This data is used to send to RAMQ.
 
-        var jsonDataArray = objSoumissionDemandesPaiementData; //this data is used to store bill info on the server
+        var jsonDataArray = RamqSoumissionDemandesPaiementGetDataForJSON(); //this data is used to store bill info on the server
         var jsonXML = {
             "request": inputXMl,
             "info": jsonDataArray // JSON data
@@ -50,19 +45,19 @@ function SoumissionDemandesPaiement()
 
 function RamqSoumissionDemandesModification()
 {
-    var objSoumissionDemandesModificationData = RamqSoumissionDemandesModificationGetData();
-    if (objSoumissionDemandesModificationData != null)
+    var objSoumissionDemandesModification = RamqSoumissionDemandesModificationGetDataForXml();
+    if (objSoumissionDemandesModificationData != null && objSoumissionDemandesModificationData[2].length > 0) 
     {
         var operationName = "Modification";
-        var inputXMl = RamqGetXmlToSend(operationName, objSoumissionDemandesModificationData); //This data is used to send to RAMQ.
+        var inputXMl = RamqGetData(operationName, objSoumissionDemandesModification); //This data is used to send to RAMQ.
 
-        var jsonDataArray = objSoumissionDemandesModificationData; //this data is used to store bill info on the server
+        var jsonDataArray = RamqSoumissionDemandesModificationGetDataForJSON(); //this data is used to store bill info on the server
         var jsonXML = {
             "request": inputXMl,
             "info": jsonDataArray // JSON data
         }
 
-        $.post("allScriptsv1.py", { tx: "modifyRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, json: JSON.stringify(jsonXML) },
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, json: JSON.stringify(jsonXML) },
                     function (result) {
                         if (result.outcome === 'error')//Display python Error
                         {
@@ -72,15 +67,15 @@ function RamqSoumissionDemandesModification()
                             displayRamqAnswer("RAMQ", result.message);
                         }
                         else if (result.message != null && result.message.substring(0, 5) != 'Error') {
-                            var objResponse = parseRAMQResponsePaiment(result.message);
+                            var objResponse = parseRAMQResponseModification(result.message);
                             displayResponseModification(objResponse);
                         }
                         else {
-                            displayRamqAnswer("RAMQ", "RamqSoumissionDemandesModification Error");
+                            displayRamqAnswer("RAMQ", "SoumissionDemandesModification Error");
                         }
                     })
             .fail(function () {
-                alert("Ramq RamqSoumissionDemandesModification Error.");
+                alert("Ramq SoumissionDemandesModification Error.");
             });
     }
     else {
@@ -92,7 +87,7 @@ function RamqSoumissionDemandesAnnulation() {
     var objSoumissionDemandesAnnulationData = SoumissionDemandesAnnulationGetData();
     if (objSoumissionDemandesAnnulationData != null)
     {
-        var jsonData = RamqGetXmlToSend("Annulation");
+        var jsonData = RamqGetData("Annulation");
 
         $.ajax({
             type: "POST",
@@ -122,7 +117,7 @@ function RamqSoumissionDemandesAnnulation() {
 }
 
 
-function RamqGetXmlToSend(operationName, _objData)
+function RamqGetData(operationName, _objData)
 {
     var xmlAEnvoyer = '';
 
@@ -132,7 +127,7 @@ function RamqGetXmlToSend(operationName, _objData)
     }
     else if (operationName == 'Modification')
     {
-        xmlAEnvoyer = RamqGetSoumissionDemandesModificationXML(_objData);
+        xmlAEnvoyer = RamqGetSoumissionDemandesModificationXML();
     }
     else if (operationName == 'Annulation')
     {
@@ -150,22 +145,22 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
     '<dem_paimt xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
     '<no_dem_ext>' + RamqGenerateNoDemExt() + '</no_dem_ext>' +
     '<logcl_fact>' +
-        '<no_devpr_logcl>' + _arrData[0][0].NoDevprLogcl + '</no_devpr_logcl>' + //?
-        '<nom_devpr_logcl>' + _arrData[0][0].NomDevprLogcl + '</nom_devpr_logcl>' + //?
-        '<nom_logcl_fact>' + _arrData[0][0].NomLogclFact + '</nom_logcl_fact>' + //?
-        '<no_versi_logcl_fact>' + _arrData[0][0].NoVersiLogclFact + '</no_versi_logcl_fact>' + //?
-        '<no_versi_xml_dem>' + _arrData[0][0].NoVersiXmlDem + '</no_versi_xml_dem>' + //?
+        '<no_devpr_logcl>' + _arrData[0].NoDevprLogcl + '</no_devpr_logcl>' + //?
+        '<nom_devpr_logcl>' + _arrData[0].NomDevprLogcl + '</nom_devpr_logcl>' + //?
+        '<nom_logcl_fact>' + _arrData[0].NomLogclFact + '</nom_logcl_fact>' + //?
+        '<no_versi_logcl_fact>' + _arrData[0].NoVersiLogclFact + '</no_versi_logcl_fact>' + //?
+        '<no_versi_xml_dem>' + _arrData[0].NoVersiXmlDem + '</no_versi_xml_dem>' + //?
     '</logcl_fact>' +
     '<demdr>' +
-        '<typ_id_intvn>' + _arrData[0][1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _arrData[0][1].DemdrIdIntvn + '</id_intvn>' + //?
+        '<typ_id_intvn>' + _arrData[1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].DemdrIdIntvn + '</id_intvn>' + //?
     '</demdr>' +
     '<exped_difrn_demdr>' +
-        '<typ_id_intvn>' + _arrData[0][1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _arrData[0][1].ExpedIdIntvn + '</id_intvn>' + //?
+        '<typ_id_intvn>' + _arrData[1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].ExpedIdIntvn + '</id_intvn>' + //?
     '</exped_difrn_demdr>' +
     '<moda_paimt>' +
-        '<typ_moda_paimt>' + _arrData[0][1].TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
+        '<typ_moda_paimt>' + _arrData[1].TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
     '</moda_paimt>' +
     '<liste_fact>' +
         RamqGetListFact(_arrData, dent_Type) +// dent_Type is a global variable : Dentist, Chirurgiens, Denturologiste
@@ -176,28 +171,29 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
 
 // Create common part for all specialists
 function RamqGetSoumissionDemandesModificationXML(_arrData) {
+
     var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
     '<dem_modif xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
     '<no_dem_ext>' + RamqGenerateNoDemExt() + '</no_dem_ext>' +
     '<logcl_fact>' +
-        '<no_devpr_logcl>' + _arrData[0][0].NoDevprLogcl + '</no_devpr_logcl>' + //?
-        '<nom_devpr_logcl>' + _arrData[0][0].NomDevprLogcl + '</nom_devpr_logcl>' + //?
-        '<nom_logcl_fact>' + _arrData[0][0].NomLogclFact + '</nom_logcl_fact>' + //?
-        '<no_versi_logcl_fact>' + _arrData[0][0].NoVersiLogclFact + '</no_versi_logcl_fact>' + //?
-        '<no_versi_xml_dem>' + _arrData[0][0].NoVersiXmlDem + '</no_versi_xml_dem>' + //?
+        '<no_devpr_logcl>' + _arrData[0].NoDevprLogcl + '</no_devpr_logcl>' + //?
+        '<nom_devpr_logcl>' + _arrData[0].NomDevprLogcl + '</nom_devpr_logcl>' + //?
+        '<nom_logcl_fact>' + _arrData[0].NomLogclFact + '</nom_logcl_fact>' + //?
+        '<no_versi_logcl_fact>' + _arrData[0].NoVersiLogclFact + '</no_versi_logcl_fact>' + //?
+        '<no_versi_xml_dem>' + _arrData[0].NoVersiXmlDem + '</no_versi_xml_dem>' + //?
     '</logcl_fact>' +
     '<demdr>' +
-        '<typ_id_intvn>' + _arrData[0][1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _arrData[0][1].DemdrIdIntvn + '</id_intvn>' + //?
+        '<typ_id_intvn>' + _arrData[1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].DemdrIdIntvn + '</id_intvn>' + //?
     '</demdr>' +
     '<exped_difrn_demdr>' +
-        '<typ_id_intvn>' + _arrData[0][1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _arrData[0][1].ExpedIdIntvn + '</id_intvn>' + //?
+        '<typ_id_intvn>' + _arrData[1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
+        '<id_intvn>' + _arrData[1].ExpedIdIntvn + '</id_intvn>' + //?
     '</exped_difrn_demdr>' +
-    '<id_fact_ramq>' +
+    '<id_fact_ramq>'+
 		'<no_fact_ramq>' + globRamqNoFactRamq + '</no_fact_ramq>' +
-		'<jeton_comm>' + globRamqJetonComm + '</jeton_comm>' +
-	'</id_fact_ramq>' +
+		'<jeton_comm>'+ globRamqJetonComm +'</jeton_comm>'+
+	'</id_fact_ramq>'+
     '<fact_a_modif>' +
         RamqGetListFact(_arrData, dent_Type) +// dent_Type is a global variable : Dentist, Chirurgiens, Denturologiste
     '</fact_a_modif>' +
@@ -210,8 +206,8 @@ function RamqGetSoumissionDemandesModificationXML(_arrData) {
 // Create part of xml for Chirg 
 function RamqGetListFact(_arrData, _dent_Type)
 {
-    var objDataFromVisionR = _arrData[0][1];
-    var objAdditionalData = _arrData[0][2];
+    var objDataFromVisionR = _arrData[1];
+    var objAdditionalData = _arrData[3];
     var xml = '';
     var factServDentaChirTitle = '';
     var listeLigneFactServDentaChirgTitle = '';
@@ -255,7 +251,7 @@ function RamqGetListFact(_arrData, _dent_Type)
                     '</liste_pers_objet_fact>' +
                     RamqGetIndFactAssocDrXml(objDataFromVisionR.IndFactAssosDr, _dent_Type) +//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
                     '<' + listeLigneFactServDentaChirgTitle + '>' +
-                        RamqGetListeLigneFactServDenta(_arrData[1],_arrData[2], _dent_Type) +
+                        RamqGetListeLigneFactServDenta(_arrData[2], _dent_Type) +
                     '</' + listeLigneFactServDentaChirgTitle + '>' +
                 '</' + factServDentaChirTitle + '>';
     return xml;
@@ -372,7 +368,6 @@ function RamqGetLieuConsiXml(pObjAdditionalData)
     }
     return xml;
 }
-
 function RamqGetIndFactAssocDrXml(p_IndFactAssosDr, p_dent_Type)
 {
     if (p_dent_Type == 'Denturologiste')
@@ -381,17 +376,18 @@ function RamqGetIndFactAssocDrXml(p_IndFactAssosDr, p_dent_Type)
         return '<ind_fact_assoc_dr>' + p_IndFactAssosDr + '</ind_fact_assoc_dr>';
 }
 
-function RamqGetListeLigneFactServDenta(pArrGridData, pArrFormMoreData, _dent_Type)
+function RamqGetListeLigneFactServDenta(pArrBillData, _dent_Type)
 {
     var xml = '';
     if (_dent_Type == 'Dentiste' || _dent_Type == 'Chirurgiens')
-        xml = RamqGetListe_ligne_fact_serv_denta_chirg(pArrGridData, pArrFormMoreData, _dent_Type);
+        xml = RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type);
     else if (_dent_Type == 'Denturologiste')
-        xml = RamqGetListe_ligne_fact_serv_denta_dentu(pArrGridData, pArrFormMoreData, _dent_Type);
+        xml = RamqGetListe_ligne_fact_serv_denta_dentu(pArrBillData, _dent_Type);
     return xml;
 }
 
-function RamqGetListe_ligne_fact_serv_denta_chirg(pArrpGridData, pArrFormMoreData, _dent_Type)
+
+function RamqGetListe_ligne_fact_serv_denta_chirg(pArrBillData, _dent_Type)
 {
     var xml = '';
     var ligneFactServDentaChirgTitle = '';
@@ -403,71 +399,41 @@ function RamqGetListe_ligne_fact_serv_denta_chirg(pArrpGridData, pArrFormMoreDat
     }
     var ligneNum = 1;
 
-    for (var i = 0; i < pArrpGridData.length; i++)
+    for (var i = 0; i < pArrBillData.length; i++)
     {
-        //var pObjBillData = pArrBillData[i];
-        var pObjGridData = pArrpGridData[i];
-        var pObjFormMoreData;
-
-        if (pObjGridData.Type == 'AMQ' || pObjGridData.Type == 'BES')
+        var pObjBillData = pArrBillData[i];
+        if (pObjBillData.Type == 'AMQ' || pObjBillData.Type == 'BES')
         {
-            pObjFormMoreData = GetObjFormMoreData(pObjGridData.row_id, pArrFormMoreData);
-
-            var dateServ;
-            if (pObjFormMoreData && pObjFormMoreData.datServElmFact) {
-                dateServ = pObjFormMoreData.datServElmFact;
-            }
-            else {
-                dateServ = RamqGetCurrentDate();
-            }
-
-            var codeRole;
-            if (pObjGridData && pObjGridData.codeRole) {
-                codeRole = pObjGridData.codeRole;
-            }
-            else {
-                codeRole = 1; //TODO:For test only
-            }
-
-            var noLigne;
-            if (pObjGridData && pObjGridData.ramq_id) {
-                noLigne = pObjGridData.ramq_id
-            }
-            else
-                noLigne = ligneNum;
-
-
             xml = xml +
                 '<' + ligneFactServDentaChirgTitle + '>' +
-                    '<no_ligne_fact>' + noLigne + '</no_ligne_fact>' +
-                    //'<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
+                    '<no_ligne_fact>' + ligneNum + '</no_ligne_fact>' +
                     '<typ_id_elm_fact>' + '1' + '</typ_id_elm_fact>' + //1 : Code facturation élément assuré
-                    '<id_elm_fact>' + pObjGridData.Code + '</id_elm_fact>' + //Code de facturation
-                    '<dat_serv_elm_fact>' + dateServ + '</dat_serv_elm_fact>' +
-                    '<cod_role>' + codeRole + '</cod_role>' + //Data 1 : Responsable 4 : Assistant
-                    RamqGetDatAutorProthAcryl(pObjFormMoreData) +
+                    '<id_elm_fact>' + pObjBillData.Code + '</id_elm_fact>' + //Code de facturation
+                    '<dat_serv_elm_fact>' + RamqGetCurrentDate() + '</dat_serv_elm_fact>' + //TODO:Is current date? format YYYY-mm-DD (2017-08-01)
+                    '<cod_role>' + '1' + '</cod_role>' + //TODO: Where from? Constant? Data 1 : Responsable 4 : Assistant
+                    RamqGetDatAutorProthAcryl(pObjBillData.dat_autor_proth_acryl) +
                     '<info_serv_denta>' +
-                        '<no_dent>' + pObjGridData.Dent + '</no_dent>' +
+                        '<no_dent>' + pObjBillData.Dent + '</no_dent>' +
                         '<liste_surf_dent_trait>' +
-                            RamqGetListe_surf_dent_trait(pObjGridData.Surface) +
+                            RamqGetListe_surf_dent_trait(pObjBillData.Surface) +
                         '</liste_surf_dent_trait>' +
                         //optional
-                        RamqGetRaisTraitDentaXml(pObjFormMoreData) +
+                        RamqGetRaisTraitDentaXml(pObjBillData.typ_id_rais_trait_denta, pObjBillData.id_rais_trait_denta) +
                         //optional
-                        RamqGetSiteTraitDentaXml(pObjFormMoreData) +
+                        RamqGetSiteTraitDentaXml(pObjBillData.typ_id_site_trait_denta, pObjBillData.id_site_trait_denta) +
                         //optional
-                        RamqGetInfoMedConsmXml(pObjFormMoreData) +
+                        RamqGetInfoMedConsmXml(pObjBillData.liste_med_consm) +
                     '</info_serv_denta>' +
                     //optional
-                    RamqGetListeElmMesurXml(pObjFormMoreData) +
+                    RamqGetListeElmMesurXml(pObjBillData.liste_elm_mesur) +
                     //optional
-                    RamqGetListElmContxXml(pObjFormMoreData) +
+                    RamqGetListElmContxXml(pObjBillData.liste_elm_contx) +
                     //optional
-                    RamqGetListeLieuRefreXml(pObjFormMoreData) +
+                    RamqGetListeLieuRefreXml(pObjBillData.typ_refre_lieu, pObjBillData.isLieuCodifieALaRegie, pObjBillData.id_lieu_phys,  pObjBillData.codePostal, pObjBillData.code_localite_dentiste,  pObjBillData.no_bur, pObjBillData.lieu_type) +
                     //optional
-                    RamqGetRefreAutreProfXml(pObjFormMoreData) +
+                    RamqGetRefreAutreProfXml(pObjBillData.typ_refre_autre_prof, pObjBillData.typ_id_prof, pObjBillData.id_prof) +
 
-                    RamqGetMntPrcuPatntXml(pObjGridData.Total) +
+                    RamqGetMntPrcuPatntXml(pObjBillData.Total)+
                   
                  '</' + ligneFactServDentaChirgTitle + '>';
             ligneNum++;
@@ -505,52 +471,52 @@ function RamqGetListe_ligne_fact_serv_denta_dentu(pArrBillData, _dent_Type)
     return xml;
 }
 
-function RamqGetRaisTraitDentaXml(pObjFormMoreData)
+function RamqGetRaisTraitDentaXml(p_typ_id_rais_trait_denta, p_id_rais_trait_denta )
 {
     var res = '';
-    if (pObjFormMoreData && pObjFormMoreData.typ_id_rais_trait_denta && pObjFormMoreData.id_rais_trait_denta)
+    if(p_typ_id_rais_trait_denta &&  p_id_rais_trait_denta)
     {
         res =
             '<rais_trait_denta>' +
-                '<typ_id_rais_trait_denta>' + pObjFormMoreData.typ_id_rais_trait_denta + '</typ_id_rais_trait_denta>' +
-                '<id_rais_trait_denta>' + pObjFormMoreData.id_rais_trait_denta + '</id_rais_trait_denta>' +
+                '<typ_id_rais_trait_denta>' + p_typ_id_rais_trait_denta + '</typ_id_rais_trait_denta>' +
+                '<id_rais_trait_denta>' + p_id_rais_trait_denta + '</id_rais_trait_denta>' +
             '</rais_trait_denta>';
     }
     return res;
 }
 
-function RamqGetSiteTraitDentaXml(pObjFormMoreData)
+function RamqGetSiteTraitDentaXml(p_typ_id_site_trait_denta , p_id_site_trait_denta)
 {
-    
     var res = '';
-    if (pObjFormMoreData && pObjFormMoreData.typ_id_site_trait_denta && pObjFormMoreData.id_site_trait_denta)
+    if (p_typ_id_site_trait_denta && p_id_site_trait_denta)
     {
         res =
             '<site_trait_denta>'+
-                '<typ_id_site_trait_denta>' + pObjFormMoreData.typ_id_site_trait_denta + '</typ_id_site_trait_denta>' +
-                '<id_site_trait_denta>' + pObjFormMoreData.id_site_trait_denta + '</id_site_trait_denta>' +
+                '<typ_id_site_trait_denta>' + p_typ_id_site_trait_denta + '</typ_id_site_trait_denta>' +
+                '<id_site_trait_denta>' + p_id_site_trait_denta + '</id_site_trait_denta>' +
             '</site_trait_denta>';
     }
     return res;
 }
 
-function RamqGetInfoMedConsmXml(pObjFormMoreData)
+function RamqGetInfoMedConsmXml(p_liste_med_consm)
 {
+
     var res = '';
 
-    if (pObjFormMoreData && pObjFormMoreData.liste_med_consm && pObjFormMoreData.liste_med_consm.length > 0)
+    if (p_liste_med_consm && p_liste_med_consm.length>0)
     {
         res =
             '<info_med_consm>' +
                 '<typ_med_consm>' + '1' + '</typ_med_consm>' + //TODO: is this constant?
                 '<liste_med_consm>';
             ;
-        for (var i = 0; i < pObjFormMoreData.liste_med_consm.length; i++)
+        for (var i = 0; i < p_liste_med_consm.length; i++)
         {
             res +=
                 '<med_consm>' +
                     '<typ_id_med_consm>' + '1' + '</typ_id_med_consm>' +//TODO: is this constant?
-                    '<id_med_consm>' + pObjFormMoreData.liste_med_consm[i] + '</id_med_consm>' +
+                    '<id_med_consm>' + p_liste_med_consm[i] + '</id_med_consm>' +
                 '</med_consm>';
         }
         res +=
@@ -560,16 +526,16 @@ function RamqGetInfoMedConsmXml(pObjFormMoreData)
     return res;
 }
 
-function RamqGetListeElmMesurXml(pObjFormMoreData)
+function RamqGetListeElmMesurXml(p_liste_elm_mesur)
 {
     var res = '';
-    if (pObjFormMoreData && pObjFormMoreData.liste_elm_mesur && pObjFormMoreData.liste_elm_mesur.length > 0)
+    if (p_liste_elm_mesur && p_liste_elm_mesur.length > 0)
     {
         res +=
             '<liste_elm_mesur>';
-        for (var i = 0; i < pObjFormMoreData.liste_elm_mesur.length; i++)
+        for (var i = 0; i < p_liste_elm_mesur.length; i++)
         {
-            var arrElem = pObjFormMoreData.liste_elm_mesur[i].split('/');
+            var arrElem = p_liste_elm_mesur[i].split('/');
             res +=
                 '<elm_mesur>'+
                     '<cod_elm_mesur>' + arrElem[0] + '</cod_elm_mesur>' +
@@ -582,17 +548,17 @@ function RamqGetListeElmMesurXml(pObjFormMoreData)
     return res;
 }
 
-function RamqGetListElmContxXml(pObjFormMoreData)
+function RamqGetListElmContxXml(p_arr_elm_contx)
 {
     var res = '';
-    if (pObjFormMoreData && pObjFormMoreData.liste_elm_contx && pObjFormMoreData.liste_elm_contx.length > 0)
+    if (p_arr_elm_contx && p_arr_elm_contx.length > 0)
     {
         res += '<liste_elm_contx>';
-        for (var i = 0; i < pObjFormMoreData.liste_elm_contx.length; i++)
+        for(var i = 0; i< p_arr_elm_contx.length; i++)
         {
             res += 
                 '<elm_contx>'+
-                    '<cod_elm_contx>' + pObjFormMoreData.liste_elm_contx[i] + '</cod_elm_contx>' +
+                    '<cod_elm_contx>' + p_arr_elm_contx[i] + '</cod_elm_contx>' +
                 '</elm_contx>';
         }
         res +=
@@ -601,46 +567,46 @@ function RamqGetListElmContxXml(pObjFormMoreData)
     return res;
 }
 
-function RamqGetListeLieuRefreXml(pObjFormMoreData)
+function RamqGetListeLieuRefreXml(p_typ_refre_lieu, p_isLieuCodifieALaRegie, p_id_lieu_phys,  p_codePostal, p_code_localite_dentiste, p_no_bur, p_lieu_type)
 {
     var res = '';
-    if (pObjFormMoreData && ((pObjFormMoreData.isLieuCodifieALaRegie != null && pObjFormMoreData.typ_refre_lieu && pObjFormMoreData.id_lieu_phys) || (pObjFormMoreData.isLieuCodifieALaRegie != null && pObjFormMoreData.typ_refre_lieu && pObjFormMoreData.lieu_type)))
+    if ((p_isLieuCodifieALaRegie != null && p_typ_refre_lieu && p_id_lieu_phys) || (p_isLieuCodifieALaRegie != null && p_typ_refre_lieu && p_lieu_type))
     {
         res +=
         '<lieu_en_refre>' +
-            '<typ_refre_lieu>' + pObjFormMoreData.typ_refre_lieu + '</typ_refre_lieu>' + // 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
+            '<typ_refre_lieu>' + p_typ_refre_lieu + '</typ_refre_lieu>' + // 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
             '<liste_lieu_refre>';
 
-        if (pObjFormMoreData.isLieuCodifieALaRegie) {
+        if (p_isLieuCodifieALaRegie == true) {
             res +=
                 '<lieu_refre_phys>' +
                     '<typ_id_lieu_phys>' + '1' + '</typ_id_lieu_phys>' + //TODO: is it constant?
-                    '<id_lieu_phys>' + pObjFormMoreData.id_lieu_phys + '</id_lieu_phys>';
+                    '<id_lieu_phys>' + p_id_lieu_phys + '</id_lieu_phys>';
             res +=
                 '</lieu_refre_phys>';
         }
         else  //Non codifie
         {
             var lieuType;
-            if (pObjFormMoreData.lieu_type === "Cabinet")
+            if (p_lieu_type === "Cabinet")
                 lieuType = 'C';
-            else if (pObjFormMoreData.lieu_type === "Domicile")
+            else if (p_lieu_type === "Domicile")
                 lieuType = 'D';
-            else if (pObjFormMoreData.lieu_type === "Autre")
+            else if (p_lieu_type === "Autre")
                 lieuType = 'A';
 
             var typ_id_lieu_geo = -1;
             var id_lieu_geo = "";
-            if (pObjFormMoreData.codePostal)
+            if (p_codePostal)
             {
                 typ_id_lieu_geo = 2;
-                id_lieu_geo = pObjFormMoreData.codePostal;
+                id_lieu_geo = p_codePostal;
             }
                 
-            if (pObjFormMoreData.code_localite_dentiste)
+            if (p_code_localite_dentiste)
             {
                 typ_id_lieu_geo = 3;
-                id_lieu_geo = pObjFormMoreData.code_localite_dentiste;
+                id_lieu_geo = p_code_localite_dentiste;
             }
                 
            
@@ -650,7 +616,7 @@ function RamqGetListeLieuRefreXml(pObjFormMoreData)
                     '<id_lieu_geo>' + id_lieu_geo + '</id_lieu_geo>' +
                     '<typ_lieu_geo>' + lieuType + '</typ_lieu_geo>';
             if (p_lieu_type === "Cabinet") {
-                res += '<no_bur>' + pObjFormMoreData.no_bur + '</no_bur>';
+                res += '<no_bur>' + p_no_bur + '</no_bur>';
             }
 
             res +=
@@ -664,18 +630,18 @@ function RamqGetListeLieuRefreXml(pObjFormMoreData)
 }
 
 // TODO: waiting for UI
-function RamqGetRefreAutreProfXml(pObjFormMoreData)
+function RamqGetRefreAutreProfXml(p_typ_refre_autre_prof, p_typ_id_prof, p_id_prof)
 {
     var res = '';
-    if (pObjFormMoreData && pObjFormMoreData.typ_refre_autre_prof && pObjFormMoreData.typ_id_prof && pObjFormMoreData.id_prof)
+    if (p_typ_refre_autre_prof && p_typ_id_prof && p_id_prof)
     {
         res +=
             '<refre_autre_prof>' +
-            '<typ_refre_autre_prof>' + pObjFormMoreData.typ_refre_autre_prof + '</typ_refre_autre_prof>' +
+            '<typ_refre_autre_prof>' + p_typ_refre_autre_prof + '</typ_refre_autre_prof>' +
             '<info_prof_refre>' +
                 '<prof_refre_connu>' +
-                '<typ_id_prof>' + pObjFormMoreData.typ_id_prof + '</typ_id_prof>' +
-                '<id_prof>' + pObjFormMoreData.id_prof + '</id_prof>' +
+                '<typ_id_prof>' + p_typ_id_prof + '</typ_id_prof>' +
+                '<id_prof>' + p_id_prof + '</id_prof>' +
                 '</prof_refre_connu>' +
             '</info_prof_refre>' +
             '</refre_autre_prof>';
@@ -696,12 +662,11 @@ function RamqGetMntPrcuPatntXml(p_mnt_prcu_patnt)
     return res;
 }
 
-function RamqGetDatAutorProthAcryl(pObjFormMoreData)
+function RamqGetDatAutorProthAcryl(p_date_autorisation_dentiste)
 {
-
     var res = '';
-    if (pObjFormMoreData && pObjFormMoreData.dat_autor_proth_acryl)
-        res = '<dat_autor_proth_acryl>' + pObjFormMoreData.dat_autor_proth_acryl + '</dat_autor_proth_acryl>';
+    if (p_date_autorisation_dentiste)
+        res = '<dat_autor_proth_acryl>' + p_date_autorisation_dentiste + '</dat_autor_proth_acryl>';
     return res;
 }
 
@@ -733,6 +698,8 @@ function RamqGetCurrentDate()
 
     return  y + '-' + m +'-' + day;
 }
+
+
 
 function getSoumissionDemandesModificationXML()
 {
@@ -894,7 +861,6 @@ function parseRAMQResponsePaiment(strXml)
     //liste_fact_recev
     response.arrListeFactRecev = [];
     var arrFactRecev = xmlDoc.getElementsByTagName("liste_fact_recev")[0].children;
-
     for (var j = 0; j < arrFactRecev.length; j++)
     {
         var objFactRecev = {};
@@ -1071,21 +1037,66 @@ function RamqGetFactNumber()
 }
 
 
-function RamqSoumissionDemandesPaiementGetData()
+
+function RamqSoumissionDemandesPaiementGetDataForXml()
 {
     /*
-     data source to create a json :
+     data source to create an xml :
+     1.Constant data related to application and developer. objConstAppData.
+     2.Data from visioneR objVisionRData.
+     4.Data from UI. objBillData.
+    */
+    /*returns an array of objects:
+    arrData[0] = objConstAppData;
+    arrData[1] = objVisionRData;
+    arrData[2] = objBillData;
+    */
+    var objConstAppData = RamqGetConstAppData();
+    var objVisionRData = RamqGetVisionRData();
+    var objBillData = RamqGetBillData();
+    var objAdditionalData = RamqGetAdditionalData(); //Data from Payment form "Renseignements complementaires Regie"
+
+    var arrData = [];
+    arrData[0] = objConstAppData;
+    arrData[1] = objVisionRData;
+    arrData[2] = objBillData;
+    arrData[3] = objAdditionalData;
+    return arrData;
+}
+
+function RamqSoumissionDemandesModificationGetDataForXml()
+{
+
+    //TODO: Start here
+    //globRamqBillInfo
+    var objConstAppData = RamqGetConstAppData();
+    var objVisionRData = RamqGetVisionRData();
+    var objBillData = RamqGetBillData();
+    var objAdditionalData = RamqGetAdditionalData(); //Data from Payment form "Renseignements complementaires Regie"
+
+    var arrData = [];
+    arrData[0] = objConstAppData;
+    arrData[1] = objVisionRData;
+    arrData[2] = objBillData;
+    arrData[3] = objAdditionalData;
+    return arrData;
+}
+
+function RamqSoumissionDemandesPaiementGetDataForJSON()
+{
+    /*
+     data source to create an json :
      1. Common data (Constant data related to application and developer + Data from visioneR); objCommonData
      2. Data from arrGrilleDeFacturation array.
      3. Data from arrGrilleDeFacturation_forms array.
     
-    returns an  array of objects:
-    arrData[0] = arrCommonData[objConstAppData,objVisionRData,objAdditionalData];
+    returns an json array of objects:
+    arrData[0] = arrCommonData[objConstAppData,objVisionRData];
     arrData[1] = objGrilleDeFacturationData;
     arrData[2] = objGrilleDeFacturationFormData;
     */
     var objConstAppData = RamqGetConstAppData();
-    var objVisionRData = globVisionRData;
+    var objVisionRData = RamqGetVisionRData();
     var objBillData = RamqGetBillData();
     var objAdditionalData = RamqGetAdditionalData(); //Data from Payment form "Renseignements complementaires Regie"
 
@@ -1100,28 +1111,6 @@ function RamqSoumissionDemandesPaiementGetData()
     //return JSON.stringify(arrData);
     return arrData;
 }
-
-function RamqSoumissionDemandesModificationGetData() {
-    /*
-     data source to create a json :
-     1. Common data (Constant data related to application and developer + Data from visioneR); objCommonData
-     2. Data from arrGrilleDeFacturation array.
-     3. Data from arrGrilleDeFacturation_forms array.
-    
-    returns an  array of objects:
-    arrData[0] = arrCommonData[objConstAppData,objVisionRData,objAdditionalData];
-    arrData[1] = globArrGrilleDeFacturation_update;
-    arrData[2] = globArrGrilleDeFacturation_forms_update;
-    */
-    RamqBillUpdateBillInfo();
-    var arrData = [];
-    arrData[0] = globRamqBillInfo.info[0];
-    arrData[1] = globArrGrilleDeFacturation_update;
-    arrData[2] = globArrGrilleDeFacturation_forms_update;
-
-    return arrData;
-}
-
 
     
 function SoumissionDemandesAnnulationGetData()
@@ -1169,8 +1158,8 @@ function RamqGetVisionRData()
     res.IdPers = 'DISL14082210';//NAM
     res.NamExpDate = '2018-01-01';
     res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
-    res.InsTypeList = ['ACE', 'AGA'];
-    res.TypProf = 'Dentiste'; //TODO: For test only Dentiste , Chirurgiens , Denturologiste
+
+    res.TypProf = dent_Type; //TODO: For test only
 
     //Patient without NAM
     res.NomPers='Smith';
@@ -1181,6 +1170,7 @@ function RamqGetVisionRData()
     res.Nas ='123456789123'; 
     res.AdrPersPatnt='333 Place de la Belle-rive, Laval, QC, H7X3R5';
     res.RepdnIdPers = 'DISL14082217';
+
 
     return res;
 }
@@ -1318,22 +1308,6 @@ function RamqGetArrayValueFromArrByName(pElementName, pArrMoreInfo)
     })
     return arrOutput;
 }
-
-//Returns object from array "More" form for the given rowId.
-function GetObjFormMoreData(pRowId, pArrFormMoreData)
-{
-    if (pRowId)
-    {
-        for (var i = 0; i < pArrFormMoreData.length; i++) {
-            if (pArrFormMoreData[i][0].value == pRowId) {
-                return pArrFormMoreData[i];
-                break;
-            }
-        }
-    }
-    return null;
-}
-
 
 //Returns additional info for the line of Bill.
 function RamqGetMoreInfo(pRowId)
@@ -1722,29 +1696,3 @@ function RamqGenerateNoDemExt()
     
     }
     */
-
-//function RamqSoumissionDemandesPaiementGetDataForXml()
-//{
-//    /*
-//     data source to create an xml :
-//     1.Constant data related to application and developer. objConstAppData.
-//     2.Data from visioneR objVisionRData.
-//     4.Data from UI. objBillData.
-//    */
-//    /*returns an array of objects:
-//    arrData[0] = objConstAppData;
-//    arrData[1] = objVisionRData;
-//    arrData[2] = objBillData;
-//    */
-//    var objConstAppData = RamqGetConstAppData();
-//    var objVisionRData = RamqGetVisionRData();
-//    var objBillData = RamqGetBillData();
-//    var objAdditionalData = RamqGetAdditionalData(); //Data from Payment form "Renseignements complementaires Regie"
-
-//    var arrData = [];
-//    arrData[0] = objConstAppData;
-//    arrData[1] = objVisionRData;
-//    arrData[2] = objBillData;
-//    arrData[3] = objAdditionalData;
-//    return arrData;
-//}
