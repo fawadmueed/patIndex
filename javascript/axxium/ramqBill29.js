@@ -88,32 +88,49 @@ function RamqBillGetNoRamq(pObjDataFromServer)
 function RamqBillGetMontant(pXmlResp)
 {
     var totalAmount = 0;
-    if (pXmlResp)
+    var parser = new DOMParser();
+    var xml = pXmlResp.replace(/\\"/g, '"');
+    if (xml)
     {
-        var obj = parseRAMQResponsePaiment(pXmlResp);
-        if (obj) {
-            var arrLigneList = obj.arrListeFactRecev[0].ListeLigneFactRecev;
-            if (arrLigneList) {
-                for (var i = 0; i < arrLigneList.length; i++) {
-                    var amount = Number(arrLigneList[i].MntPrel);
-                    if (!isNaN(amount)) {
-                        totalAmount += amount;
+        var xmlDoc = parser.parseFromString(xml, "text/xml");
+        if (xmlDoc)
+        {
+            var tag_liste_ligne_fact_recev = xmlDoc.getElementsByTagName('liste_ligne_fact_recev')[0];
+            if (tag_liste_ligne_fact_recev)
+            {
+                var arrListFactRecev = tag_liste_ligne_fact_recev.childNodes;
+                if (arrListFactRecev && arrListFactRecev.length > 0)
+                {
+                    for (var i = 0; i < arrListFactRecev.length; i++)
+                    {
+                        var amount = Number(arrListFactRecev[i].childNodes[2].innerHTML);
+                        if (!isNaN(amount))
+                        {
+                            totalAmount += amount;
+                        }
                     }
                 }
             }
         }
     }
-    
     return totalAmount;
 }
 
 function RamqBillGetStatus(pXmlResp)
 {
-    var status = 0;//"Non transmis"
-    var obj = parseRAMQResponsePaiment(pXmlResp);
-    if (obj && obj.GlobalStaRecev == "1") //bill accepted
-    {
-        status = 1;//"Accepté";
+    var status = 0;
+    var parser = new DOMParser();
+    var xml = pXmlResp.replace(/\\"/g, '"');
+    if (xml) {
+        var xmlDoc = parser.parseFromString(xml, "text/xml");
+        if (xmlDoc) {
+
+            if (xmlDoc.getElementsByTagName("sta_recev")[0] != null)
+            {
+                if (xmlDoc.getElementsByTagName("sta_recev")[0].innerHTML == '1')
+                    status = 1;
+            }
+        }
     }
     return status;
 }
@@ -213,6 +230,7 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     }
 
     dent_Type = objVisionRData.TypProf;
+    populate_factTbl_update(globArrGrilleDeFacturation_update);
     Regie_fact_modal();
 }
 
@@ -323,8 +341,6 @@ function RamqBillClearTable()
     $('#rgie_fact_table tbody').empty();
     $('#nombre_factures_regie').val('');
     $('#total_factures_regie').val('');
-    
-    
 }
 
 function RamqBillGetNoFactRamq(pXml)
