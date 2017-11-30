@@ -1,10 +1,37 @@
 
-function populate_fact_update(testArrayTable){
+$(document).ready(function(){
+
+  
+  
+  
+  $(document.body).on("submit","#form_dentiste_Up", function(event) {
+                submitForm(this);
+              });
+
+  $(document.body).on("submit","#form_chirurgiens_Up", function(event) {
+                submitForm(this);
+                
+              });
+  $(document.body).on("submit","#form_denturologiste_Up", function(event) {
+              submitForm(this);
+              });
+ 
+
+$(document.body).on('focusout',"form :text",function(){
+                $(this).val($(this).val().toUpperCase());
+              })            
+ 
+   });
+
+
+
+
+function populate_factTbl_update(testArrayTable){
 		
 		var arrayToPopulate=tableDataAmq(testArrayTable);
 
 		arrGrilleDeFacturation_update=arrayToPopulate;
-		console.log(arrGrilleDeFacturation_update);
+		// console.log(arrGrilleDeFacturation_update);
 
 		$('#factTableBody_regie tr').remove();
 		
@@ -69,7 +96,7 @@ function populate_fact_update(testArrayTable){
                       }
                     tblData.appendTo(tblRow);
                   }
-                   tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="findTableData(this);" >Plus</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Supprimer</div>');
+                   tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="modFactTableMore_update(this,arrGrilleDeFacturation_forms_update);;" >Plus</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Supprimer</div>');
                tblData.appendTo(tblRow);
             }
          
@@ -99,6 +126,111 @@ function tableDataAmq(updateArray){
 	return update_amq_arry;
 }
 
+
+function modFactTableMore_update(x,arrGrilleDeFacturation_forms_update)
+{ 
+	
+  var row_id=$(x).closest('tr').attr('id');
+  
+   switch(dent_Type){
+      
+      case 'Dentiste':
+              var data=$('#div_dentiste_Up').html();
+              $('#modal_factTbl_more_Up').html(data); 
+              $('form #rowId_dent_Up').val(row_id); //Assign id of Row Working - to the Form 
+              var thisFromData=getThisFormData(row_id,arrGrilleDeFacturation_forms_update);  //gets the Complete Array of FORM Data to populate 
+              updatedPopulateForm('form_dentiste_Up',thisFromData);
+              break;
+
+      case 'Chirurgiens':
+      
+              var data=$('#div_chirurgiens_Up').html();
+              $('#modal_factTbl_more_Up').html(data);
+              $('form #rowId_chir_Up').val(row_id); //Assign id of Row Working - to the Form 
+              var thisFromData=getThisFormData(row_id,arrGrilleDeFacturation_forms_update);
+              updatedPopulateForm('form_chirurgiens_Up',thisFromData);
+              
+              break;
+      case 'Denturologiste':
+      
+              var data=$('#div_denturologiste_Up').html();
+              $('#modal_factTbl_more_Up').html(data);
+              $('form #rowId_dentu_Up').val(row_id); //Assign id of Row Working - to the Form 
+              var thisFromData=getThisFormData(row_id,arrGrilleDeFacturation_forms_update);
+              updatedPopulateForm('form_denturologiste_Up',thisFromData);
+      
+              break;
+      default:
+              $('#modal_factTbl_more_Up').html('<h1>Error Aquiring the Dentist Type</h1>');
+
+  }
+  $('.modalFactTableMore_Up').modal('show');
+}
+
+function updatedPopulateForm(formname,thisFromData)
+{ 
+   if(thisFromData!="")
+    {
+      $("#"+formname).deserialize(thisFromData);
+
+      if(formname=='form_dentiste'){
+        
+        $.each(thisFromData,function(id,val){
+        
+        if(val.name=='medi_com_list'){
+        console.log(val.value);
+        $('#medi_com_list').append('<option selected="selected">'+val.value+'</option>')
+        }
+        
+        if(val.name=='elem_meas_list'){
+        console.log(val.value);
+        $('#elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
+        }
+
+
+     })
+  
+      }
+      else if(formname=='form_chirurgiens'){
+
+         $.each(thisFromData,function(id,val){
+        
+        if(val.name=='medi_com_list_chir'){
+        console.log(val.value);
+        $('#medi_com_list_chir').append('<option selected="selected">'+val.value+'</option>')
+        }
+        
+        if(val.name=='elem_meas_list'){
+        console.log(val.value);
+        $('#elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
+        }
+
+
+     })
+
+      }
+      else if(formname=='form_denturologiste'){
+
+      }
+    }
+
+ }
+
+function getThisFormData(row_id,arrGrilleDeFacturation_forms_update){
+  
+  var arrayToPopulateForm=[];
+
+  $.each(arrGrilleDeFacturation_forms_update,function(idx,value){
+    $.each(value,function(id,val){
+      if(val.value==row_id){
+        arrayToPopulateForm=value;
+      }
+
+    })
+  })
+  return arrayToPopulateForm;
+}
+
 function allTrData_update(){
 
   var count_ramq=0;
@@ -116,6 +248,10 @@ function allTrData_update(){
 
     var key='row_id';
     var value=$(val).attr('id');
+    myObjects[key]=value;
+
+    var key='ramq_id';
+    var value=$(val).attr('ramq_id');
     myObjects[key]=value;
     
     $.each(mytds,function(idx,val){
@@ -156,3 +292,74 @@ function allTrData_update(){
   
 
 }
+
+function Regie_fact_modal()
+   {
+
+    populate_factTbl_update(arrGrilleDeFacturation_update);
+    
+
+    $('.modal_regie_fact_modal').modal('show');
+
+   }
+
+function submitForm_Up(thisForm){
+	event.preventDefault();
+	var moreInfoArray_Up=$(thisForm).serializeArray();
+	var checkIfUpdate=updateArray_Up('row_id',moreInfoArray[0].value,moreInfoArray_Up);
+	$('.modalFactTableMore_Up').modal('hide');
+	if(checkIfUpdate){
+	  arrGrilleDeFacturation_forms_update.push(moreInfoArray);
+
+
+	}
+		}
+
+
+function updateArray_Up(namR,valR,newArray){
+   // Update complete array if Matched in its object nameR and valR send i.e : nameR=row_id valR=2
+  var nameD=namR;
+  var valueD=valR;
+  var newArray=newArray;
+
+       if(arrGrilleDeFacturation_forms_update.length==0)
+       { //first time when form is Empty
+         return true;
+       }
+
+   for(var i=0;i<arrGrilleDeFacturation_forms_update.length;i++)
+        {
+          for(j=0;j<arrGrilleDeFacturation_forms_update[i].length;j++)
+          {
+            if(arrGrilleDeFacturation_forms_update[i][j].name==nameD && arrGrilleDeFacturation_forms_update[i][j].value==valueD)
+            {
+              arrGrilleDeFacturation_forms_update[i]=newArray;
+              return false;
+              
+            }
+          }
+        }
+    return true;
+    }
+
+
+    // for(var i=0;i<arrGrilleDeFacturation_forms_update.length;i++)
+    //     {
+    //       for(var j=0;j<arrGrilleDeFacturation_forms_update[i].length;j++)
+    //       {
+    //         if((arrGrilleDeFacturation_forms_update[i][j].name==nameD)&&(arrGrilleDeFacturation_forms_update[i][j].value==valR))
+    //         {
+
+    //           console.log('Old array :');
+    //           console.log(arrGrilleDeFacturation_forms_update[i]);
+    //           arrGrilleDeFacturation_forms_update[i]=newArray;
+    //           console.log('new Array');
+    //           console.log(newArray);
+    //           // return true;
+              
+            
+              
+    //         }
+          
+    //       }
+    //     }

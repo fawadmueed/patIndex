@@ -1291,7 +1291,7 @@
                <i class="dropdown icon"></i>
                <div class="default text">Select</div>
                <div class="menu">
-                  <div class="item" data-value="3">Factures</div>
+                  <div class="item" data-value="3" >Factures</div>
                   <div class="item" data-value="2">Paiements</div>
                   <div class="item" data-value="1">Messages</div>
                   <div class="item" data-value="0">État de compte</div>
@@ -3343,7 +3343,9 @@ if($('#lieu_codifie').is(':checked')){
                      <div class="ui teal form raised segment">
                       <h4 class="ui horizontal divider header">Detail facture</h4>
                       <div class="ui grid">
+                        
                         <div class="column">
+                          <div class="ui axxium right floated button" onclick="allTrData_update()">Update</div>
                           <div class="ui axxium right floated button" onclick="">Liste des codes et tarifs</div>
                         </div>
                       </div>  
@@ -3360,7 +3362,7 @@ if($('#lieu_codifie').is(':checked')){
                                  <th>Total</th>
                                  <th>Prod</th>
                                  <th>Role</th>
-                                 <th></th>
+                                 <th>--</th>
                                  
                               </tr>
                            </thead>
@@ -3536,6 +3538,7 @@ if($('#lieu_codifie').is(':checked')){
       
       }
    </script>
+
    <div class="ui modalFactTableMore fullscreen modal">
       <i class="close icon"></i>
       <div class="header">
@@ -3554,8 +3557,9 @@ if($('#lieu_codifie').is(':checked')){
                   <div class="ui grid">
                      <div class="eight wide column">
                         <div class="ui segment">
-                           <input type="text" name="row_id" id="rowId_dent" style="display: none">
                            <h4 class="ui horizontal divider header">Prothèse en acrylique</h4>
+                           <input type="text" name="row_id" id="rowId_dent" style="display: none">
+                           
                            <div class="two fields">
                               <div class="field">
                                  <label>No d'autorisation</label>
@@ -3607,10 +3611,10 @@ if($('#lieu_codifie').is(':checked')){
           </div>
           <script type="text/javascript">
             function add_list_medi_com(){
-              $('#medi_com_list').append('<option selected="selected">'+ $('#medicam_dent_field').val()+'</option>');
+              $('#form_dentiste #medi_com_list').append('<option selected="selected">'+ $('#form_dentiste #medicam_dent_field').val()+'</option>');
             }
              function add_list_medi_del(){
-              $('#medi_com_list option:selected').remove();
+              $('#form_dentiste #medi_com_list option:selected').remove();
             }
 
           </script>
@@ -3668,11 +3672,11 @@ if($('#lieu_codifie').is(':checked')){
                         </div>
                         <script type="text/javascript">
                           function add_list_elem_meas(){
-                            $('#elem_meas_list').append('<option selected="selected">'+ 
-                              $('#mesurables_dentiste').val()+'/'+$('#medicmnt_msrbles_options_dentiste').val()+'</option>');
+                            $('#form_dentiste #elem_meas_list').append('<option selected="selected">'+ 
+                              $('#form_dentiste #mesurables_dentiste').val()+'/'+$('#form_dentiste #medicmnt_msrbles_options_dentiste').val()+'</option>');
                           }
                            function del_list_elem_meas(){
-                            $('#elem_meas_list option:selected').remove();
+                            $('#form_dentiste #elem_meas_list option:selected').remove();
                           }
 
                         </script>
@@ -3681,6 +3685,10 @@ if($('#lieu_codifie').is(':checked')){
         </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
+                        <div class="five wide field">
+                          <label>Date De Service</label>
+                          <input type="date" id="date_de_service_dentiste" value="">
+                        </div>
                            <h4 class="ui horizontal divider header">Lieu de référence</h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
@@ -3755,26 +3763,26 @@ if($('#lieu_codifie').is(':checked')){
                               <input type="text" name="type_profession_dentiste">
                            </div>
                         </div>
-                        <button class="ui axxium button" type="submit">Enregistrer</button>
+                        <button class="ui axxium button" id="" type="submit">Enregistrer</button>
             </form>
             </div>
             </div>
             </div>
          </div>
          <script type="text/javascript">
-          $(document).on('change','.lieu',function(){
+          $(document).on('change','#form_dentiste .lieu',function(){
             
-                if($('#lieu_codifie_dent').is(':checked')){
+                if($('#form_dentiste #lieu_codifie_dent').is(':checked')){
             
-                  $('#codif_selection_lieu').show();
-                  $('#codif_selection_non').hide();
-                  $('#type_lieu_cont').hide();
+                  $('#form_dentiste #codif_selection_lieu').show();
+                  $('#form_dentiste #codif_selection_non').hide();
+                  $('#form_dentiste #type_lieu_cont').hide();
                 };
-                if($('#lieu_codifie_non_dent').is(':checked')){
+                if($('#form_dentiste #lieu_codifie_non_dent').is(':checked')){
             
-                  $('#codif_selection_non').show();
-                  $('#type_lieu_cont').show();
-                  $('#codif_selection_lieu').hide();
+                  $('#form_dentiste #codif_selection_non').show();
+                  $('#form_dentiste #type_lieu_cont').show();
+                  $('#form_dentiste #codif_selection_lieu').hide();
                 };
                 // alert($('#lieu_codifie_non').checked());
               })
@@ -3912,6 +3920,10 @@ if($('#lieu_codifie').is(':checked')){
                       </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
+                          <div class="five wide field">
+                          <label>Date De Service</label>
+                          <input type="date" id="date_de_service_chirur" value="">
+                        </div>
                            <h4 class="ui horizontal divider header"><label>Lieu de référence</label></h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
@@ -4042,6 +4054,525 @@ if($('#lieu_codifie').is(':checked')){
          </div>
       </div>
    </div>
+
+<!-- =========================  UPDATE MODAL PLUS MORE FORMS DENTISTE CHIR DENTU  =============  -->
+      <div class="ui modalFactTableMore_Up fullscreen modal">
+      <i class="close icon"></i>
+      <div class="header">
+         <i class="user icon"></i>Informations complementaires Régie - Deatail Facture
+      </div>
+      <div class="content">
+         <div id="modal_factTbl_more_Up" >
+            <!-- DIV TO SHOW THE SELECTED DENTIST TYPE '-DIV CONTENT FORM-' -->
+         </div>
+         <!-- ==== Dentiste Modal -->
+
+         <div id="div_dentiste_Up" style="display: none;">
+            <form id="form_dentiste_Up" class="dent" method="post">
+               <div class="ui axxium form segment">
+                  <h4 class="ui horizontal divider header">DENTISTE</h4>
+    
+                  <div class="ui grid">
+                     <div class="eight wide column">
+                        <div class="ui segment">
+                           <h4 class="ui horizontal divider header">Prothèse en acrylique</h4>
+                           <input type="text" name="row_id" id="rowId_dent_Up" style="display: none">
+                           
+                           <div class="two fields">
+                              <div class="field">
+                                 <label>No d'autorisation</label>
+                                 <input type="text" name="no_autorisation_dentiste">
+                              </div>
+                              <div class="field">
+                                 <label>Date d'autorisation</label>
+                                 <input type="date" name="date_autorisation_dentiste">
+                              </div>
+                           </div>
+                        </div>
+                        <div class="ui segment">
+                           <h4 class="ui horizontal divider header">Traitement dentaire</h4>
+                           <div class="two fields">
+                              <div class="field">
+                                 <label>Type </label>
+                                 <input type="text" name="type_dentiste">
+                              </div>
+                              <div class="field">
+                                 <label>Raison</label>
+                                 <input type="text" name="raison_dentiste">
+                              </div>
+                           </div>
+                           <div class="two fields">
+                              <div class="field">
+                                 <label>Type </label>
+                                 <input type="text" name="typeS_dentiste">
+                              </div>
+                              <div class="field">
+                                 <label>Site</label>
+                                 <input type="text" name="site_dentiste">
+                              </div>
+                           </div>
+                        </div>
+                        <div class="six fields">
+            <div class="five  wide field">
+              <label>Médicament consommé</label>
+              <input type="text" id="medicam_dent_field">
+            </div>
+            <div class="four wide field"><div class="ui teal tiny button" onclick="add_list_medi_com_Up()" style="margin-top: 23px">+</div>
+            <div class="ui teal tiny button" onclick="add_list_medi_del_Up()" style="margin-top: 23px">-</div>
+          </div>
+            
+            <div class="field">
+              <select id="medi_com_list" name="medi_com_list" multiple="">
+                
+              </select>
+            </div>
+          </div>
+          <script type="text/javascript">
+            function add_list_medi_com_Up(){
+              $('#form_dentiste_Up #medi_com_list').append('<option selected="selected">'+ $('#form_dentiste_Up #medicam_dent_field').val()+'</option>');
+            }
+             function add_list_medi_del(){
+              $('#form_dentiste_Up #medi_com_list option:selected').remove();
+            }
+
+          </script>
+            <div class="field">
+              <label>Éléments de contexte</label>
+             
+              <select  id="dropD_dentiste" name="element_contexte_dentiste" multiple="multiple">
+                
+                <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
+                <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
+                <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                <option value="1724">Patient sous anesthésie générale (1724)</option>
+                <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                <option value="1746">Séance différente (1746)</option>
+                <option value="34">Service dont la complexité est inhabituelle (34)</option>
+                <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                <option value="1749">Site différent (1749)</option>
+                <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                <option value="1725">Soins d urgence (1725)</option>
+                <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
+                <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
+                <option value="1744">Suite à un traumatisme (1744)</option>
+                <option value="1729">Suite à une malformation osseuse (1729)</option>
+
+              </select>
+
+            </div>
+               <div class="four fields">
+                           <div class="four wide field">
+                              <label>Élements mesurables</label>
+                              <input type="text" id="mesurables_dentiste">
+                           </div>
+                           <div class="four wide field">
+                              <label></label>
+                              <select id="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
+                                 <option>Kilomètres</option>
+                                 <option>Nombre d'injections</option>
+                                 <option>Durée activités administratives</option>
+                              </select>
+                           </div>
+                        
+                        <div class="field">
+                          <div class="ui teal tiny button" onclick="add_list_elem_meas_Up()" style="margin-top: 23px">+</div>
+                          <div class="ui teal tiny button" onclick="del_list_elem_meas_Up()" style="margin-top: 23px">-</div>
+                        </div>
+                        <div class="field">
+                          <select id="elem_meas_list" name="elem_meas_list" multiple="">
+                            
+                          </select>
+                        </div>
+                        </div>
+                        <script type="text/javascript">
+                          function add_list_elem_meas_Up(){
+                            $('#form_dentiste_Up #elem_meas_list').append('<option selected="selected">'+ 
+                              $('#form_dentiste_Up #mesurables_dentiste').val()+'/'+$('#form_dentiste_Up #medicmnt_msrbles_options_dentiste').val()+'</option>');
+                          }
+                           function del_list_elem_meas_Up(){
+                            $('#form_dentiste_Up #elem_meas_list option:selected').remove();
+                          }
+
+                        </script>
+
+
+        </div>
+                     <div class="eight wide column">
+                        <div class="ui form segment">
+                        <div class="five wide field">
+                          <label>Date De Service</label>
+                          <input type="date" id="date_de_service_dentiste" value="">
+                        </div>
+                           <h4 class="ui horizontal divider header">Lieu de référence</h4>
+                           <div class="eight wide field">
+                              <label>Situation liée au lieu de référence</label>
+                              <input type="text" name="situation_lieu_dentiste">
+                           </div>
+                           <div class="ui form segment">
+                              <h4 class="ui horizontal divider header">Identification du lieu</h4>
+                              <div class="inline field">
+                                 <input type="radio" class="lieu" name="lieu_dentiste" id="lieu_codifie_dent" value="Lieu codifié á la Régie">
+                                 <label>Lieu codifié à la Régie</label>
+                              </div>
+                              <div class="inline field">
+                                 <input type="radio" class="lieu" name="lieu_dentiste" id="lieu_codifie_non_dent" value="Lieu non codifié">
+                                 <label>Lieu non codifié</label>
+                              </div>
+                              <div class="three wide field" id="codif_selection_lieu" style="display: none">
+                                 <label>Numéro du lieu</label>
+                                 <input type="text" name="numero_lieu">
+                              </div>
+                              <div class="three fields" id="codif_selection_non" style="display: none">
+                                 <div class="field">
+                                    <label>Code postal</label>
+                                    <input type="text" name="postal_dentiste">
+                                 </div>
+                                 <div class="field">
+                                    <label>Code localité</label>
+                                    <input type="text" name="code_localite_dentiste">
+                                 </div>
+                                 <div class="field">
+                                    <label>No. bureau.</label>
+                                    <input type="text" name="no_bur_dentiste">
+                                 </div>
+                              </div>
+                                <div class="" id="type_lieu_cont" style="display: none">
+                                   <strong><label>Type de lieu</label></strong>
+                                   <div class="six inline fields">
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Cabinet">
+                                         <label>Cabinet</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Domicile">
+                                         <label>Domicile</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Autre">
+                                         <label>Autre</label>
+                                      </div>
+                                   </div>
+                                 </div>
+                           </div>
+                      
+                        </div>
+                        <div class="ui form segment">
+                           <h4 class="ui horizontal divider header"><label>Référant</label></h4>
+                           <div class="eight wide field">
+                              <label>No du référant</label>
+                              <input type="text" name="no_referant_dentiste">
+                           </div>
+                           <div class="two fields">
+                              <div class="field">
+                                 <label>Nom</label>
+                                 <input type="text" name="nom_dentiste">
+                              </div>
+                              <div class="field">
+                                 <label>Prénom</label>
+                                 <input type="text" name="prenom_dentiste">
+                              </div>
+                           </div>
+                           <div class="eight wide field">
+                              <label>Type de profession</label>
+                              <input type="text" name="type_profession_dentiste">
+                           </div>
+                        </div>
+                        <button class="ui axxium button" id="" type="submit">Enregistrer</button>
+            </form>
+            </div>
+            </div>
+            </div>
+         </div>
+         <script type="text/javascript">
+          $(document).on('change','#form_dentiste_Up .lieu',function(){
+            
+                if($('#form_dentiste_Up #lieu_codifie_dent').is(':checked')){
+            
+                  $('#form_dentiste_Up #codif_selection_lieu').show();
+                  $('#form_dentiste_Up #codif_selection_non').hide();
+                  $('#form_dentiste_Up #type_lieu_cont').hide();
+                };
+                if($('form_dentiste_Up #lieu_codifie_non_dent').is(':checked')){
+            
+                  $('#form_dentiste_Up #codif_selection_non').show();
+                  $('#form_dentiste_Up #type_lieu_cont').show();
+                  $('#form_dentiste_Up #codif_selection_lieu').hide();
+                };
+                // alert($('#lieu_codifie_non').checked());
+              })
+         </script>
+         <!-- ===xx dentiste modal -->
+         <!-- == Chirugiean -->
+         <div id="div_chirurgiens_Up" style="display: none;">
+            <form id="form_chirurgiens_Up">
+               <div class="ui axxium form segment" >
+                  <input type="text" name="row_id" id="rowId_chir_Up" style="display: none">
+                  <h4 class="ui horizontal divider header">CHIRURGIENS</h4>
+                  <label>Renseignements complémentaires Régie (Chirguen)</label>
+                  <div class="ui grid">
+                     <div class="eight wide column">
+                        <div class="ui segment">
+                           <h4 class="ui horizontal divider header"><label>Prothèse en acrylique</label></h4>
+                           <div class="field">
+                              <label>No d'autorisation</label>
+                              <input type="text" name="atrsn_chirgien">
+                           </div>
+                           <div class="field">
+                              <label>Date d'autorisation</label>
+                              <input type="date" name="date_chirgien">
+                           </div>
+                        </div>
+                        <div class="ui segment">
+                           <h4 class="ui horizontal divider header"><label>Traitement dentaire</label></h4>
+                           <div class="two fields">
+                              <div class="field">
+                                 <label>Type </label>
+                                 <input type="text" name="type_reason_chirgien">
+                              </div>
+                              <div class="field">
+                                 <label>Raison</label>
+                                 <input type="text" name="reasn_chirgien">
+                              </div>
+                           </div>
+                           <div class="two fields">
+                              <div class="field">
+                                 <label>Type</label>
+                                 <input type="text" name="type_site_chirgien">
+                              </div>
+                              <div class="field">
+                                 <label>Site</label>
+                                 <input type="text" name="site_chirgien">
+                              </div>
+                           </div>
+                        </div>
+                                                <div class="six fields">
+            <div class="five  wide field">
+              <label>Médicament consommé</label>
+              <input type="text" id="medicam_chir_field">
+            </div>
+            <div class="four wide field"><div class="ui teal tiny button" onclick="add_list_medi_com()" style="margin-top: 23px">+</div>
+            <div class="ui teal tiny button" onclick="add_list_medi_del()" style="margin-top: 23px">-</div>
+          </div>
+            
+            <div class="field">
+              <select id="medi_com_list_chir" name="medi_com_list_chir" multiple="">
+                
+              </select>
+            </div>
+          </div>
+          <script type="text/javascript">
+            function add_list_medi_com(){
+              $('#medi_com_list_chir').append('<option selected="selected">'+ $('#medicam_chir_field').val()+'</option>');
+            }
+             function add_list_medi_del(){
+              $('#medi_com_list_chir option:selected').remove();
+            }
+
+          </script>
+            <div class="field">
+              <label>Éléments de contexte</label>
+             
+              <select  id="dropD_chir" name="element_contexte_chir" multiple="multiple">
+                
+                <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
+                <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
+                <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                <option value="1724">Patient sous anesthésie générale (1724)</option>
+                <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
+                <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                <option value="1746">Séance différente (1746)</option>
+                <option value="34">Service dont la complexité est inhabituelle (34)</option>
+                <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                <option value="1749">Site différent (1749)</option>
+                <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                <option value="1725">Soins d urgence (1725)</option>
+                <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
+                <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
+                <option value="1744">Suite à un traumatisme (1744)</option>
+                <option value="1729">Suite à une malformation osseuse (1729)</option>
+
+              </select>
+
+            </div>
+               <div class="four fields">
+                           <div class="four wide field">
+                              <label>Élements mesurables</label>
+                              <input type="text" id="mesurables_chir">
+                           </div>
+                           <div class="four wide field">
+                              <label></label>
+                              <select id="medicmnt_msrbles_options_chir" style="margin-top: 20px">
+                                 <option>Kilomètres</option>
+                                 <option>Nombre d'injections</option>
+                                 <option>Durée activités administratives</option>
+                              </select>
+                           </div>
+                        
+                        <div class="field">
+                          <div class="ui teal tiny button" onclick="add_list_elem_meas_chir()" style="margin-top: 23px">+</div>
+                          <div class="ui teal tiny button" onclick="del_list_elem_meas_chir()" style="margin-top: 23px">-</div>
+                        </div>
+                        <div class="field">
+                          <select id="elem_meas_list" name="elem_meas_list" multiple="">
+                            
+                          </select>
+                        </div>
+                        </div>
+                        <script type="text/javascript">
+                          function add_list_elem_meas_chir(){
+                            $('#elem_meas_list').append('<option selected="selected">'+ 
+                              $('#mesurables_chir').val()+'/'+$('#medicmnt_msrbles_options_chir').val()+'</option>');
+                          }
+                           function del_list_elem_meas_chir(){
+                            $('#elem_meas_list option:selected').remove();
+                          }
+
+                        </script>
+                      </div>
+                     <div class="eight wide column">
+                        <div class="ui form segment">
+                          <div class="five wide field">
+                          <label>Date De Service</label>
+                          <input type="date" id="date_de_service_chirur" value="">
+                        </div>
+                           <h4 class="ui horizontal divider header"><label>Lieu de référence</label></h4>
+                           <div class="eight wide field">
+                              <label>Situation liée au lieu de référence</label>
+                              <input type="text" name="situatn_lie_chirgien">
+                           </div>
+                           <div class="ui form segment">
+                              <h4 class="ui horizontal divider header"><label>Identification du lieu</label></h4>
+                              <div class="inline field">
+                                 <input type="radio" class="lieu" name="lieu_chirgien" id="lieu_codifie_chir" value="Lieu codifié á la Régie">
+                                 <label>Lieu codifié à la Régie</label>
+                              </div>
+                              <div class="inline field">
+                                 <input type="radio" class="lieu" name="lieu_chirgien" id="lieu_codifie_non_chir" value="Lieu non codifié">
+                                 <label>Lieu non codifié</label>
+                              </div>
+                               <div class="three wide field" id="codif_selection_lieu" style="display: none">
+                                 <label>Numéro du lieu</label>
+                                 <input type="text" name="" id="num_lieu_chirr_fact">
+                              </div>
+                              <div class="three fields" style="display: none" id="codif_selection_non">
+                                 <div class="field">
+                                    <label>Code postal</label>
+                                    <input type="text" name="postal_chirgien">
+                                 </div>
+                                 <div class="field">
+                                    <label>Code localité</label>
+                                    <input type="text" name="code_chirgien">
+                                 </div>
+                                 <div class="field">
+                                    <label>No. bureau</label>
+                                    <input type="text" name="no_bur_chirgien">
+                                 </div>
+                              </div>
+                              <div class="" id="type_lieu_cont" style="display: none">
+                                   <strong><label>Type de lieu</label></strong>
+                                   <div class="six inline fields">
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Cabinet">
+                                         <label>Cabinet</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Domicile">
+                                         <label>Domicile</label>
+                                      </div>
+                                      <div class="field">
+                                         <input type="radio" name="lieu_type" value="Autre">
+                                         <label>Autre</label>
+                                      </div>
+                                   </div>
+                                 </div>
+                           </div>
+                         
+                        </div>
+                        <div class="ui form segment">
+                           <h4 class="ui horizontal divider header"><label>Référant</label></h4>
+                           <div class="eight wide field">
+                              <label>No du référant</label>
+                              <input type="text" name="referamt_chirgien">
+                           </div>
+                           <div class="two fields">
+                              <div class="field">
+                                 <label>Nom</label>
+                                 <input type="text" name="nom_chirgien">
+                              </div>
+                              <div class="field">
+                                 <label>Prénom</label>
+                                 <input type="text" name="prenom_chirgien">
+                              </div>
+                           </div>
+                           <div class="eight wide field">
+                              <label>Type de profession</label>
+                              <input type="text" name="type_profession_chirgien">
+                           </div>
+                        </div>
+                        <button class="ui axxium tiny button" type="submit">Enregistrer</button>
+            </form>
+            </div>
+            </div>
+            </div>
+         </div>
+         <script type="text/javascript">
+          $(document).on('change','.lieu',function(){
+            
+                if($('#lieu_codifie_chir').is(':checked')){
+            
+                  $('#codif_selection_lieu').show();
+                  $('#codif_selection_non').hide();
+                  $('#type_lieu_cont').hide();
+                };
+                if($('#lieu_codifie_non_chir').is(':checked')){
+            
+                  $('#codif_selection_non').show();
+                  $('#type_lieu_cont').show();
+                  $('#codif_selection_lieu').hide();
+                };
+                // alert($('#lieu_codifie_non').checked());
+              })
+         </script>
+         <!-- ===xx Chirguein -->
+         <!--  Denturologiste-->
+         <div id="div_denturologiste" style="display: none;">
+            <form id="form_denturologiste" >
+               <div class="ui axxium form segment">
+                  <input type="text" name="row_id" id="rowId_dentu_Up" style="display: none">
+                  <h4 class="ui horizontal divider header">DENTUROLOGISTE</h4>
+                  <label>Prothése en acrylique</label>
+                  <div class="field">
+                     <label>No d'autorisation</label>
+                     <input type="text" name="autrstn_dentur">
+                  </div>
+                  <div class="field">
+                     <label>Date d'autorisation</label>
+                     <input type="date" name="date_aut_dentur">
+                  </div>
+                  <div class="field">
+                     <label>Éléments de contexte</label>
+                     <select  id="dropD_denturologiste" name="element_context_dentur">
+                        <option>Remplacement d une prothèse pour perte ou bris (1740)</option>
+                        <option>Remplacement de deux prothèses pour perte ou bris (1741)</option>
+                        <option>Séance différente (1747)</option>
+                        <option>Site différent (1750)</option>
+                     </select>
+                  </div>
+               </div>
+               <button class="ui axxium tiny button" type="submit">Submit</button>
+            </form>
+            <!-- ===xx=== -->
+         </div>
+      </div>
+   </div>
+<!-- ========================= xxxx UPDATE MODAL PLUS MORE FORMS DENTISTE CHIR DENTU xxxxxxxxxxxx ======  -->
    <div class="ui modalDosConsul small modal">
       <i class="close icon"></i>
       <div class="header">
@@ -4822,10 +5353,23 @@ if($('#lieu_codifie').is(':checked')){
       </div>
    </div>
    <script>
+        $(document).ready(function(){
+          var today = new Date();
+          var dd = today.getDate();
+          var mm = today.getMonth()+1; //January is 0!
+
+          var yyyy = today.getFullYear();
+          if(dd<10){dd='0'+dd} if(mm<10){mm='0'+mm} today = mm+'/'+dd+'/'+yyyy;
+
+            $('#date_de_service_dentiste').attr('value', today);
+      
+      })
+
      $(document.body).on('focusout',"#factTableBody td",function(){
                      $(this).text($(this).text().toUpperCase());
                    })
       
+  
       
        $('.modNoteProt.content .ui.form')
              .form({
@@ -4868,11 +5412,7 @@ if($('#lieu_codifie').is(':checked')){
          $('.modalPayment.modal').modal('show');
        }
        
-       function Regie_fact_modal()
-       {
-        populate_fact_update(arrGrilleDeFacturation_update);
-        $('.modal_regie_fact_modal').modal('show');
-       }
+       
        function modLabo()
        {
          $('.modalLabo.modal').modal('show');
@@ -5709,6 +6249,7 @@ if($('#lieu_codifie').is(':checked')){
       
    </script>
    <script type="text/javascript">
+
       function changeLang(x)
         {
           $("label").addClass("trn");

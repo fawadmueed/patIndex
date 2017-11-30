@@ -12,6 +12,7 @@ $(document).ready(function(){
   $(document.body).on("submit","#form_dentiste", function(event) {
                 submitForm(this);
               });
+
   $(document.body).on("submit","#form_chirurgiens", function(event) {
                 submitForm(this);
                 
@@ -41,8 +42,8 @@ function newRecordFact(){
               if(fact_tbl_row_id==1)
                 {
                 
-                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]).text('AMQ'); 
-                // globVisionRData.InsTypeList[0]
+                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]).text(globVisionRData.InsTypeList[0]); 
+                // globVisionRData.InsTypeList[0]  TYPE from VisionR
                 tblData.appendTo(tblRow);
                 }
             else{
@@ -144,6 +145,11 @@ function getAllTrData(){
 
     console.log(arrGrilleDeFacturation); 
     arrGrilleDeFacturation_update=arrGrilleDeFacturation;
+    arrGrilleDeFacturation_forms_update=arrGrilleDeFacturation_forms;
+    
+
+    console.log('Same FORM Data array');
+    console.log(arrGrilleDeFacturation_forms_update);
     // 
 
     // console.log(moreInfoArray_glbl  )
@@ -161,7 +167,12 @@ function submitForm(thisForm){
     $('.modalFactTableMore').modal('hide');
     if(checkIfUpdate){
       arrGrilleDeFacturation_forms.push(moreInfoArray);
+
+
     }
+
+
+
 
                 
 }
@@ -185,6 +196,7 @@ function getMoreInfo(){
 
 function modFactTableMore(x)
 { 
+ 
   var row_id=$(x).closest('tr').attr('id');
    
    switch(dent_Type){
@@ -223,6 +235,7 @@ function modFactTableMore(x)
 }
 
 function getThisFormData(row_id){
+
   var arrayToPopulateForm=[];
 
   $.each(arrGrilleDeFacturation_forms,function(idx,value){
@@ -363,26 +376,26 @@ function updateArray(namR,valR,newArray){
     }
 
 
-    for(var i=0;i<arrGrilleDeFacturation_forms.length;i++)
-        {
-          for(var j=0;j<arrGrilleDeFacturation_forms[i].length;j++)
-          {
-            if((arrGrilleDeFacturation_forms[i][j].name==nameD)&&(arrGrilleDeFacturation_forms[i][j].value==valR))
-            {
+    // for(var i=0;i<arrGrilleDeFacturation_forms.length;i++)
+    //     {
+    //       for(var j=0;j<arrGrilleDeFacturation_forms[i].length;j++)
+    //       {
+    //         if((arrGrilleDeFacturation_forms[i][j].name==nameD)&&(arrGrilleDeFacturation_forms[i][j].value==valR))
+    //         {
 
-              console.log('Old array :');
-              console.log(arrGrilleDeFacturation_forms[i]);
-              arrGrilleDeFacturation_forms[i]=newArray;
-              console.log('new Array');
-              console.log(newArray);
-              // return true;
+    //           console.log('Old array :');
+    //           console.log(arrGrilleDeFacturation_forms[i]);
+    //           arrGrilleDeFacturation_forms[i]=newArray;
+    //           console.log('new Array');
+    //           console.log(newArray);
+    //           // return true;
               
             
               
-            }
+    //         }
           
-          }
-        }
+    //       }
+    //     }
 
 
 
