@@ -95,18 +95,16 @@ function RamqBillGetMontant(pXmlResp)
         var xmlDoc = parser.parseFromString(xml, "text/xml");
         if (xmlDoc)
         {
-            var tag_liste_ligne_fact_recev = xmlDoc.getElementsByTagName('liste_ligne_fact_recev')[0];
-            if (tag_liste_ligne_fact_recev)
-            {
-                var arrListFactRecev = tag_liste_ligne_fact_recev.childNodes;
-                if (arrListFactRecev && arrListFactRecev.length > 0)
-                {
-                    for (var i = 0; i < arrListFactRecev.length; i++)
-                    {
-                        var amount = Number(arrListFactRecev[i].childNodes[2].innerHTML);
-                        if (!isNaN(amount))
-                        {
-                            totalAmount += amount;
+            if (xmlDoc.getElementsByTagName("sta_recev")[0] != null && xmlDoc.getElementsByTagName("sta_recev")[0].innerHTML == '1') {
+                var tag_liste_ligne_fact_recev = xmlDoc.getElementsByTagName('liste_ligne_fact_recev')[0];
+                if (tag_liste_ligne_fact_recev) {
+                    var arrListFactRecev = tag_liste_ligne_fact_recev.childNodes;
+                    if (arrListFactRecev && arrListFactRecev.length > 0) {
+                        for (var i = 0; i < arrListFactRecev.length; i++) {
+                            var amount = Number(arrListFactRecev[i].childNodes[2].innerHTML);
+                            if (!isNaN(amount)) {
+                                totalAmount += amount;
+                            }
                         }
                     }
                 }
@@ -394,7 +392,13 @@ function RamqBillGetJetonComm(pXml)
 
 function RamqBillReSendToRamq()
 {
-    RamqSoumissionDemandesModification();
+    globRamqOperationType = "Update";
+    if (globRamqJetonComm && globRamqNoFactRamq) {
+        RamqSoumissionDemandesModification();
+    }
+    else {
+        RamqRESoumissionDemandesPaiement();
+    }
 }
 
     
