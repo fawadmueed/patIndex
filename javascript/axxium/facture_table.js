@@ -7,9 +7,17 @@
 $(document).ready(function(){
 
   newRecordFact();
-  
+
+  $(document.body).on("keypress","#factTableBody tr td[data-target='codeRole']", function(e) {
+
+          if(e.which == 13) {
+                newRecordFact();
+            }
+            return e.which!=13;
+              });
   
   $(document.body).on("submit","#form_dentiste", function(event) {
+      console.log('form submit Fact called');
                 submitForm(this);
               });
 
@@ -96,7 +104,7 @@ function getPrevRowType(idPrev){
 }
 
 function getAllTrData(){
-
+  console.log('getAlltrData called');
   var count_ramq=0;
   var count_insur=0;
 
@@ -144,12 +152,12 @@ function getAllTrData(){
    else{
 
     console.log(arrGrilleDeFacturation); 
-    arrGrilleDeFacturation_update=arrGrilleDeFacturation;
-    arrGrilleDeFacturation_forms_update=arrGrilleDeFacturation_forms;
-    
+    console.log(arrGrilleDeFacturation_forms);
 
-    console.log('Same FORM Data array');
-    console.log(arrGrilleDeFacturation_forms_update);
+    arrGrilleDeFacturation_update=arrGrilleDeFacturation;
+    // arrGrilleDeFacturation_forms_update=arrGrilleDeFacturation_forms;
+    
+    
     // 
 
     // console.log(moreInfoArray_glbl  )
@@ -161,6 +169,7 @@ function getAllTrData(){
 }
 
 function submitForm(thisForm){
+  console.log('fact submitfn called');
     event.preventDefault();
     var moreInfoArray=$(thisForm).serializeArray();
     var checkIfUpdate=updateArray('row_id',moreInfoArray[0].value,moreInfoArray);
@@ -198,10 +207,11 @@ function modFactTableMore(x)
 { 
  
   var row_id=$(x).closest('tr').attr('id');
-   
+
    switch(dent_Type){
       
       case 'Dentiste':
+
               var data=$('#div_dentiste').html();
               $('#modal_factTbl_more').html(data); 
               $('form #rowId_dent').val(row_id); //Assign id of Row Working - to the Form 
@@ -224,6 +234,7 @@ function modFactTableMore(x)
               $('#modal_factTbl_more').html(data);
               $('form #rowId_dentu').val(row_id); //Assign id of Row Working - to the Form 
               var thisFromData=getThisFormData(row_id);
+
               populateForm('form_denturologiste',thisFromData);
       
               break;
@@ -237,36 +248,50 @@ function modFactTableMore(x)
 function getThisFormData(row_id){
 
   var arrayToPopulateForm=[];
-
+  console.log('in array to pop');
+  console.log(arrGrilleDeFacturation_forms);
   $.each(arrGrilleDeFacturation_forms,function(idx,value){
+    
+    
     $.each(value,function(id,val){
-      if(val.value==row_id){
+     console.log(val);
+      if((val.name=="row_id")&&(val.value==row_id))
+      {
+        console.log('Row id match with Form Id ');
         arrayToPopulateForm=value;
+        
       }
-
+      
     })
   })
+  console.log(arrayToPopulateForm);
   return arrayToPopulateForm;
 }
 
 function populateForm(formname,thisFromData)
 { 
-   if(thisFromData!="")
-    {
+  
+    console.log(thisFromData);
       $("#"+formname).deserialize(thisFromData);
-
+    
       if(formname=='form_dentiste'){
         
+        $('#form_dentiste #medi_com_list option').remove();
+        $('#form_dentiste #elem_meas_list option').remove();
+
         $.each(thisFromData,function(id,val){
         
-        if(val.name=='medi_com_list'){
-        console.log(val.value);
-        $('#medi_com_list').append('<option selected="selected">'+val.value+'</option>')
+
+        if(val.name=='liste_med_consm_denti'){
+        
+        
+        $('#form_dentiste #medi_com_list').append('<option selected="selected">'+val.value+'</option>')
         }
         
-        if(val.name=='elem_meas_list'){
-        console.log(val.value);
-        $('#elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
+        if(val.name=='liste_elm_mesur_denti'){
+        
+        
+        $('#form_dentiste #elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
         }
 
 
@@ -275,16 +300,17 @@ function populateForm(formname,thisFromData)
       }
       else if(formname=='form_chirurgiens'){
 
+         $('#form_chirurgiens #medi_com_list_chir option').remove();
+        $('#form_chirurgiens #elem_meas_list option').remove();
+
          $.each(thisFromData,function(id,val){
         
-        if(val.name=='medi_com_list_chir'){
-        console.log(val.value);
-        $('#medi_com_list_chir').append('<option selected="selected">'+val.value+'</option>')
+        if(val.name=='liste_med_consm_bucc'){
+        $('#form_chirurgiens #medi_com_list_chir').append('<option selected="selected">'+val.value+'</option>')
         }
         
-        if(val.name=='elem_meas_list'){
-        console.log(val.value);
-        $('#elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
+        if(val.name=='liste_elm_mesur_bucc'){
+        $('#form_chirurgiens #elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
         }
 
 
@@ -294,12 +320,13 @@ function populateForm(formname,thisFromData)
       else if(formname=='form_denturologiste'){
 
       }
-    }
+    
 
  }
 
-function emptyTable (){
+function emptyTable (option){
   //Empty Existing Table and Initialize all parameters of Table
+
   fact_tbl_row_id=0;
   arrGrilleDeFacturation=[];
   arrGrilleDeFacturation_forms=[];
@@ -307,7 +334,15 @@ function emptyTable (){
   checkDentType();
   //IMP! call Dent_type Modal again for selection in Main FactTabl
   $("#factTableBody tr").remove(); 
-  newRecordFact();
+  
+  if(option=='newTbl')
+    {
+      newRecordFact();
+    }
+  else
+    { 
+      return;
+    }
 
 }
 
@@ -351,6 +386,7 @@ function deleteFromArray(toDo,namR,valR){
 
 function updateArray(namR,valR,newArray){
    // Update complete array if Matched in its object nameR and valR send i.e : nameR=row_id valR=2
+   console.log('update array FACT call');
   var nameD=namR;
   var valueD=valR;
   var newArray=newArray;
@@ -367,6 +403,8 @@ function updateArray(namR,valR,newArray){
             if(arrGrilleDeFacturation_forms[i][j].name==nameD && arrGrilleDeFacturation_forms[i][j].value==valueD)
             {
               arrGrilleDeFacturation_forms[i]=newArray;
+              console.log('Form Array updated');
+              console.log(arrGrilleDeFacturation_forms);
               return false;
               
             }
@@ -420,4 +458,105 @@ function setDentType(){
 }
 function closeModal(){
   $('.modalFactTableMore').modal('hide');
+}
+
+function robData(){
+  console.log('in function ');
+
+  $.post("allScriptsv1.py", {tx: "getFactureInfo", patientId: '234577', nodossier: '39' , nofact: '30'}, 
+            function(result){
+                debugger;
+                if(result.outcome == 'error')
+                    $("#message").append(result.message);
+                else
+                    $("#message").append("<h2>&nbsp;Creation of the file was .... </h2>");        
+                  console.log(result);
+                  populate_tbl_from(result.infos,result.rows)
+            });
+}
+
+function populate_tbl_from(arrayForm,arrayTbl)
+{
+  emptyTable('populate');
+  arrGrilleDeFacturation=arrayTbl;
+  arrGrilleDeFacturation_forms=arrayForm;
+  arrGrilleDeFacturation_forms_update=arrayForm;
+  populate_table_fact(arrGrilleDeFacturation);
+}
+
+function populate_table_fact(arrToPopTabl){
+    
+    var arrayToPopulate=arrToPopTabl; 
+
+    // arrGrilleDeFacturation_update=arrayToPopulate;
+    // console.log(arrGrilleDeFacturation_update);
+
+    
+    var tblBody=$('#factTableBody');
+
+          $.each(arrayToPopulate,function(idx,val){
+            // val - each row 
+
+              //only Rows with ramq_id ( RAMQ )
+            // fact_tbl_row_id_=val.row_id;
+            // ramq_id=val.ramq_id
+
+            tblRow=$('<tr>').attr('id',val.row_id).attr('ramq_id',val.ramq_id);
+
+            var fields=['Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod','codeRole'];
+            
+                 for(i=0;i<10;i++)
+                  {
+
+                       switch (i) {
+
+                       case 0: //Type
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Type);
+                       break;
+
+                       case 1:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Dent);
+                       break;
+
+                       case 2:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Surface);
+                       break;
+
+                       case 3:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Code);
+                       break;
+
+                       case 4:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Description);
+                       break;
+
+                       case 5:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Frais);
+                      break;
+
+                       case 6:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Honoraires);
+                       break;
+
+                       case 7:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Total);
+                       break;
+
+                       case 8:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Prod);
+                       break;
+
+                       case 9:
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.codeRole);
+                       break;
+                      }
+                    tblData.appendTo(tblRow);
+                  }
+                   tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="modFactTableMore(this,arrGrilleDeFacturation_forms);" >Plus</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Supprimer</div>');
+               tblData.appendTo(tblRow);
+          
+
+                tblRow.appendTo(tblBody);
+        });
+
 }

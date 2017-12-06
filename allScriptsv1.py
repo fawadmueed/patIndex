@@ -1,4 +1,5 @@
 #!C:\Python27\python.exe -u
+# -*- coding: utf-8 -*-
 
 import cgi
 import glob
@@ -354,18 +355,7 @@ if (tx == "updatePrix"):
 	except:
 		print '{ In the EXCEPT - Hello Fadi }'	
 		
-if (tx == "translator"):
-	try:
-		import json
 
-		data=form["thisTag"].value
-		json_file_write=open("json/translator.json",'w')
-		print data;
-		json_file_write.write(data)
-		json_file_write.close()
-
-	except:
-		print '{ Error file not written with data }'	
 
 if (tx == "getFile"):
 	try:
@@ -434,35 +424,268 @@ if (tx == "uploadDOC"):
 
 	
 # ROBERTO CODE
-def CleanXML(s):
-	s = s.replace("\\r\\n","")
-	s = s.replace("\\n","")
-	s = s.replace("\\r","")
-	s = s.replace("\"<","<")
-	s = s.replace(">\"",">")
-	s = s.replace("  ","")
-	s = s.replace("\\\"","\"")
-	return s
 
-def date(datestr="", format="%Y-%m-%d"):
+def getdate(datestr="", format="%Y-%m-%d"):
     if not datestr:
         return datetime.today().date()
     return datetime.strptime(datestr, format).date()
-    
-if (tx == "getRamqData"):   
+
+def CleanXML(s, escapeguillemet=True):
+    s = s.replace("\\n", "")
+    s = s.replace("\\r", "")
+    s = s.replace("\"<", "<")
+    s = s.replace(">\"", ">")
+    s = s.replace("  ", "")
+    if escapeguillemet:
+        s = s.replace("\\\"", "\"")
+    return s
+
+if tx == "getFactureInfo":
+    try:
+        patientId = form['patientId'].value
+        nodossier = form['nodossier'].value
+        nofactext = form['nofact'].value
+
+        #read info
+        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+        data = json.load(json_data)
+        json_data.close()
+
+        rows = []
+        infos = []
+
+        #amq section
+        if data["amq"] is not None:
+            if data["amq"]["req"] is not None:
+                for item in data["amq"]["req"][1]:
+                    rows.append(item)
+                for item in data["amq"]["req"][2]:
+                    infos.append(item)
+        #cas
+        if data["cas"] is not None:
+            if data["cas"]["req"] is not None:
+                for item in data["cas"]["req"]:
+                    rows.append(item)
+        #ins
+        if data["ins"] is not None:
+            if data["ins"]["req"] is not None:
+                for item in data["ins"]["req"]:
+                    rows.append(item)        
+
+        facture = { 'rows' : rows, 'infos' : infos}
+
+        print json.dumps(facture)       
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno)
+
+if tx == "updateFacture":
+    try:
+        patientId = form['patientId'].value
+        nodossier = form['nodossier'].value
+        nofactext = form['nofact'].value
+        dataJson = json.loads(form['json'].value)
+
+        #read info
+        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+        data = json.load(json_data)
+        json_data.close()
+
+        #update file
+        if dataJson["amq"] is not None:
+            data["amq"] = {'req': dataJson["amq"], 'resp' : None, 'date' : None, 'status' : 0, 'nofact' : nofactext}
+        
+        if dataJson["ins"] is not None:
+            data["ins"] = {'req': dataJson["ins"], 'resp' : None, 'date' : None, 'status' : 0, 'nofact' : nofactext}
+
+        if dataJson["cas"] is not None:
+            data["cas"] = {'req': dataJson["cas"], 'resp' : None, 'date' : None, 'status' : 0, 'nofact' : nofactext}
+
+        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+        logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+        logFile.close()
+
+        message = {'outcome' : 'success', 'message': 'ok'}
+        print json.dumps(message)
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno)
+
+if tx == "createFacture":
+    try:
+        clinicId = form['clinicId'].value
+        patientId = form['patientId'].value
+        nodossier = form['nodossier'].value
+
+        #read the nofact for credentials
+        json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
+        data = json.load(json_data)
+        json_data.close()
+        nofact = data.get('nofact', 0)
+        nofact = nofact + 1
+
+        #save the new nofact
+        logFile = open('json/ramqCredentials/'+clinicId+'.json', 'w')
+        data["nofact"] = nofact
+        logFile.write(json.dumps(data))
+        logFile.close()
+
+        #save the new nofact
+        dataJSON = {'status': 0, 'amq': None, 'cas': None, 'ins': None}
+        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofact), 'w')
+        logFile.write(json.dumps(dataJSON))
+        logFile.close()
+
+        message = {'outcome' : 'success', 'nofact': nofact}
+        print json.dumps(message)
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
+
+if tx == "getPatientLogs":
+    try:
+        patientId = form['patientId'].value
+        if not os.path.isdir('json/facturation/%s/log'%(patientId)):
+            print '{ "files": [ ] }'
+        else:
+            #In case, the dates are missing
+            try:
+                datefrom = getdate(form['dFrom'].value)
+            except:
+                datefrom = getdate()
+
+            try:
+                dateto = getdate(form['dTo'].value)  
+            except:
+                dateto = getdate()
+        
+            logs = []
+            jsondata = {}
+            files = os.listdir("json/facturation/%s/log"%patientId)
+            files = ['json/facturation/%s/log/'%patientId+elt for elt in files if elt.endswith(".xml")]
+            files.sort(key=os.path.getmtime)
+            files.reverse()
+            for filename in files:
+                mdate = os.path.getmtime(filename)
+                datefile = datetime.fromtimestamp(mdate).date()
+                if datefile >= datefrom and datefile <= dateto:
+                    #read info
+                    file = open(filename, 'r')
+                    xmlstring = file.read()
+                    file.close()
+
+                    tmp_log = {}
+                    tmp_log["facture"] = filename.split('/')[4].split('_')[1]
+                    tmp_log["nodossier"] = filename.split('/')[4].split('_')[0]
+                    tmp_log["xml"] = xmlstring.replace("\"", "\\\"") 
+                    tmp_log["datecreation"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
+                    logs.append(tmp_log)
+                                                 
+            jsondata["logs"] = logs
+            print json.dumps(jsondata).decode('unicode-escape').encode('utf8')   
+
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno)  
+
+if tx == "getPatientFactures":
+    try:
+        patientId = form['patientId'].value
+        section = form.getvalue('section', 'amq') #default section
+        if not os.path.isdir('json/facturation/%s'%(patientId)):
+            print '{ "files": [ ] }'
+        else:
+            #In case, the dates are missing
+            try:
+                datefrom = getdate(form['dFrom'].value)
+            except:
+                datefrom = getdate()
+
+            try:
+                dateto = getdate(form['dTo'].value)  
+            except:
+                dateto = getdate()
+
+            factures = []
+            jfactures = {}
+            files = os.listdir("json/facturation/%s"%patientId)
+            files = ['json/facturation/%s/'%patientId+elt for elt in files if elt.endswith(".json")]
+            files.sort(key=os.path.getmtime)
+            files.reverse()
+            for filename in files:
+                mdate = os.path.getmtime(filename)
+                datefile = datetime.fromtimestamp(mdate).date()
+                if datefile >= datefrom and datefile <= dateto:
+                    #read info
+                    json_data = open(filename, 'r')
+                    data = json.load(json_data)
+                    json_data.close()
+                    
+                    if section == 'amq':
+                        #verify if the is or not empty bill
+                        if data["amq"] is not None:
+                            tmp_fact = {}
+                            tmp_fact["facture"] = filename.split('/')[3].split('_')[1].split('.')[0]
+                            tmp_fact["nodossier"] = filename.split('/')[3].split('_')[0]
+                            tmp_fact["info"] = data["amq"]["req"]
+                            tmp_fact["xml"] = '' if data["amq"]["resp"] is None else data["amq"]["resp"].replace("\"", "\\\"")
+                            tmp_fact["dateregie"] = '' if data["amq"]["date"] is None else data["amq"]["date"]
+                            tmp_fact["datecreation"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
+                            tmp_fact["status"] = data["amq"]["status"]
+                            factures.append(tmp_fact)
+                    elif section == 'ins':
+                        if data["ins"] is not None:
+                            tmp_fact = {}
+                            tmp_fact["facture"] = filename.split('/')[3].split('_')[1].split('.')[0]
+                            tmp_fact["nodossier"] = filename.split('/')[3].split('_')[0]
+                            tmp_fact["info"] = data["ins"]["req"]
+                            tmp_fact["xml"] = '' if data["ins"]["resp"] is None else data["ins"]["resp"].replace("\"", "\\\"")
+                            tmp_fact["datetransaction"] = data["ins"]["date"]
+                            tmp_fact["datecreation"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
+                            tmp_fact["status"] = data["ins"]["status"]
+                            factures.append(tmp_fact)
+                    elif section == 'cas':
+                        if data["cas"] is not None:
+                            tmp_fact = {}
+                            tmp_fact["facture"] = filename.split('/')[3].split('_')[1].split('.')[0]
+                            tmp_fact["nodossier"] = filename.split('/')[3].split('_')[0]
+                            tmp_fact["info"] = data["cas"]["req"]
+                            tmp_fact["datetransaction"] = data["cas"]["date"]
+                            tmp_fact["datecreation"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
+                            factures.append(tmp_fact)
+                            
+            jfactures["factures"] = factures
+            print json.dumps(jfactures).decode('unicode-escape').encode('utf8')   
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno)  
+
+if tx == "cancelRamqData":
     try:
         #read parameters from request
         clinicId = form['clinicId'].value
         patientId = form['patientId'].value
+        nodossier = form['nodossier'].value
+        nofactext = form['nofact'].value
         dataJson = json.loads(form['json'].value)
         xmlreq = dataJson["request"]
-      
+        datainputs = dataJson["info"]
+  
+        #define namespace for read xml       
+        nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
+
         #read the parameters for credentials
         json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
         data = json.load(json_data)
         json_data.close()
         UserPass= data["MachineIdPass"]	
-        UserId= data["MachineId"]	
+        UserId= data["MachineId"]
+        
 
         #send the request to WebApi that calls RAMQ server
         dataJSON = { 'UserId': UserId, 'UserPass': UserPass, 'XmlToSend': CleanXML(xmlreq)}
@@ -472,65 +695,221 @@ if (tx == "getRamqData"):
         if r.status_code != 200:
             print '{ "outcome" : "error", "message" : "Something was wrong" }'
         else:
-            resp = r.text
-            #In case, something happen in server side code 500
-            if(resp is None or resp.find("Error") > -1):
-                print '{ "outcome" : "error", "message" : "%s" }'%resp    
-            else:
-                #clean XMl
-                xmlstring = resp
-                #define namespace for read xml       
-                nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
+            xmlresp = r.text
+            if xmlresp is None or not xmlresp:          
+                print '{ "outcome" : "error", "message" : "Something was wrong" }'
+            else:         
+                if xmlresp.find("Error") > -1 or xmlresp.find("null") > -1:   #In case, something happen in server side code 500
+                    if xmlresp.find("null") > -1:
+                        xmlresp = 'Le fichier XML envoyé n\'est pas conforme'
+                    message = {'outcome': 'error', 'message': CleanXML(xmlresp, False)}
+                    print json.dumps(message)
+                else:         
+                    #verify if the response is ok or not
+                    root = ET.fromstring(CleanXML(xmlresp.encode('utf-8')))               
+                    nbrerror = int(root.find('n:sta_recev', namespaces=nsmap).text) #1: ok, 2: Fail                     
+                    
+                    #clean data before saving
+                    xmlresp = CleanXML(xmlresp, False)
 
-                #Get the tocken from request to create filename later         
-                root = ET.fromstring(CleanXML(xmlreq.encode('utf-8')))
-                nofactext = root.find('n:liste_fact/n:fact_serv_denta_chirg_denti_1_1_0/n:no_fact_ext', namespaces=nsmap).text
-        
-                #verify if the response is ok or not
-                root = ET.fromstring(CleanXML(xmlstring.encode('utf-8')))            
-                nbrerror = root.find('n:sta_recev', namespaces=nsmap).text
-                if(nbrerror == "1"): #1: ok, 2: Fail
-                    xmlreq = xmlreq.replace("\"", "\\\"").replace("\r","").replace("\n","").replace("  ","")
-                    xmlstring = xmlstring.replace("\"<","<").replace(">\"",">").replace("\r","").replace("\n","").replace("  ","").replace('\\r','').replace('\\n','')
-                    dataJSON = {'xmlreq': xmlreq, 'xmlresp': xmlstring}
-                    logFile = open('json/ramq/'+ patientId + '_' + nofactext + '.json', 'w')
-                    logFile.write(json.dumps(dataJSON).decode('unicode-escape').encode('utf8'))
-                    logFile.close()
-                                
-                message = {'outcome' : 'success', 'message': xmlstring}
-                print json.dumps(message)
+                    if nbrerror == 1:   
+                        #read the bill
+                        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+                        data = json.load(json_data)
+                        json_data.close()
+                        #change status and date transaction
+                        data["amq"]["date"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+                        data["amq"]["status"] = 3 # Canceled
+                        data["amq"]["resp"] = data["amq"]["resp"].replace("\"", "\\\"")
+                        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+                        logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+                        logFile.close()
+
+                    #create log file
+                    logFile = open('json/facturation/%s/log/%s_%s_%s_amq.xml'%(patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
+                    logFile.write(CleanXML(xmlresp, True).encode('utf8'))
+                    logFile.close()                        
+                            
+                    message = {'outcome' : 'success', 'message': xmlresp}
+                    print json.dumps(message)
     except:
-        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
 
-    
-if (tx == "getEtatCompte"):   
+if tx == "modifyRamqData":
+    try:
+        #read parameters from request
+        clinicId = form['clinicId'].value
+        patientId = form['patientId'].value
+        nodossier = form['nodossier'].value
+        nofactext = form['nofact'].value
+        dataJson = json.loads(form['json'].value)
+        xmlreq = dataJson["request"]
+        datainputs = dataJson["info"] 
+        #define namespace for read xml       
+        nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
+
+        #read the parameters for credentials
+        json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
+        data = json.load(json_data)
+        json_data.close()
+        UserPass = data["MachineIdPass"]	
+        UserId = data["MachineId"]
+
+        #send the request to WebApi that calls RAMQ server
+        dataJSON = { 'UserId': UserId, 'UserPass': UserPass, 'XmlToSend': CleanXML(xmlreq)}
+        headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
+        r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostPaymentRequest', json=dataJSON, headers=headers)
+
+        if r.status_code != 200:
+            print '{ "outcome" : "error", "message" : "Something was wrong" }'
+        else:
+            xmlresp = r.text
+            if xmlresp is None or not xmlresp:          
+                print '{ "outcome" : "error", "message" : "Something was wrong" }'
+            else:         
+                if xmlresp.find("Error") > -1 or xmlresp.find("null") > -1:   #In case, something happen in server side code 500
+                    if xmlresp.find("null") > -1:
+                        xmlresp = 'Le fichier XML envoyé n\'est pas conforme'
+                    message = {'outcome': 'error', 'message': CleanXML(xmlresp, False)}
+                    print json.dumps(message)
+                else:         
+                    #verify if the response is ok or not
+                    root = ET.fromstring(CleanXML(xmlresp.encode('utf-8')))               
+                    nbrerror = int(root.find('n:sta_recev', namespaces=nsmap).text) #1: ok, 2: Fail
+
+                    #clean data before saving
+                    xmlresp = CleanXML(xmlresp, False)
+
+                    #set input row
+                    if nbrerror == 1:   
+                        #read the bill
+                        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+                        data = json.load(json_data)
+                        json_data.close()
+                        data["amq"]["req"] = datainputs
+                        data["amq"]["resp"] = xmlresp
+                        data["amq"]["date"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+                        data["amq"]["status"] = 1 #OK
+                        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+                        logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+                        logFile.close()
+                    
+                    #create log file
+                    logFile = open('json/facturation/%s/log/%s_%s_%s_amq.xml'%(patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
+                    logFile.write(CleanXML(xmlresp, True).encode('utf8'))
+                    logFile.close()
+
+                    message = {'outcome' : 'success', 'message': xmlresp}
+                    print json.dumps(message)
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
+
+if tx == "getRamqData":   
+    try:
+        #read parameters from request
+        clinicId = form['clinicId'].value
+        patientId = form['patientId'].value
+        nodossier = form['nodossier'].value
+        nofactext = form['nofact'].value
+        
+        dataJson = json.loads(form['json'].value)
+        xmlreq = dataJson["request"]
+        datainputs = dataJson["info"]
+  
+        #define namespace for read xml       
+        nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
+
+        #verify if log folder exists if not, create it
+        if not os.path.isdir('json/facturation/%s/log/amq'%(patientId)):
+            os.makedirs('json/facturation/%s/log/amq'%(patientId))
+
+        #read the parameters for credentials
+        json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
+        data = json.load(json_data)
+        json_data.close()
+        UserPass = data["MachineIdPass"]	
+        UserId = data["MachineId"]
+
+        #send the request to WebApi that calls RAMQ server
+        dataJSON = {'UserId': UserId, 'UserPass': UserPass, 'XmlToSend': CleanXML(xmlreq)}
+        headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
+        r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostPaymentRequest', json=dataJSON, headers=headers)
+
+        if r.status_code != 200:
+            print '{ "outcome" : "error", "message" : "Something was wrong" }'
+        else:
+            xmlresp = r.text
+            if xmlresp is None or not xmlresp:          
+                print '{ "outcome" : "error", "message" : "Something was wrong" }'
+            else:         
+                if xmlresp.find("Error") > -1 or xmlresp.find("null") > -1:   #In case, something happen in server side code 500
+                    if xmlresp.find("null") > -1:
+                        xmlresp = 'Le fichier XML envoyé n\'est pas conforme'
+                    message = {'outcome': 'error', 'message': CleanXML(xmlresp, False)}
+                    print json.dumps(message)
+                else:         
+                    #verify if the response is ok or not
+                    root = ET.fromstring(CleanXML(xmlresp.encode('utf-8')))               
+                    nbrerror = int(root.find('n:sta_recev', namespaces=nsmap).text) #1: ok, 2: Fail
+
+                    #clean data before saving
+                    xmlresp = CleanXML(xmlresp, False)     
+
+                    #read the empty bill
+                    json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+                    data = json.load(json_data)
+                    json_data.close()
+                    
+                    #set input row              
+                    data["amq"] = {'req': datainputs, 'resp' : xmlresp if nbrerror == 1 else None, 'date' : datetime.today().strftime("%Y-%m-%d %H:%M:%S"), 'status' : nbrerror, 'nofact' : nofactext}
+                    logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+                    logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+                    logFile.close()
+                    
+                    #create log file
+                    logFile = open('json/facturation/%s/log/%s_%s_%s_amq.xml'%(patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
+                    logFile.write(CleanXML(xmlresp, True).encode('utf8'))
+                    logFile.close()
+                    
+                    message = {'outcome' : 'success', 'message': xmlresp}
+                    print json.dumps(message)
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
+   
+if tx == "getEtatCompte":   
     try:
         clinicId = form['clinicId'].value
         TypEntIntvnEchgs = form['TypEntIntvnEchgs'].value
 
         #verify if folder exists if not, create it
-        if(not os.path.isdir('json/ec/'+ clinicId)):
+        if not os.path.isdir('json/ec/'+ clinicId):
             os.makedirs('json/ec/'+ clinicId)
 
         #read the parameters for credentials
         json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
         data = json.load(json_data)
         json_data.close()
-        UserPass= data["MachineIdPass"]	
-        UserId= data["MachineId"]
-        IdEntIntvnEchg= data["NoIntervenant"]
+        UserPass = data["MachineIdPass"]	
+        UserId = data["MachineId"]
+        IdEntIntvnEchg = data["NoIntervenant"]
 
         #get Etat Compte
         headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
-        dataJSON = { 'UserId': UserId, 'UserPass': UserPass, 'IdEntIntvnEchg': IdEntIntvnEchg, 'TypEntIntvnEchg': TypEntIntvnEchgs }
+        dataJSON = {'UserId': UserId, 'UserPass': UserPass, 'IdEntIntvnEchg': IdEntIntvnEchg, 'TypEntIntvnEchg': TypEntIntvnEchgs}
         r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostReceiveEtatDeCompteAsByteArray', json=dataJSON, headers=headers)
 
-        if(r.status_code != 200):
+        if r.status_code != 200:
             print '{ "outcome" : "error", "message" : "Something was wrong" }'
         else:
             resp = r.json()
             ErrorMessage = resp["ErrorMessage"]
-            if(ErrorMessage != ""):
+            if ErrorMessage != "":
                 message = {'outcome' : 'error', 'message': ErrorMessage}
                 print json.dumps(message)
             else:        
@@ -541,49 +920,55 @@ if (tx == "getEtatCompte"):
                 logFile = open('json/ec/'+ clinicId + '/' + FileName, 'wb')
                 logFile.write(file_64_decode)
                 logFile.close()
-                message = {'outcome' : 'success', 'message': 'http://' + os.environ['HTTP_HOST'] + '/axxium/json/ec/' + clinicId + '/' + FileName}
+                message = {'outcome' : 'success', 'message': 'http://%s/%s/json/ec/%s/%s'%(os.environ['HTTP_HOST'], 'axxium', clinicId, FileName)}
                 print (json.dumps(message))         
     except:
-        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
 
 if (tx == "getECFiles"):   
     try:
         clinicId = form['clinicId'].value
+        if not os.path.isdir("json/ec/"+clinicId):
+            print '{ "files": [ ] }'
+        else:
+            #In case, the dates are missing
+            try:
+                datefrom = getdate(form['dFrom'].value)
+            except:
+                datefrom = getdate()
 
-        #In case, the dates are missing
-        try:
-            datefrom = date(form['dFrom'].value)
-        except:
-            datefrom = date()
+            try:
+                dateto = getdate(form['dTo'].value)  
+            except:
+                dateto = getdate()
+                
+            print '{ "files": [ '
+            files = os.listdir("json/ec/"+clinicId)
+            files = ['json/ec/'+clinicId+'/'+elt for elt in files]
+            files.sort(key=os.path.getmtime)
+            files.reverse()
+            comma = False
+            ctr = 0
+            for filename in files:
+                mdate = os.path.getmtime(filename)
+                datefile = datetime.fromtimestamp(mdate).date()
+                if datefile >= datefrom and datefile <= dateto:
+                    if comma:
+                        print ','
+                    print '{ "file" : "%s"'%filename.split('/')[3]
+                    print ', "url" : "http://%s/%s/%s"'%(os.environ['HTTP_HOST'], 'axxium', filename)
+                    print ', "date" : "%s"'%time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
+                    print " } "
+                    comma = True
+                    ctr = ctr + 1  
 
-        try:
-            dateto = date(form['dTo'].value)  
-        except:
-            dateto = date()
-            
-        print '{ "files": [ '
-        files = os.listdir("json/ec/"+clinicId)
-        files = ['json/ec/'+clinicId+'/'+elt for elt in files ]
-        files.sort(key=os.path.getmtime)
-        files.reverse()
-        comma = False
-        ctr = 0
-        for filename in files:
-            mdate = os.path.getmtime(filename)
-            datefile = datetime.fromtimestamp(mdate).date()
-            if datefile >= datefrom and datefile <= dateto:
-                if comma:
-                    print ','
-                print '{ "file" : "%s"'%filename.split('/')[3]
-                print ', "url" : "http://%s/axxium/%s"'%(os.environ['HTTP_HOST'], filename)
-                print ', "date" : "%s"'%time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
-                print " } "
-                comma = True
-                ctr = ctr + 1  
-
-        print '], "count" : '+str(ctr)+' }'        
+            print '], "count" : '+str(ctr)+' }'        
     except:
-        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
 
 if (tx == "GenerIdMachine"):   
     try:
@@ -593,7 +978,7 @@ if (tx == "GenerIdMachine"):
         pMotDePasse = form['MotDePasse'].value
 
         headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
-        dataJSON = { 'CodeErreur': None, 'NoIntervenant': pNoIntervenant, 'IdUtilisateur': pIdUtilisateur, 'MotDePasse': pMotDePasse, 'IdMachine': None, 'MotDePasseMachine': None, 'ServerError': None}
+        dataJSON = {'CodeErreur': None, 'NoIntervenant': pNoIntervenant, 'IdUtilisateur': pIdUtilisateur, 'MotDePasse': pMotDePasse, 'IdMachine': None, 'MotDePasseMachine': None, 'ServerError': None}
         r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostGenerIdMacine', json=dataJSON, headers=headers)
 
         if(r.status_code != 200):
@@ -613,13 +998,15 @@ if (tx == "GenerIdMachine"):
                     message = {'outcome' : 'error', 'message': '%s'%ServerError}
                     print json.dumps(message)
                 else:        
-                    dataJSON = { 'ClinicId': clinicId, 'MachineId': IdMachine, 'MachineIdPass': MotDePasseMachine, 'NoIntervenant': pNoIntervenant, 'CreationDate' : datetime.now().strftime('%Y-%m-%d') }
+                    dataJSON = {'ClinicId': clinicId, 'MachineId': IdMachine, 'MachineIdPass': MotDePasseMachine, 'NoIntervenant': pNoIntervenant, 'CreationDate' : datetime.now().strftime('%Y-%m-%d')}
                     logFile = open('json/ramqCredentials/'+ clinicId + '.json', 'w')
                     logFile.write(json.dumps(dataJSON))
                     logFile.close()
                     print '{ "outcome" : "success", "message" : "" }'         
     except:
-        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
 
 if (tx == "ChangePassword"):   
     try:
@@ -629,12 +1016,12 @@ if (tx == "ChangePassword"):
         json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
         data = json.load(json_data)
         json_data.close()
-        pMachineIdPass= data["MachineIdPass"]	
-        pMachineId= data["MachineId"]
-        pNoIntervenant= data["NoIntervenant"]
+        pMachineIdPass = data["MachineIdPass"]	
+        pMachineId = data["MachineId"]
+        pNoIntervenant = data["NoIntervenant"]
 
         headers = {'content-type': 'application/json; charset=utf-8'} # set what your server accepts
-        dataJSON = { 'CodeErreur': None, 'NoIntervenant': pNoIntervenant, 'IdMachine': pMachineId, 'AncienMotDePasse': pMachineIdPass, 'MotDePasseMachine': '', 'ServerError': None}
+        dataJSON = {'CodeErreur': None, 'NoIntervenant': pNoIntervenant, 'IdMachine': pMachineId, 'AncienMotDePasse': pMachineIdPass, 'MotDePasseMachine': '', 'ServerError': None}
         r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostChangePassword', json=dataJSON, headers=headers)
 
         if(r.status_code != 200):
@@ -654,10 +1041,12 @@ if (tx == "ChangePassword"):
                     message = {'outcome' : 'error', 'message': '%s'%ServerError}
                     print json.dumps(message)
                 else:        
-                    dataJSON = { 'ClinicId': clinicId, 'MachineId': IdMachine, 'MachineIdPass': MotDePasseMachine, 'NoIntervenant': pNoIntervenant, 'CreationDate' : datetime.now().strftime('%Y-%m-%d') }
+                    dataJSON = {'ClinicId': clinicId, 'MachineId': IdMachine, 'MachineIdPass': MotDePasseMachine, 'NoIntervenant': pNoIntervenant, 'CreationDate' : datetime.now().strftime('%Y-%m-%d')}
                     logFile = open('json/ramqCredentials/'+ clinicId + '.json', 'w')
                     logFile.write(json.dumps(dataJSON))
                     logFile.close()
                     print '{ "outcome" : "success", "message" : "" }'          
     except:
-        print '{ "outcome" : "error", "message" : "%s" }'%sys.exc_info()[0]
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
