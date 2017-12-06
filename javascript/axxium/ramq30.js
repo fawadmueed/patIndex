@@ -9,6 +9,7 @@ $(document).ready(function () {
 });
 function SoumissionDemandesPaiement()
 {
+    RamqBillClearFormFactures();
     globRamqOperationType = "New";
     var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
     if (objSoumissionDemandesPaiementData != null) //TODO: empty line shouldn't be added to an array.
@@ -50,6 +51,7 @@ function SoumissionDemandesPaiement()
 
 function RamqSoumissionDemandesModification()
 {
+    RamqBillClearFormFactures();
     var objSoumissionDemandesModificationData = RamqSoumissionDemandesModificationGetData();
     if (objSoumissionDemandesModificationData != null)
     {
@@ -88,6 +90,7 @@ function RamqSoumissionDemandesModification()
 }
 
 function RamqSoumissionDemandedAnnulation() {
+    RamqBillClearFormFactures();
     var objSoumissionDemandesAnnulationData = RamqSoumissionDemandesAnnulationGetData();
     if (objSoumissionDemandesAnnulationData != null) {
         var operationName = "Annulation";
@@ -126,6 +129,7 @@ function RamqSoumissionDemandedAnnulation() {
 
 function RamqRESoumissionDemandesPaiement()
 {
+    RamqBillClearFormFactures();
     var objRESoumissionDemandesPaiementData = RamqRESoumissionDemandesPaiementGetData();
     if (objRESoumissionDemandesPaiementData != null) {
         var operationName = "Paiement";
@@ -273,7 +277,6 @@ function RamqGetSoumissionDemandesAnnulationXML(_arrData)
                 '</dem_annu>';
     return xml;
 }
-
 
 // Create part of xml for Chirg 
 function RamqGetListFact(_arrData)
@@ -757,7 +760,6 @@ function RamqGetListeLieuRefreXml(pObjFormMoreData)
     return res;
 }
 
-
 function RamqGetRefreAutreProfXml(pObjFormMoreData)
 {
     var res = '';
@@ -1075,6 +1077,27 @@ function parseRAMQResponseModification(strXml)
             }
         }
     }
+    else if (response.GlobalStaRecev == "1")
+    {
+        var objLigneFactRecev = {};
+        //liste_ligne_fact_recev
+        objLigneFactRecev.ListeLigneFactRecev = [];
+        var arrListeLigneFactRecev = xmlDoc.getElementsByTagName('liste_ligne_fact_recev')[0].children;
+        for (var l = 0; l < arrListeLigneFactRecev.length; l++) {
+            var LigneFactRecev = {};
+            LigneFactRecev.NoLigneFact = arrListeLigneFactRecev[l].children[0].innerHTML;
+            LigneFactRecev.StaRecev = arrListeLigneFactRecev[l].children[1].innerHTML;
+
+            if (LigneFactRecev.StaRecev == "1") {
+                LigneFactRecev.MntPrel = (arrListeLigneFactRecev[l].children[2]) ? arrListeLigneFactRecev[l].children[2].innerHTML : '';
+                LigneFactRecev.FormuExpl = (arrListeLigneFactRecev[l].children[3]) ? arrListeLigneFactRecev[l].children[3].innerHTML : '';
+            }
+                
+            objLigneFactRecev.ListeLigneFactRecev.push(LigneFactRecev);
+        }
+        response.arrListeLigneFactRecev = [];
+        response.arrListeLigneFactRecev.push(objLigneFactRecev);
+    }
     return response;
 }
 
@@ -1217,6 +1240,23 @@ function displayResponseModification(_response)
         }
         alert(errormsg);
     }
+    var sumMntPrel = 0;
+    var arrListeLigneFactRecev = _response.arrListeLigneFactRecev;
+    if (arrListeLigneFactRecev != null) {
+        for (var n = 0; n < arrListeLigneFactRecev.length; n++) {
+            var arrLigneFactRecev = arrListeLigneFactRecev[n].ListeLigneFactRecev;
+            if (arrLigneFactRecev != null) {
+                for (var p = 0; p < arrLigneFactRecev.length; p++) {
+                    var ligneFactRecev = arrLigneFactRecev[p];
+                    sumMntPrel += Number(ligneFactRecev.MntPrel);
+                    //msg += '<p>' + 'Ligne ' + ligneFactRecev.NoLigneFact + ': ' + removeCDATA(ligneFactRecev.FormuExpl) + '</p>';
+                }
+
+                //msg += '<p>Montant preliminaire total: ' + sumMntPrel + '$</p>';
+                $('#novl_montant_regie_fact').val(sumMntPrel);
+            }
+        }
+    }
 
 }
     
@@ -1258,7 +1298,6 @@ function RamqGetFactNumber()
 
     //TODO: implement real algorithm.
 }
-
 
 function RamqSoumissionDemandesPaiementGetData()
 {
@@ -1340,8 +1379,6 @@ function RamqSoumissionDemandesModificationGetData() {
     return arrData;
 }
 
-
-    
 function RamqSoumissionDemandesAnnulationGetData()
 {
     /*
@@ -1443,8 +1480,6 @@ function RamqGetVisionRData()
     
     return res;
 }
-
-
 
 function RamqGetAdditionalData()//Data from Payment form "Renseignements complementaires Regie"
 {
@@ -1600,83 +1635,83 @@ function GetObjFormMoreData(pRowId, pArrFormMoreData, ptypProf)
                 }
                 else if (ptypProf == 'Dentiste' && globRamqOperationType == "Update") {
                     //objRes.no_autorisation_dentiste = RamqGetValueFromArrByName('no_autor_proth_acryl_denti_upd', arrMoreInfo);//TODO: this value isn't used
-                    objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('dat_autor_proth_acryl_denti_upd', pArrFormMoreData[i]);
+                    objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('dat_autor_proth_acryl_denti', pArrFormMoreData[i]);
 
-                    objRes.typ_id_rais_trait_denta = RamqGetValueFromArrByName('typ_id_rais_trait_denta_denti_upd', pArrFormMoreData[i]);
-                    objRes.id_rais_trait_denta = RamqGetValueFromArrByName('id_rais_trait_denta_denti_upd', pArrFormMoreData[i]);
+                    objRes.typ_id_rais_trait_denta = RamqGetValueFromArrByName('typ_id_rais_trait_denta_denti', pArrFormMoreData[i]);
+                    objRes.id_rais_trait_denta = RamqGetValueFromArrByName('id_rais_trait_denta_denti', pArrFormMoreData[i]);
 
-                    objRes.typ_id_site_trait_denta = RamqGetValueFromArrByName('typ_id_site_trait_denta_denti_upd', pArrFormMoreData[i]);
-                    objRes.id_site_trait_denta = RamqGetValueFromArrByName('id_site_trait_denta_denti_upd', pArrFormMoreData[i]);
+                    objRes.typ_id_site_trait_denta = RamqGetValueFromArrByName('typ_id_site_trait_denta_denti', pArrFormMoreData[i]);
+                    objRes.id_site_trait_denta = RamqGetValueFromArrByName('id_site_trait_denta_denti', pArrFormMoreData[i]);
 
-                    objRes.liste_med_consm = RamqGetArrayValueFromArrByName('liste_med_consm_denti_upd', pArrFormMoreData[i]);
+                    objRes.liste_med_consm = RamqGetArrayValueFromArrByName('liste_med_consm_denti', pArrFormMoreData[i]);
 
-                    objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_denti_upd', pArrFormMoreData[i]);
+                    objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_denti', pArrFormMoreData[i]);
 
-                    objRes.liste_elm_mesur = RamqGetArrayValueFromArrByName('liste_elm_mesur_denti_upd', pArrFormMoreData[i]);
+                    objRes.liste_elm_mesur = RamqGetArrayValueFromArrByName('liste_elm_mesur_denti', pArrFormMoreData[i]);
 
-                    objRes.dat_serv_elm_fact = RamqGetArrayValueFromArrByName('dat_serv_elm_fact_denti_upd', pArrFormMoreData[i]);
+                    objRes.dat_serv_elm_fact = RamqGetArrayValueFromArrByName('dat_serv_elm_fact_denti', pArrFormMoreData[i]);
 
-                    objRes.typ_refre_lieu = RamqGetValueFromArrByName('typ_refre_lieu_denti_upd', pArrFormMoreData[i]); //Permet d'identifier le type de lieu en référence. Domaine de valeurs 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
+                    objRes.typ_refre_lieu = RamqGetValueFromArrByName('typ_refre_lieu_denti', pArrFormMoreData[i]); //Permet d'identifier le type de lieu en référence. Domaine de valeurs 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
 
-                    objRes.isLieuCodifieALaRegie = (RamqGetValueFromArrByName('lieu_refre_phys_denti_upd', pArrFormMoreData[i]) == null) ? null : (RamqGetValueFromArrByName('lieu_refre_phys_denti', pArrFormMoreData[i]) == 'Lieu codifié á la Régie') ? true : false; //null if not both radio button not selected, true if Lie Codifie a la Regie selected otherwise false.
+                    objRes.isLieuCodifieALaRegie = (RamqGetValueFromArrByName('lieu_refre_phys_denti', pArrFormMoreData[i]) == null) ? null : (RamqGetValueFromArrByName('lieu_refre_phys_denti', pArrFormMoreData[i]) == 'Lieu codifié á la Régie') ? true : false; //null if not both radio button not selected, true if Lie Codifie a la Regie selected otherwise false.
 
-                    objRes.id_lieu_phys = RamqGetValueFromArrByName('id_lieu_phys_denti_upd', pArrFormMoreData[i]);
-                    objRes.codePostal = RamqGetValueFromArrByName('code_postal_geo_denti_upd', pArrFormMoreData[i]);
+                    objRes.id_lieu_phys = RamqGetValueFromArrByName('id_lieu_phys_denti', pArrFormMoreData[i]);
+                    objRes.codePostal = RamqGetValueFromArrByName('code_postal_geo_denti', pArrFormMoreData[i]);
 
-                    objRes.code_localite_dentiste = RamqGetValueFromArrByName('code_localite_geo_denti_upd', pArrFormMoreData[i]);
-                    objRes.no_bur = RamqGetValueFromArrByName('no_bureau_geo_denti_upd', pArrFormMoreData[i]);
-                    objRes.lieu_type = RamqGetValueFromArrByName('typ_lieu_geo_denti_upd', pArrFormMoreData[i]);
+                    objRes.code_localite_dentiste = RamqGetValueFromArrByName('code_localite_geo_denti', pArrFormMoreData[i]);
+                    objRes.no_bur = RamqGetValueFromArrByName('no_bureau_geo_denti', pArrFormMoreData[i]);
+                    objRes.lieu_type = RamqGetValueFromArrByName('typ_lieu_geo_denti', pArrFormMoreData[i]);
 
                     //Referant
-                    objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_refre_autre_prof_denti_upd', pArrFormMoreData[i]); //Type de profession
+                    objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_refre_autre_prof_denti', pArrFormMoreData[i]); //Type de profession
                     objRes.typ_id_prof = '1' //1 : Numéro dispensateur RAMQ 
-                    objRes.id_prof = RamqGetValueFromArrByName('id_prof_refre_denti_upd', pArrFormMoreData[i]);//No du Referant
+                    objRes.id_prof = RamqGetValueFromArrByName('id_prof_refre_denti', pArrFormMoreData[i]);//No du Referant
 
                 }
                 else if (ptypProf == 'Chirurgiens' && globRamqOperationType == "Update") {
                     //objRes.no_autorisation_dentiste = RamqGetValueFromArrByName('no_autor_proth_acryl_bucc_upd', arrMoreInfo);//TODO: this value isn't used
-                    objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('dat_autor_proth_acryl_bucc_upd', pArrFormMoreData[i]);
+                    objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('dat_autor_proth_acryl_bucc', pArrFormMoreData[i]);
 
-                    objRes.typ_id_rais_trait_denta = RamqGetValueFromArrByName('typ_id_rais_trait_denta_bucc_upd', pArrFormMoreData[i]);
-                    objRes.id_rais_trait_denta = RamqGetValueFromArrByName('id_rais_trait_denta_bucc_upd', pArrFormMoreData[i]);
+                    objRes.typ_id_rais_trait_denta = RamqGetValueFromArrByName('typ_id_rais_trait_denta_bucc', pArrFormMoreData[i]);
+                    objRes.id_rais_trait_denta = RamqGetValueFromArrByName('id_rais_trait_denta_bucc', pArrFormMoreData[i]);
 
-                    objRes.typ_id_site_trait_denta = RamqGetValueFromArrByName('typ_id_site_trait_denta_bucc_upd', pArrFormMoreData[i]);
-                    objRes.id_site_trait_denta = RamqGetValueFromArrByName('id_site_trait_denta_bucc_upd', pArrFormMoreData[i]);
+                    objRes.typ_id_site_trait_denta = RamqGetValueFromArrByName('typ_id_site_trait_denta_bucc', pArrFormMoreData[i]);
+                    objRes.id_site_trait_denta = RamqGetValueFromArrByName('id_site_trait_denta_bucc', pArrFormMoreData[i]);
 
-                    objRes.liste_med_consm = RamqGetArrayValueFromArrByName('liste_med_consm_bucc_upd', pArrFormMoreData[i]);
+                    objRes.liste_med_consm = RamqGetArrayValueFromArrByName('liste_med_consm_bucc', pArrFormMoreData[i]);
 
-                    objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_bucc_upd', pArrFormMoreData[i]);
+                    objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_bucc', pArrFormMoreData[i]);
 
-                    objRes.liste_elm_mesur = RamqGetArrayValueFromArrByName('liste_elm_mesur_bucc_upd', pArrFormMoreData[i]);
+                    objRes.liste_elm_mesur = RamqGetArrayValueFromArrByName('liste_elm_mesur_bucc', pArrFormMoreData[i]);
 
-                    objRes.dat_serv_elm_fact = RamqGetArrayValueFromArrByName('dat_serv_elm_fact_bucc_upd', pArrFormMoreData[i]);
+                    objRes.dat_serv_elm_fact = RamqGetArrayValueFromArrByName('dat_serv_elm_fact_bucc', pArrFormMoreData[i]);
 
-                    objRes.typ_refre_lieu = RamqGetValueFromArrByName('typ_refre_lieu_bucc_upd', pArrFormMoreData[i]); //Permet d'identifier le type de lieu en référence. Domaine de valeurs 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
+                    objRes.typ_refre_lieu = RamqGetValueFromArrByName('typ_refre_lieu_bucc', pArrFormMoreData[i]); //Permet d'identifier le type de lieu en référence. Domaine de valeurs 10 : Établissement pris en charge lors d'une garde multi-établissements 14 : Lieu de départ pour un déplacement
 
-                    objRes.isLieuCodifieALaRegie = (RamqGetValueFromArrByName('lieu_refre_phys_bucc_upd', pArrFormMoreData[i]) == null) ? null : (RamqGetValueFromArrByName('lieu_refre_phys_bucc', pArrFormMoreData[i]) == 'Lieu codifié á la Régie') ? true : false; //null if not both radio button not selected, true if Lie Codifie a la Regie selected otherwise false.
+                    objRes.isLieuCodifieALaRegie = (RamqGetValueFromArrByName('lieu_refre_phys_bucc', pArrFormMoreData[i]) == null) ? null : (RamqGetValueFromArrByName('lieu_refre_phys_bucc', pArrFormMoreData[i]) == 'Lieu codifié á la Régie') ? true : false; //null if not both radio button not selected, true if Lie Codifie a la Regie selected otherwise false.
 
-                    objRes.id_lieu_phys = RamqGetValueFromArrByName('id_lieu_phys_bucc_upd', pArrFormMoreData[i]);
-                    objRes.codePostal = RamqGetValueFromArrByName('code_postal_geo_bucc_upd', pArrFormMoreData[i]);
+                    objRes.id_lieu_phys = RamqGetValueFromArrByName('id_lieu_phys_bucc', pArrFormMoreData[i]);
+                    objRes.codePostal = RamqGetValueFromArrByName('code_postal_geo_bucc', pArrFormMoreData[i]);
 
-                    objRes.code_localite_dentiste = RamqGetValueFromArrByName('code_localite_geo_bucc_upd', pArrFormMoreData[i]);
-                    objRes.no_bur = RamqGetValueFromArrByName('no_bureau_geo_bucc_upd', pArrFormMoreData[i]);
-                    objRes.lieu_type = RamqGetValueFromArrByName('typ_lieu_geo_bucc_upd', pArrFormMoreData[i]);
+                    objRes.code_localite_dentiste = RamqGetValueFromArrByName('code_localite_geo_bucc', pArrFormMoreData[i]);
+                    objRes.no_bur = RamqGetValueFromArrByName('no_bureau_geo_bucc', pArrFormMoreData[i]);
+                    objRes.lieu_type = RamqGetValueFromArrByName('typ_lieu_geo_bucc', pArrFormMoreData[i]);
 
                     //Referant
-                    objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_refre_autre_prof_bucc_upd', pArrFormMoreData[i]); //Type de profession
+                    objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_refre_autre_prof_bucc', pArrFormMoreData[i]); //Type de profession
                     objRes.typ_id_prof = '1' //1 : Numéro dispensateur RAMQ 
-                    objRes.id_prof = RamqGetValueFromArrByName('id_prof_refre_bucc_upd', pArrFormMoreData[i]);//No du Referant
+                    objRes.id_prof = RamqGetValueFromArrByName('id_prof_refre_bucc', pArrFormMoreData[i]);//No du Referant
 
                 }
                 else if (ptypProf == 'Denturologiste' && globRamqOperationType == "Update") {
                     objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('dat_autor_proth_acryl_dentu', pArrFormMoreData[i]);
 
-                    objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_dentu_upd', pArrFormMoreData[i]);
+                    objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_dentu', pArrFormMoreData[i]);
 
                     //Referant
-                    objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_refre_autre_prof_dentu_upd', pArrFormMoreData[i]); //Type de profession
+                    objRes.typ_refre_autre_prof = RamqGetValueFromArrByName('typ_refre_autre_prof_dentu', pArrFormMoreData[i]); //Type de profession
                     objRes.typ_id_prof = '1' //1 : Numéro dispensateur RAMQ  
-                    objRes.id_prof = RamqGetValueFromArrByName('id_prof_refre_dentu_upd', pArrFormMoreData[i]);//No du Referant
+                    objRes.id_prof = RamqGetValueFromArrByName('id_prof_refre_dentu', pArrFormMoreData[i]);//No du Referant
                 }
                 break;
             }
@@ -1704,18 +1739,6 @@ function RamqGenerateNoDemExt()
     return new Date().getTime();
 }
 
-function RamqGetBillNumberFromServer()
-{
-    var billNumber = new Date().getTime();
-    //$.post("allScriptsv1.py", {tx: "getNoFacture", clinicId: globClinicId}, 
-    //function(result){
-    //    if(result.outcome == 'error')
-    //        return billNumber;
-    //    else
-    //        return result.nofact;
-    //});
-    return billNumber;
-}
 
 //creates new global bill (json file) on the servert and returns bill number.
 function RamqCreateNewGlobalBill()
@@ -1797,3 +1820,17 @@ function RamqGetCasDataFromGrille() {
     }
     return arrRes;
 }
+
+
+//function RamqGetBillNumberFromServer()
+//{
+//    var billNumber = new Date().getTime();
+//    //$.post("allScriptsv1.py", {tx: "getNoFacture", clinicId: globClinicId}, 
+//    //function(result){
+//    //    if(result.outcome == 'error')
+//    //        return billNumber;
+//    //    else
+//    //        return result.nofact;
+//    //});
+//    return billNumber;
+//}

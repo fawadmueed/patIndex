@@ -39,8 +39,8 @@ function RamqBillGetDataForTable(pArrDataFromServer)
         objOutputData.RamqNo = RamqBillGetNoRamq(objInputData.info); //#RAMQ
         objOutputData.Date = objInputData.datecreation;
         objOutputData.FactureNo = objInputData.facture;
-        objOutputData.Nom = "";
-        objOutputData.Prenom = "";
+        objOutputData.Nom = (objInputData.info[0][1] && objInputData.info[0][1].NomPers)?objInputData.info[0][1].NomPers:'';
+        objOutputData.Prenom = (objInputData.info[0][1] && objInputData.info[0][1].PrePers) ? objInputData.info[0][1].PrePers : '';
         objOutputData.Montant = (objInputData.xml)?RamqBillGetMontant(objInputData.xml):0;
         objOutputData.Status = pArrDataFromServer[i].status;
         objOutputData.IfUpdatePossible = RamqBillIfUpdatePossible(pArrDataFromServer[i].status, objInputData.dateregie);
@@ -224,8 +224,25 @@ function RamqBillPopulateBillDetails(pArrBilldata)
         $('#type_lieu_aut_regie_fact').prop('checked', true);
     }
 
+    //Show/ hide buttons "Annuler fact" & Transferer a la Regie
+
+    var isBillEditable = RamqBillIfUpdatePossible(pArrBilldata.status, pArrBilldata.dateregie);
+    if (isBillEditable) {
+        //Show two buttons
+        $('#btn_anuler_fact').removeClass("disabled");
+        $('#btn_detail_trnsfr_regi').removeClass("disabled");
+    }
+    else if (pArrBilldata.status == 0) // non transmis
+    {
+        $('#btn_anuler_fact').addClass("disabled");
+        $('#btn_detail_trnsfr_regi').removeClass("disabled");
+    }
+    else
+    {
+        $('#btn_anuler_fact').addClass("disabled");
+        $('#btn_detail_trnsfr_regi').addClass("disabled");
+    }
     
-    //populate_factTbl_update(arrGrilleDeFacturation_update);
     Regie_fact_modal();
 }
 
@@ -396,31 +413,122 @@ function RamqBillReSendToRamq()
     }
 }
 
+function RamqBillClearFormFactures() {
+    $("#rgie_fact_table tbody").empty();
+    $('#rgie_fact_ane_start').val('');
+    $('#rgie_fact_ane_end').val('');
+    $('#nombre_factures_regie').val('');
+    $('#total_factures_regie').val('');
+}
+
 //=========================================Message========================================
 
 function RamqBillGetMessageLog()
 {
     $.post("allScriptsv1.py", { tx: "getPatientLogs", patientId: globPatientId },
-            function (result) {
-                if (result.message !== undefined)
-                    $("#message").append(result.message);
-                else {
-                    var items = [];
-                    $.each(result, function (key, val) {
-                        if (key == "logs") {
-                            items.push("<table>");
-                            items.push("<tr><th>No facture</th><th>No dossier</th><th>date creation</th><th>Contenu</th></tr>");
-                            $.each(val, function (keyin, valin) {
-                                items.push("<tr>");
-                                items.push("<td>&nbsp;<a href=\"#\">" + valin.facture + "</a></td><td>&nbsp;" + valin.nodossier + "</td><td>&nbsp;" + valin.datecreation + "</td><td>&nbsp;" + valin.xml + "</td>");
-                                items.push("</tr>");
-                            });
-                            items.push("</table>");
-                        }
+        function (result) {
+            if (result.message !== undefined)
+                alert(result.message);
+            else {
+                var arrDataForMessageTable = [];
+                arrDataForMessageTable = RamqBillCreateDataArrForMessageTable(result.logs);
+                RamqBillPopulateMessageTable(arrDataForMessageTable);
 
-                    });
-                    $("#message").append(items.join(""));
-                }
-            });
+            }
+        });
 }
     
+function RamqBillCreateDataArrForMessageTable(pArrLogs)
+{
+    var arrRes = [];
+    
+    
+    for (var i = 0; i < pArrLogs.length; i++)
+    {
+        var objRes = {};
+        objRes.datecreation = pArrLogs[i].datecreation;
+        objRes.facture = pArrLogs[i].facture;
+        var objDataFromXml = RamqBillMessageGetDataFromXml(pArrLogs[i].xml);
+        if (objDataFromXml)
+        {
+            //objRes.noRamq = objDataFromXml.noRamq;
+            objRes.status = objDataFromXml.status;
+            objRes.message = objDataFromXml.message;
+            objRes.detailsMessage = objDataFromXml.detailsMessage;
+        }
+        arrRes.push(objRes);
+    }
+    return arrRes;
+}
+
+function RamqBillMessageGetDataFromXml(pXml)
+{
+    var response = {};
+    var parser = new DOMParser();
+    var xml = pXml.replace(/\\"/g, '"');
+    var xmlDoc = parser.parseFromString(xml, "text/xml");
+
+    //Global info
+    var status = (xmlDoc.getElementsByTagName("sta_recev")[0] != null) ? xmlDoc.getElementsByTagName("sta_recev")[0].childNodes[0].nodeValue : null;
+    if (status)
+    {
+        response.status = (status == "2") ? 'Non recevable' : (status == "1") ? 'Recevable' : '';
+
+        var arrMsgExplRecev = xmlDoc.getElementsByTagName('msg_expl_recev');
+        if (arrMsgExplRecev.length > 0)
+        {
+            var msgDetails = ''
+            for (var i = 0; i < arrMsgExplRecev.length; i++)
+            {
+                if (i == 0) {
+                    var globalMsg = arrMsgExplRecev[i].childNodes[0].innerHTML + ': ' + arrMsgExplRecev[i].childNodes[1].innerHTML;
+                    response.message = globalMsg.substr(0,20)+'...';
+                }
+                else {
+                    msgDetails += arrMsgExplRecev[i].childNodes[0].innerHTML + ': ' + arrMsgExplRecev[i].childNodes[1].innerHTML ;
+                }
+            }
+            
+            response.detailsMessage = msgDetails;
+        }
+
+    }
+    return response;
+}
+
+function RamqBillPopulateMessageTable(pArrData)
+{
+    var tableContent = '';
+    if (pArrData)
+    {
+        for(var i = 0; i<pArrData.length; i++)
+        {
+            var detMsg = pArrData[i].detailsMessage;//.replace(/'/g, "\\'");
+            if (detMsg)
+                detMsg = detMsg.replace(/'/g, "\\'");
+            else
+                detMsg = '';
+
+            tableContent += '<tr onclick = "RamqBillMessageShowError(\'' + detMsg + '\')" >';
+            tableContent += '<td></td>';
+            tableContent += '<td>' + pArrData[i].facture + '</td>';
+            tableContent += '<td>' + pArrData[i].datecreation + '</td>';
+            tableContent += '<td>' + pArrData[i].status + '</td>';
+            var msg;
+            if (pArrData[i].message)
+                msg = pArrData[i].message;
+            else
+                msg = '';
+            tableContent += '<td>' + msg + '</td>';
+            tableContent += "</tr>";
+        }
+        $('#reg_msg_tbl tbody').append(tableContent);
+    }
+}
+
+function RamqBillMessageShowError(pMessage)
+{
+    if(pMessage!='')
+        alert(pMessage);
+}
+
