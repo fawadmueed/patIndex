@@ -6,6 +6,7 @@ var globBillNumber; //The number of "global" bill.
 
 $(document).ready(function () {
     globVisionRData = RamqGetVisionRData();
+    
 });
 function SoumissionDemandesPaiement()
 {
