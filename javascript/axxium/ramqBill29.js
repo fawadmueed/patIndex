@@ -5,8 +5,25 @@ var globRamqNoFactRamq;
 //var arrGrilleDeFacturation_update;
 //var arrGrilleDeFacturation_forms_update;
 var globRamqBillMessageTable;
+var globRamqBillPaymentTable;
+var globRamqBillPaymentBillNo;
+
 var globRamqBillArrDataForMessageTable = [];
+var globRamqBillArrDataForPaymentTable = [];
+
 $(document).ready(function () {
+    //Payment table
+    globRamqBillPaymentTable = $('#tblRamqPaiments').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['excelHtml5'],
+    });
+
+    $('#tblRamqPaiments tbody').on('click', 'tr', function () {
+        var rowData = globRamqBillPaymentTable.row(this).data();
+        RamqBillPaymentOpenDetails(rowData[3]);
+    });
+
+    //Message Table
      globRamqBillMessageTable = $('#reg_msg_tbl').DataTable({
         "columns": [
             { "width": "20%" },
@@ -38,7 +55,7 @@ function RamqBillGetDataFromServer()
 {
     var dateFrom = $("#rgie_fact_ane_start").val();
     var dateTo = $("#rgie_fact_ane_end").val();
-    $.post("allScriptsv1.py", { tx: "getPatientFactures", patientId: globPatientId, dFrom: dateFrom, dTo: dateTo },
+    $.post("allScriptsv1.py", { tx: "getPatientFactures", clinicId: globClinicId, patientId: globPatientId, dFrom: dateFrom, dTo: dateTo },
             function (result) {
                 if (result.message !== undefined)
                     alert(result.message);
@@ -378,6 +395,15 @@ function RamqBillClearTable()
     $('#total_factures_regie').val('');
 }
 
+function RamqBillClearPaymentTable()
+{
+    $('#tblRamqPaiments tbody').empty();
+    $('#txtRamqPaymentNonPayedBill').val('');
+    $('#txtRamqPaymentTotalBill').val('');
+    $('#txtRamqPaymentNoPayments').val('');
+    $('#txtRamqPaymentTotalPayments').val('');
+}
+
 function RamqBillGetNoFactRamq(pXml)
 {
     var noFact = '';
@@ -455,7 +481,7 @@ function RamqBillGetMessageLog()
     var blFrom = $('#reg_msg_no_fact_frm').val();
     var blTo = $('#reg_msg_no_fact_to').val();
 
-    $.post("allScriptsv1.py", { tx: "getPatientLogs", patientId: globPatientId, dFrom: dateFrom, dTo: dateTo, billTo: blTo, billFrom: blFrom },
+    $.post("allScriptsv1.py", { tx: "getPatientLogs",clinicId: globClinicId, patientId: globPatientId, dFrom: dateFrom, dTo: dateTo, billTo: blTo, billFrom: blFrom },
         function (result) {
             if (result.message !== undefined)
                 alert(result.message);
@@ -562,3 +588,207 @@ function RamqBillUpdateMessageTable()
     }
 }
 
+//========================================= Payments ========================================
+function RamqBillGetPaymentList() {
+    RamqBillClearPaymentTable();
+
+    var dateFrom = $('#txtRamqPaymentDateFrom').val();
+    var dateTo = $('#txtRamqPaymentDateTo').val();
+    var patId = globPatientId;
+    if ($('#chkRamqPaymentDisplayAllPatient').is(':checked'))
+    {
+        patId = ''
+    }
+    
+    $.post("allScriptsv1.py", { tx: "getAcceptedBills", clinicId: globClinicId, patientId: patId, dFrom: dateFrom, dTo: dateTo },
+        function (result) {
+            if (result.message !== undefined)
+                alert(result.message);
+            else {
+                globRamqBillArrDataForPaymentTable = RamqBillCreateDataArrForPaymentTable(result.factures);
+                RamqBillPaymentUpdateTable();
+            }
+        });
+}
+
+function RamqBillCreateDataArrForPaymentTable(pArrPayment)
+{
+    var arrRes = [];
+
+    for (var i = 0; i < pArrPayment.length; i++)
+    {
+        var arr = [];
+        
+
+        var objDataFromXml = RamqBillPaymentGetDataFromXml(pArrPayment[i].xml);
+        if (objDataFromXml)
+        {
+            var billAmount = objDataFromXml.honoraires;
+            //var ramqPayment = pArrPayment[i].
+            var payeeStatus = "Non";
+            if (parseFloat(billAmount.toFixed(2)) == parseFloat(ramqPayment.toFixed(2)))
+            {
+                payeeStatus = "Oui";
+            }
+
+            arr.push(pArrPayment[i].nodossier);//dossier
+            arr.push(objDataFromXml.noRamq);//#AMQ
+            arr.push(pArrPayment[i].dateregie);//RamqDate
+            arr.push(pArrPayment[i].facture);//billNumber.
+            arr.push(billAmount);//amount of bill
+            //arr.push(pArrPayment[i].);//No recu
+            //arr.push(pArrPayment[i].);//Code
+            //arr.push(pArrPayment[i].);//Raison
+            //arr.push(ramqPayment);//Paiment
+            //arr.push(pArrPayment[i].);//effectue
+            arr.push(payeeStatus);
+        }
+        arrRes.push(arr);
+    }
+    return arrRes;
+}
+
+function RamqBillPaymentGetDataFromXml(pXml)
+{
+    var response = {};
+    var parser = new DOMParser();
+    var xml = pXml.replace(/\\"/g, '"');
+    var xmlDoc = parser.parseFromString(xml, "text/xml");
+
+    //Global info
+    var ramqNo = (xmlDoc.getElementsByTagName("no_fact_ramq")[0] != null) ? xmlDoc.getElementsByTagName("no_fact_ramq")[0].childNodes[0].nodeValue : null;
+    response.noRamq = (ramqNo) ? ramqNo : '';
+    response.honoraires = RamqBillGetMontant(pXml);
+
+    return response;
+}
+
+function RamqBillPaymentOpenDetails(pBillNumber)
+{
+    globRamqBillPaymentBillNo = pBillNumber;
+    modPaimnt();
+
+}
+
+function RamqBillPaymentSendPaymentDetails()
+{
+    var billNo = globRamqBillPaymentBillNo;
+    var noRecu = $('#').val();
+    var code = $('#').val();
+    var raison = $('#').val();
+    var payment = $('#').val();
+    var effectue = $('#').val();
+
+    $.post("allScriptsv1.py", { tx: "", },
+        function (result) {
+            if (result.message !== undefined)
+                alert(result.message);
+            else {
+                
+            }
+        });
+}
+
+function RamqBillPopulatePaymentTable(pArrData)
+{
+    globRamqBillPaymentTable.clear().draw();
+    globRamqBillPaymentTable.rows.add(pArrData); // Add new data
+    globRamqBillPaymentTable.columns.adjust().draw();
+
+    $('#txtRamqPaymentNonPayedBill').val(RamqBillPaymentGetNonPayedBillNo(pArrData));
+    $('#txtRamqPaymentTotalBill').val(RamqBillPaymentGetBillTotalAmount(pArrData));
+    $('#txtRamqPaymentNoPayments').val(RamqBillPaymentGetPaymentNo(pArrData));
+    $('#txtRamqPaymentTotalPayments').val(RamqBillPaymentGetPaymentTotalAmount(pArrData));
+}
+
+function RamqBillPaymentUpdateTable()
+{
+    if($('#optRamqPaymentAllBills').is(':checked'))
+    {
+        RamqBillPopulatePaymentTable(globRamqBillArrDataForPaymentTable);
+    }
+    else if($('#optRamqPaymentPayedBills').is(':checked'))
+    {
+        var arrData = [];
+        for(var i=0; i< globRamqBillArrDataForPaymentTable.length; i++)
+        {
+            if(globRamqBillArrDataForPaymentTable[i][8]!=='')
+            {
+                arrData.push(globRamqBillArrDataForPaymentTable[i]);
+                RamqBillPopulatePaymentTable(arrData);
+            }
+        }
+    }
+    else if($('#optRamqNonPayedBills').is(':checked'))
+    {
+        var arrData = [];
+        for(var i=0; i< globRamqBillArrDataForPaymentTable.length; i++)
+        {
+            if(globRamqBillArrDataForPaymentTable[i][8] =='')
+            {
+                arrData.push(globRamqBillArrDataForPaymentTable[i]);
+                RamqBillPopulatePaymentTable(arrData);
+            }
+        }
+    }
+}
+
+function RamqBillPaymentGetNonPayedBillNo(pArrData)
+{
+    var res = 0;
+    for(var i= 0; i< pArrData.length; i++)
+    {
+        if(pArrData[i][8]==='')
+        {
+            res++;
+        }
+    }
+    return res;
+}
+
+function RamqBillPaymentGetBillTotalAmount(pArrData)
+{
+    var res = 0;
+    for(var i= 0; i< pArrData.length; i++)
+    {
+        if(pArrData[i][4]!=='')
+        {
+            var amount = Number(pArrData[i][4]);
+            if (!isNaN(amount)) 
+            {
+                res += amount;
+            }
+        }
+    }
+    return res;
+}
+
+function RamqBillPaymentGetPaymentNo(pArrData)
+{
+    var res = 0;
+    for(var i= 0; i< pArrData.length; i++)
+    {
+        if(pArrData[i][8]!=='')
+        {
+            res++;
+        }
+    }
+    return res;
+}
+
+function RamqBillPaymentGetPaymentTotalAmount(pArrData)
+{
+    var res = 0;
+    for(var i= 0; i< pArrData.length; i++)
+    {
+        if(pArrData[i][8]!=='')
+        {
+            var amount = Number(pArrData[i][4]);
+            if (!isNaN(amount)) 
+            {
+                res += amount;
+            }
+        }
+    }
+    return res;
+}
