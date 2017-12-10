@@ -6,7 +6,8 @@ var globRamqNoFactRamq;
 //var arrGrilleDeFacturation_forms_update;
 var globRamqBillMessageTable;
 var globRamqBillPaymentTable;
-var globRamqBillPaymentBillNo;
+var globRamqBillPaymentObjRowData;
+
 
 var globRamqBillArrDataForMessageTable = [];
 var globRamqBillArrDataForPaymentTable = [];
@@ -16,11 +17,18 @@ $(document).ready(function () {
     globRamqBillPaymentTable = $('#tblRamqPaiments').DataTable({
         dom: 'Bfrtip',
         buttons: ['excelHtml5'],
+        searching:false
     });
 
     $('#tblRamqPaiments tbody').on('click', 'tr', function () {
-        var rowData = globRamqBillPaymentTable.row(this).data();
-        RamqBillPaymentOpenDetails(rowData[3]);
+        globRamqBillPaymentObjRowData = globRamqBillPaymentTable.row(this).data();
+        RamqBillPaymentOpenDetails();
+        //Clean form Payment details
+        $('#regi_pamnt_no_recu').val('');
+        $('#regi_pamnt_code').val('');
+        $('#regi_pamnt_rason').val('');
+        $('#regi_pamnt').val('');
+        $('#regi_pamnt_effectu').val('');
     });
 
     //Message Table
@@ -624,9 +632,15 @@ function RamqBillCreateDataArrForPaymentTable(pArrPayment)
         if (objDataFromXml)
         {
             var billAmount = objDataFromXml.honoraires;
-            //var ramqPayment = pArrPayment[i].
+            var ramqPayment = 0;
+            if (pArrPayment[i].Payment && pArrPayment[i].Payment.Payment && Number(pArrPayment[i].Payment.Payment))
+            {
+                ramqPayment = Number(pArrPayment[i].Payment.Payment);
+            }
+            
+            
             var payeeStatus = "Non";
-            if (parseFloat(billAmount.toFixed(2)) == parseFloat(ramqPayment.toFixed(2)))
+            if (ramqPayment !=null && parseFloat(billAmount.toFixed(2)) == parseFloat(ramqPayment.toFixed(2)))
             {
                 payeeStatus = "Oui";
             }
@@ -636,11 +650,11 @@ function RamqBillCreateDataArrForPaymentTable(pArrPayment)
             arr.push(pArrPayment[i].dateregie);//RamqDate
             arr.push(pArrPayment[i].facture);//billNumber.
             arr.push(billAmount);//amount of bill
-            //arr.push(pArrPayment[i].);//No recu
-            //arr.push(pArrPayment[i].);//Code
-            //arr.push(pArrPayment[i].);//Raison
-            //arr.push(ramqPayment);//Paiment
-            //arr.push(pArrPayment[i].);//effectue
+            arr.push((pArrPayment[i].Payment && pArrPayment[i].Payment.NoRecu)?pArrPayment[i].Payment.NoRecu:'');//No recu
+            arr.push((pArrPayment[i].Payment && pArrPayment[i].Payment.Code) ? pArrPayment[i].Payment.Code : '');//Code
+            arr.push((pArrPayment[i].Payment && pArrPayment[i].Payment.Raison) ? pArrPayment[i].Payment.Raison : '');//Raison
+            arr.push(ramqPayment.toFixed(2));//Paiment
+            arr.push((pArrPayment[i].Payment && pArrPayment[i].Payment.Effectue) ? pArrPayment[i].Payment.Effectue : '');//effectue 
             arr.push(payeeStatus);
         }
         arrRes.push(arr);
@@ -663,28 +677,27 @@ function RamqBillPaymentGetDataFromXml(pXml)
     return response;
 }
 
-function RamqBillPaymentOpenDetails(pBillNumber)
+function RamqBillPaymentOpenDetails()
 {
-    globRamqBillPaymentBillNo = pBillNumber;
     modPaimnt();
-
 }
 
 function RamqBillPaymentSendPaymentDetails()
 {
-    var billNo = globRamqBillPaymentBillNo;
-    var noRecu = $('#').val();
-    var code = $('#').val();
-    var raison = $('#').val();
-    var payment = $('#').val();
-    var effectue = $('#').val();
-
-    $.post("allScriptsv1.py", { tx: "", },
+    var noDossier = globRamqBillPaymentObjRowData[0]
+    var billNo = globRamqBillPaymentObjRowData[3];
+    var noRecu = $('#regi_pamnt_no_recu').val();
+    var code = $('#regi_pamnt_code').val();
+    var raison = $('#regi_pamnt_rason').val();
+    var payment = $('#regi_pamnt').val();
+    var effectue = $('#regi_pamnt_effectu').val();
+    //TODO: change globPatientId to patId from table payment.
+    $.post("allScriptsv1.py", { tx: "addpayment", clinicId: globClinicId, patientId: globPatientId, nodossier: noDossier, nofact: billNo, NoRecu: noRecu, Code: code, Raison: raison, Payment: payment, Effectue: effectue },
         function (result) {
-            if (result.message !== undefined)
+            if (result.outcome == 'error')
                 alert(result.message);
             else {
-                
+                alert("Payment info saved successfully");
             }
         });
 }
@@ -712,7 +725,7 @@ function RamqBillPaymentUpdateTable()
         var arrData = [];
         for(var i=0; i< globRamqBillArrDataForPaymentTable.length; i++)
         {
-            if(globRamqBillArrDataForPaymentTable[i][8]!=='')
+            if(globRamqBillArrDataForPaymentTable[i][8]!==0)
             {
                 arrData.push(globRamqBillArrDataForPaymentTable[i]);
                 RamqBillPopulatePaymentTable(arrData);
@@ -738,7 +751,7 @@ function RamqBillPaymentGetNonPayedBillNo(pArrData)
     var res = 0;
     for(var i= 0; i< pArrData.length; i++)
     {
-        if(pArrData[i][8]==='')
+        if(pArrData[i][8]===0)
         {
             res++;
         }
@@ -783,12 +796,12 @@ function RamqBillPaymentGetPaymentTotalAmount(pArrData)
     {
         if(pArrData[i][8]!=='')
         {
-            var amount = Number(pArrData[i][4]);
+            var amount = Number(pArrData[i][8]);
             if (!isNaN(amount)) 
             {
                 res += amount;
             }
         }
     }
-    return res;
+    return res.toFixed(2);
 }
