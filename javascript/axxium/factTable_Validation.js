@@ -81,6 +81,8 @@
 
     var valid;
     var val=$(this).text();
+
+    val=parseInt(val);
     
      });
 
