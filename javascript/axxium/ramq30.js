@@ -1434,14 +1434,13 @@ function displayRamqAnswer(_header, _content)
 
 function RamqGetConstAppData()
 {
-    //TODO: Change to real data.
     var res = {};
 
-    res.NoDevprLogcl = '18011';//?
-    res.NomDevprLogcl = 'Développeur';//?
-    res.NomLogclFact = 'Mon logiciel';//?
-    res.NoVersiLogclFact = '1.0.0';//?
-    res.NoVersiXmlDem = 'ACTE';//?
+    res.NoDevprLogcl = '18011';
+    res.NomDevprLogcl = 'Axxium Vision Inc.';
+    res.NomLogclFact = 'VisionR';
+    res.NoVersiLogclFact = '11.0.0.4189';
+    res.NoVersiXmlDem = 'ACTE';
     return res;
 }
 
