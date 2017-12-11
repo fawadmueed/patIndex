@@ -425,6 +425,7 @@ if (tx == "uploadDOC"):
 	
 # ROBERTO CODE
 
+
 def getdate(datestr="", format="%Y-%m-%d"):
     if not datestr:
         return datetime.today().date()
@@ -445,9 +446,10 @@ if tx == "getFactureInfo":
         patientId = form['patientId'].value
         nodossier = form['nodossier'].value
         nofactext = form['nofact'].value
+        clinicId = form['clinicId'].value
 
         #read info
-        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+        json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
         data = json.load(json_data)
         json_data.close()
 
@@ -485,10 +487,11 @@ if tx == "updateFacture":
         patientId = form['patientId'].value
         nodossier = form['nodossier'].value
         nofactext = form['nofact'].value
+        clinicId = form['clinicId'].value
         dataJson = json.loads(form['json'].value)
 
         #read info
-        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+        json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
         data = json.load(json_data)
         json_data.close()
 
@@ -502,7 +505,7 @@ if tx == "updateFacture":
         if dataJson["cas"] is not None:
             data["cas"] = {'req': dataJson["cas"], 'resp' : None, 'date' : None, 'status' : 0, 'nofact' : nofactext}
 
-        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+        logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
         logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
         logFile.close()
 
@@ -532,9 +535,13 @@ if tx == "createFacture":
         logFile.write(json.dumps(data))
         logFile.close()
 
+        #verify if log folder exists if not, create it
+        if not os.path.isdir('json/facturation/%s/%s/log'%(clinicId, patientId)):
+            os.makedirs('json/facturation/%s/%s/log'%(clinicId, patientId))
+
         #save the new nofact
         dataJSON = {'status': 0, 'amq': None, 'cas': None, 'ins': None}
-        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofact), 'w')
+        logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofact), 'w')
         logFile.write(json.dumps(dataJSON))
         logFile.close()
 
@@ -548,41 +555,48 @@ if tx == "createFacture":
 if tx == "getPatientLogs":
     try:
         patientId = form['patientId'].value
-        if not os.path.isdir('json/facturation/%s/log'%(patientId)):
-            print '{ "files": [ ] }'
+        clinicId = form['clinicId'].value
+
+        if not os.path.isdir('json/facturation/%s/%s/log'%(clinicId, patientId)):
+            print '{ "logs": [ ] }'
         else:
             #In case, the dates are missing
             try:
                 datefrom = getdate(form['dFrom'].value)
             except:
-                datefrom = getdate()
+                datefrom = date(datetime.today().date().year, datetime.today().date().month -1, datetime.today().date().day)
 
             try:
                 dateto = getdate(form['dTo'].value)  
             except:
                 dateto = getdate()
-        
+                
+            billfrom = int(form.getvalue('billFrom', 1))
+            billTo = int(form.getvalue('billTo', 10000))
+
             logs = []
             jsondata = {}
-            files = os.listdir("json/facturation/%s/log"%patientId)
-            files = ['json/facturation/%s/log/'%patientId+elt for elt in files if elt.endswith(".xml")]
-            files.sort(key=os.path.getmtime)
+            files = os.listdir("json/facturation/%s/%s/log"%(clinicId, patientId))
+            files = ['json/facturation/%s/%s/log/'%(clinicId, patientId)+elt for elt in files if elt.endswith(".xml")]
+            files.sort(key=os.path.getctime)
             files.reverse()
             for filename in files:
-                mdate = os.path.getmtime(filename)
+                mdate = os.path.getctime(filename)
                 datefile = datetime.fromtimestamp(mdate).date()
                 if datefile >= datefrom and datefile <= dateto:
-                    #read info
-                    file = open(filename, 'r')
-                    xmlstring = file.read()
-                    file.close()
+                    nofacture = int(filename.split('/')[5].split('_')[1])
+                    if  billfrom <= nofacture and nofacture <= billTo:
+                        #read info
+                        file = open(filename, 'r')
+                        xmlstring = file.read()
+                        file.close()
 
-                    tmp_log = {}
-                    tmp_log["facture"] = filename.split('/')[4].split('_')[1]
-                    tmp_log["nodossier"] = filename.split('/')[4].split('_')[0]
-                    tmp_log["xml"] = xmlstring.replace("\"", "\\\"") 
-                    tmp_log["datecreation"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
-                    logs.append(tmp_log)
+                        tmp_log = {}
+                        tmp_log["facture"] = nofacture
+                        tmp_log["nodossier"] = filename.split('/')[5].split('_')[0]
+                        tmp_log["xml"] = xmlstring.replace("\"", "\\\"") 
+                        tmp_log["datecreation"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
+                        logs.append(tmp_log)
                                                  
             jsondata["logs"] = logs
             print json.dumps(jsondata).decode('unicode-escape').encode('utf8')   
@@ -595,9 +609,10 @@ if tx == "getPatientLogs":
 if tx == "getPatientFactures":
     try:
         patientId = form['patientId'].value
+        clinicId = form['clinicId'].value
         section = form.getvalue('section', 'amq') #default section
-        if not os.path.isdir('json/facturation/%s'%(patientId)):
-            print '{ "files": [ ] }'
+        if not os.path.isdir('json/facturation/%s/%s'%(clinicId, patientId)):
+            print '{ "factures": [ ] }'
         else:
             #In case, the dates are missing
             try:
@@ -612,12 +627,12 @@ if tx == "getPatientFactures":
 
             factures = []
             jfactures = {}
-            files = os.listdir("json/facturation/%s"%patientId)
-            files = ['json/facturation/%s/'%patientId+elt for elt in files if elt.endswith(".json")]
-            files.sort(key=os.path.getmtime)
+            files = os.listdir("json/facturation/%s/%s"%(clinicId, patientId))
+            files = ['json/facturation/%s/%s/'%(clinicId, patientId)+elt for elt in files if elt.endswith(".json")]
+            files.sort(key=os.path.getctime)
             files.reverse()
             for filename in files:
-                mdate = os.path.getmtime(filename)
+                mdate = os.path.getctime(filename)
                 datefile = datetime.fromtimestamp(mdate).date()
                 if datefile >= datefrom and datefile <= dateto:
                     #read info
@@ -629,8 +644,8 @@ if tx == "getPatientFactures":
                         #verify if the is or not empty bill
                         if data["amq"] is not None:
                             tmp_fact = {}
-                            tmp_fact["facture"] = filename.split('/')[3].split('_')[1].split('.')[0]
-                            tmp_fact["nodossier"] = filename.split('/')[3].split('_')[0]
+                            tmp_fact["facture"] = filename.split('/')[4].split('_')[1].split('.')[0]
+                            tmp_fact["nodossier"] = filename.split('/')[4].split('_')[0]
                             tmp_fact["info"] = data["amq"]["req"]
                             tmp_fact["xml"] = '' if data["amq"]["resp"] is None else data["amq"]["resp"].replace("\"", "\\\"")
                             tmp_fact["dateregie"] = '' if data["amq"]["date"] is None else data["amq"]["date"]
@@ -640,8 +655,8 @@ if tx == "getPatientFactures":
                     elif section == 'ins':
                         if data["ins"] is not None:
                             tmp_fact = {}
-                            tmp_fact["facture"] = filename.split('/')[3].split('_')[1].split('.')[0]
-                            tmp_fact["nodossier"] = filename.split('/')[3].split('_')[0]
+                            tmp_fact["facture"] = filename.split('/')[4].split('_')[1].split('.')[0]
+                            tmp_fact["nodossier"] = filename.split('/')[4].split('_')[0]
                             tmp_fact["info"] = data["ins"]["req"]
                             tmp_fact["xml"] = '' if data["ins"]["resp"] is None else data["ins"]["resp"].replace("\"", "\\\"")
                             tmp_fact["datetransaction"] = data["ins"]["date"]
@@ -651,8 +666,8 @@ if tx == "getPatientFactures":
                     elif section == 'cas':
                         if data["cas"] is not None:
                             tmp_fact = {}
-                            tmp_fact["facture"] = filename.split('/')[3].split('_')[1].split('.')[0]
-                            tmp_fact["nodossier"] = filename.split('/')[3].split('_')[0]
+                            tmp_fact["facture"] = filename.split('/')[4].split('_')[1].split('.')[0]
+                            tmp_fact["nodossier"] = filename.split('/')[4].split('_')[0]
                             tmp_fact["info"] = data["cas"]["req"]
                             tmp_fact["datetransaction"] = data["cas"]["date"]
                             tmp_fact["datecreation"] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(mdate))
@@ -714,24 +729,112 @@ if tx == "cancelRamqData":
 
                     if nbrerror == 1:   
                         #read the bill
-                        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+                        json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
                         data = json.load(json_data)
                         json_data.close()
                         #change status and date transaction
                         data["amq"]["date"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
                         data["amq"]["status"] = 3 # Canceled
                         data["amq"]["resp"] = data["amq"]["resp"].replace("\"", "\\\"")
-                        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+                        logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
                         logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
                         logFile.close()
 
                     #create log file
-                    logFile = open('json/facturation/%s/log/%s_%s_%s_amq.xml'%(patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
+                    logFile = open('json/facturation/%s/%s/log/%s_%s_%s_amq.xml'%(clinicId, patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
                     logFile.write(CleanXML(xmlresp, True).encode('utf8'))
                     logFile.close()                        
                             
                     message = {'outcome' : 'success', 'message': xmlresp}
                     print json.dumps(message)
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
+
+if tx == "getAcceptedBills": #ACCEPTED 
+    try:
+        clinicId = form['clinicId'].value      
+        patientId = form.getvalue('patientId')
+
+        #In case, the dates are missing
+        try:
+            datefrom = getdate(form['dFrom'].value)
+        except:
+            datefrom = date(datetime.today().date().year, datetime.today().date().month -1, datetime.today().date().day)
+
+        try:
+            dateto = getdate(form['dTo'].value)  
+        except:
+            dateto = getdate()
+
+        factures = []
+        jfactures = {}
+        fichiers = []
+
+        if patientId is not None and patientId != '':
+            fichiers = os.listdir("json/facturation/%s/%s"%(clinicId, patientId))
+            fichiers = ['json/facturation/%s/%s/'%(clinicId, patientId)+elt for elt in fichiers if elt.endswith(".json")]
+        else:
+            for path, subdirs, files in os.walk('json/facturation/%s'%clinicId):
+                files = [elt for elt in files if elt.endswith(".json")]
+                for name in files:
+                    fichiers.append(os.path.join(path, name).replace("\\","/")) #fix bug for slash vs back slash
+
+        fichiers.sort(key=os.path.getctime)
+        fichiers.reverse()
+        for filename in fichiers:
+            mdate = os.path.getctime(filename)
+            datefile = datetime.fromtimestamp(mdate).date()
+            if datefile >= datefrom and datefile <= dateto:
+                #read info
+                json_data = open(filename, 'r')
+                data = json.load(json_data)
+                json_data.close()    
+
+                if data["amq"] is not None:
+                    if int(data["amq"]["status"]) == 1: #ACCEPTED
+                        tmp_fact = {}
+                        tmp_fact["facture"] = filename.split('/')[4].split('_')[1].split('.')[0]
+                        tmp_fact["nodossier"] = filename.split('/')[4].split('_')[0]
+                        tmp_fact["patientId"] = filename.split('/')[3]
+                        tmp_fact["dateregie"] = data["amq"]["date"]
+                        tmp_fact["xml"] = '' if data["amq"]["resp"] is None else data["amq"]["resp"].replace("\"", "\\\"")
+                        tmp_fact["Payment"] = data["amq"].get('Payment', None) 
+                        factures.append(tmp_fact)                              
+
+        jfactures["factures"] = factures
+        print json.dumps(jfactures).decode('unicode-escape').encode('utf8')   
+    except:
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        print '{ "outcome" : "error", "message" : "%s, %s. %s, line %s" }'%(exc_type, exc_obj, fname, exc_tb.tb_lineno) 
+
+if tx == "addpayment":
+    try:
+        clinicId = form['clinicId'].value      
+        patientId = form['patientId'].value
+        nodossier = form['nodossier'].value
+        nofactext = form['nofact'].value
+        NoRecu = form['NoRecu'].value
+        Code = form['Code'].value
+        Raison = form['Raison'].value
+        Payment = form['Payment'].value
+        Effectue = form['Effectue'].value
+
+        #read the bill
+        json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
+        data = json.load(json_data)
+        json_data.close()
+        #update payement
+        data["amq"]["Payment"] = {'NoRecu' : NoRecu, 'Code' : Code, 'Raison' : Raison, 'Payment' : Payment, 'Effectue' : Effectue }
+        data["amq"]["resp"] = data["amq"]["resp"].replace("\"", "\\\"")
+        logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
+        logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+        logFile.close()   
+
+        message = {'outcome' : 'success', 'message': 'OK'}
+        print json.dumps(message)     
     except:
         exc_type, exc_obj, exc_tb = sys.exc_info()
         fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -785,19 +888,18 @@ if tx == "modifyRamqData":
                     #set input row
                     if nbrerror == 1:   
                         #read the bill
-                        json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+                        json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
                         data = json.load(json_data)
                         json_data.close()
                         data["amq"]["req"] = datainputs
                         data["amq"]["resp"] = xmlresp
-                        data["amq"]["date"] = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
                         data["amq"]["status"] = 1 #OK
-                        logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+                        logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
                         logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
                         logFile.close()
                     
                     #create log file
-                    logFile = open('json/facturation/%s/log/%s_%s_%s_amq.xml'%(patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
+                    logFile = open('json/facturation/%s/%s/log/%s_%s_%s_amq.xml'%(clinicId, patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
                     logFile.write(CleanXML(xmlresp, True).encode('utf8'))
                     logFile.close()
 
@@ -822,10 +924,6 @@ if tx == "getRamqData":
   
         #define namespace for read xml       
         nsmap = {'n': 'urn:ramq-gouv-qc-ca:RFP'}
-
-        #verify if log folder exists if not, create it
-        if not os.path.isdir('json/facturation/%s/log/amq'%(patientId)):
-            os.makedirs('json/facturation/%s/log/amq'%(patientId))
 
         #read the parameters for credentials
         json_data = open('json/ramqCredentials/'+clinicId+'.json', 'r')
@@ -860,18 +958,18 @@ if tx == "getRamqData":
                     xmlresp = CleanXML(xmlresp, False)     
 
                     #read the empty bill
-                    json_data = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'r')
+                    json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
                     data = json.load(json_data)
                     json_data.close()
                     
                     #set input row              
                     data["amq"] = {'req': datainputs, 'resp' : xmlresp if nbrerror == 1 else None, 'date' : datetime.today().strftime("%Y-%m-%d %H:%M:%S"), 'status' : nbrerror, 'nofact' : nofactext}
-                    logFile = open('json/facturation/%s/%s_%s.json'%(patientId, nodossier, nofactext), 'w')
+                    logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
                     logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
                     logFile.close()
                     
                     #create log file
-                    logFile = open('json/facturation/%s/log/%s_%s_%s_amq.xml'%(patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
+                    logFile = open('json/facturation/%s/%s/log/%s_%s_%s_amq.xml'%(clinicId, patientId, nodossier, nofactext, datetime.today().strftime("%Y%m%d%H%M%S")), 'w')
                     logFile.write(CleanXML(xmlresp, True).encode('utf8'))
                     logFile.close()
                     
@@ -947,12 +1045,12 @@ if (tx == "getECFiles"):
             print '{ "files": [ '
             files = os.listdir("json/ec/"+clinicId)
             files = ['json/ec/'+clinicId+'/'+elt for elt in files]
-            files.sort(key=os.path.getmtime)
+            files.sort(key=os.path.getctime)
             files.reverse()
             comma = False
             ctr = 0
             for filename in files:
-                mdate = os.path.getmtime(filename)
+                mdate = os.path.getctime(filename)
                 datefile = datetime.fromtimestamp(mdate).date()
                 if datefile >= datefrom and datefile <= dateto:
                     if comma:

@@ -3,72 +3,102 @@
 
      
     // ======= Valiation BYPASS for TESTING =========================================
-//      $(document.body).on('focusout', "#factTableBody td[data-target='Type']", function(){
+     $(document.body).on('focusout', "#factTableBody td[data-target='Type']", function(){
 
-//     var valid;
-//     var val=$(this).text();
-//     if(val=="")
-//     { // Condition 1 : If no entries , type CAS
-//       // alert("Selecing Default Type:CAS");
-//       $(this).text('CAS');
-//       valid=true;
-//     }
-//     else
-//     {
-//       valid=validation('Type',val);
-//     }
+    var valid;
+    var val=$(this).text();
+    if(val=="")
+    { // Condition 1 : If no entries , type CAS
+      // alert("Selecing Default Type:CAS");
+      $(this).text('CAS');
+      warnMsg('Selecting Default TYPE : CAS ');
+      valid=true;
+    }
+    else
+    {
+      valid=validation('Type',val);
+    }
 
-//     if(!valid){
-//       $(this).focus();
-//       $(this).text('');
+    if(!valid){
+      $(this).focus();
+      $(this).text('');
       
-//     }
-//      });
+    }
+     });
 
-//     $(document.body).on('focusout', "#factTableBody td[data-target='Dent']", function(){
+    $(document.body).on('focusout', "#factTableBody td[data-target='Dent']", function(){
 
-//   console.log('dent focus out called');
-//   var valid;
-//   var val=$(this).text();
+  console.log('dent focus out called');
+  var valid;
+  var val=$(this).text();
   
-//   console.log(val);
+  console.log(val);
 
-//   valid=validation('Dent',val);
-//   console.log(valid);
+  valid=validation('Dent',val);
+  console.log(valid);
 
 
-//    if((val=="")||(val==null))
-//     { 
-//       warnMsg('No Value, Selecting default Val :1')
-//       // alert("No Value, Selecting default Val :1");
-//       $(this).text('1');
-//       valid=true;
-//     }
-//     else
-//     {
-//       valid=validation('Dent',val);
-//     }
+   if((val=="")||(val==null))
+    { 
+      warnMsg('No Value entered in DENT. Selecting default value 1.')
+      // alert("No Value, Selecting default Val :1");
+      $(this).text('1');
+      valid=true;
+    }
+    else
+    {
+      valid=validation('Dent',val);
+    }
   
 
-//  if(!valid){
-//       valid=true;
-//       alert('Wrong Range! Please Enter Correct value.');
-//       $(this).text('');
+ if(!valid){
+      valid=true;
+      alert('Wrong Range! Please Enter Correct value.');
+      $(this).text('');
       
-//     }
-// });
+    }
+});
 
-//    });
+    $(document.body).on('focusout', "#factTableBody td[data-target='Code']", function(){
+
+    var valid;
+    var val=$(this).text();
+    var popData=$(this).parent();
+    var code_data=getCodeData(val);
+    if(code_data && !(val==""))
+    {
+      $(popData).children("td[data-target='Description']").text(code_data.fr);
+      $(popData).children("td[data-target='Frais']").text(code_data.frais);
+    }
+    else
+    {
+      warnMsg('Invalid value entered in CODE.');
+    }
+    
+     });
+
+    $(document.body).on('focusout', "#factTableBody td[data-target='Frais']", function(){
+
+    var valid;
+    var val=$(this).text();
+    
+     });
 
 // =====================================================================
 }); 
  function warnMsg(msg)
- {  console.log(msg);
-    $('#warn_msg_fact_content').text('<p>'+msg+'</p>')
+ {  
+    console.log(msg);
+
+    
     $('#wrn_msg_fact_tbl').removeClass('hidden');
-    $('#wrn_msg_fact_tbl').addClass('visible');
-    // $('#wrn_msg_fact_tbl').transition({duration:'1s'});
- }
+    $('#warn_msg_fact_content').text(msg);
+    $('#wrn_msg_fact_tbl').fadeIn().addClass('visible').delay(6000).fadeOut("slow",function(){
+      $('#wrn_msg_fact_tbl').removeClass('visible');
+      $('#wrn_msg_fact_tbl').addClass('hidden');
+       });
+    
+ }  
 
   function validation(type,val)
   {
@@ -79,7 +109,8 @@
       //Condition 2: If none of AMQ BES HOP and CAS and Selected DrpDown Value - MESSAGE ERROR
       if ((!(val=="AMQ"||val=="BES"||val=="HOP" ))&&(!(val=="CAS"))&&(!(val==$("#ramq_select").val())))
     {
-      alert('Error! No type selected');
+      // alert('Error! No type selected');
+      warnMsg('TYPE error. Please enter correct type.')
       return false;
     }
     
@@ -90,15 +121,17 @@
         
         if(!valid_ramq)
         {
-        alert('Invalid RAMQ Card Number : Please check Ramq Card Number');
+        // alert('Invalid RAMQ Card Number : Please check Ramq Card Number');
+        warnMsg('Invalid RAMQ card number. Please check RAMQ card number.');
         return false;
       
         }
         else
         {
-          console.log('Checking expiry Now');
+          warnMsg('Checking expiry Now');
           var check_exp=check_ramq_exp();
           if(!check_exp){
+            warnMsg('RAMQ card expired. Please put valid RAMQ card.')
             return false;
           }
           return true;
@@ -132,7 +165,7 @@
       }
       else
       {
-        
+        warnMsg('Invalid input. This value does not exist for Denturologiste Dent type.');
         return false;
       }
       break;
@@ -146,7 +179,7 @@
       }
       else
       {
-        
+        warnMsg('Invalid input. This value does not exist for Dentiste Dent type.');
         return false;
       }
       break;
@@ -154,7 +187,7 @@
     default:
        if((val<1)||(val>85))
     { 
-      
+      warnMsg('Invalid input.This value does not exist for any Dent Type.')
       return false;
     }
 else{
@@ -293,4 +326,35 @@ else{
       return false;
     }
   }
+
+  var dataJson_Code;      
+        $.getJSON("json/params/codes6.json",function(data){
+          dataJson_Code=data;
+        });
+  
+
+function getCodeData(codeVal){
+        
+       var output;
+      
+        var search1= codeVal;
+        var reg=new RegExp(search1,'i');
+      
+          $.each(dataJson_Code,function(key,val){
+      
+            if(key.search(reg) != -1)
+            {
+            output=val;
+
+            
+
+          }
+          });
+      
+        return output;
+      
+          // $('#codesBody').html(output);
+      
+      
+      };
   

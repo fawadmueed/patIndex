@@ -52,7 +52,7 @@ function populate_table(arrToPopTabl){
             // ramq_id=val.ramq_id
             var ramqId=val.ramq_id;
 
-            ramqId=ramqId.toString();
+            
             tblRow=$('<tr>').attr('id',val.row_id).attr('ramq_id',ramqId);
 
             var fields=['Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod','codeRole'];
@@ -124,8 +124,7 @@ function add_empty_row(){
             // ramq_id=val.ramq_id
             fact_tbl_row_id_Up=fact_tbl_row_id_Up+1;
             ramq_id_Up=ramq_id_Up+1;
-            console.log('in empty row');
-            console.log(fact_tbl_row_id_Up);
+          
 			tblRow=$('<tr>').attr('id',fact_tbl_row_id_Up).attr('ramq_id',ramq_id_Up); 
 			//fact_tbl_row id sorting the highest value already, also asiging to ramq_id
 
@@ -281,13 +280,13 @@ function updatedPopulateForm(formname,thisFromData_Up)
         
         $.each(thisFromData_Up,function(id,val){
         
-	        if(val.name=='liste_med_consm_denti_upd')
+	        if(val.name=='liste_med_consm_denti')
 	        {
 		        console.log(val.value);
 		        $('#form_dentiste_Up #medi_com_list_Up').append('<option selected="selected">'+val.value+'</option>')
 	        }
 	        
-	        if(val.name=='liste_elm_mesur_denti_upd')
+	        if(val.name=='liste_elm_mesur_denti')
 	        {
 		        console.log(val.value);
 		        $('#form_dentiste_Up #elem_meas_list_Up').append('<option selected="selected">'+val.value+'</option>')
@@ -304,12 +303,12 @@ function updatedPopulateForm(formname,thisFromData_Up)
 
         $.each(thisFromData_Up,function(id,val){
         
-        if(val.name=='liste_med_consm_bucc_upd'){
+        if(val.name=='liste_med_consm_bucc'){
         console.log(val.value);
         $('#form_chirurgiens_Up #medi_com_list_chir').append('<option selected="selected">'+val.value+'</option>')
         }
         
-        if(val.name=='liste_elm_mesur_bucc_upd'){
+        if(val.name=='liste_elm_mesur_bucc'){
         console.log(val.value);
         $('#form_chirurgiens_Up #elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
         }
@@ -429,7 +428,7 @@ function Regie_fact_modal()
    	$('#factTableBody_regie tr').remove();
     populate_table(arrGrilleDeFacturation_update);
     
-    $('.modal_regie_fact_modal').modal('show');
+    $('.modal_regie_fact_modal.modal').modal('show');
 
    }
 
@@ -438,23 +437,23 @@ function Regie_fact_modal()
 
    	arrGrilleDeFacturation_forms_update.push( [
 {name: "row_id", value: "1"},
-{name: "no_autor_proth_acryl_denti_upd", value: "FAWAD  1 "},
-{name: "dat_autor_proth_acryl_denti_upd", value: "02/22/2017"},
-{name: "typ_id_rais_trait_denta_denti_upd", value: "AB"},
-{name: "id_rais_trait_denta_denti_upd", value: "123"},
-{name: "typ_id_site_trait_denta_denti_upd", value: ""},
-{name: "id_site_trait_denta_denti_upd", value: ""},
-{name: "liste_med_consm_denti_upd", value: "FAWW"},
-{name: "liste_elm_contx_denti_upd", value: "1727"},
-{name: "liste_elm_mesur_denti_upd", value: "RAMM/Kilomètres"},
-{name: "lieu_refre_phys_denti_upd", value: ""},
-{name: "id_lieu_phys_denti_upd", value: ""},
-{name: "code_postal_geo_denti_upd", value: ""},
-{name: "code_localite_geo_denti_upd", value: ""},
-{name: "no_bureau_geo_denti_upd", value: ""},
-{name: "id_prof_refre_denti_upd", value: ""},
-{name: "lieu_refre_phys_denti_upd", value: "Lieu codifié á la Régie"},
-{name: "id_lieu_phys_denti_upd", value: "1222222"}
+{name: "no_autor_proth_acryl_denti", value: "FAWAD  1 "},
+{name: "dat_autor_proth_acryl_denti", value: "02/22/2017"},
+{name: "typ_id_rais_trait_denta_denti", value: "AB"},
+{name: "id_rais_trait_denta_denti", value: "123"},
+{name: "typ_id_site_trait_denta_denti", value: ""},
+{name: "id_site_trait_denta_denti", value: ""},
+{name: "liste_med_consm_denti", value: "FAWW"},
+{name: "liste_elm_contx_denti", value: "1727"},
+{name: "liste_elm_mesur_denti", value: "RAMM/Kilomètres"},
+{name: "lieu_refre_phys_denti", value: ""},
+{name: "id_lieu_phys_denti", value: ""},
+{name: "code_postal_geo_denti", value: ""},
+{name: "code_localite_geo_denti", value: ""},
+{name: "no_bureau_geo_denti", value: ""},
+{name: "id_prof_refre_denti", value: ""},
+{name: "lieu_refre_phys_denti", value: "Lieu codifié á la Régie"},
+{name: "id_lieu_phys_denti", value: "1222222"}
 ],
 [
 {name: "row_id", value: "2"},

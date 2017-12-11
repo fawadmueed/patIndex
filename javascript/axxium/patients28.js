@@ -589,7 +589,7 @@
       qParams = JSON.parse(xmlhttp2.responseText);
       if (qParams["logo"])
       {
-        // document.getElementById("topLogo").setAttribute("src", "images/"+qParams["logo"]);
+        document.getElementById("topLogo").setAttribute("src", "images/"+qParams["logo"]);
       }
     }
   }

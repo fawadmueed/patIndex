@@ -42,6 +42,8 @@
    <script src="javascript/axxium/ramqEC29.js"></script>
    <script src="javascript/axxium/ramqBill29.js"></script>
    <script src="javascript/axxium/fact_detail_regi_table.js"></script>
+
+   
    <!-- <script type="text/javascript"> var translator = $('body').translate({lang:"", t:dict});  </script> -->
    <!-- Alexey JS FILE -->
    <style type="text/css">
@@ -54,7 +56,15 @@
    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/dataTables.semanticui.min.css">
    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js"></script>
+   <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+   <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
+
+   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
    <script>
+
       function getLang()
       {
         // alert('getLang function');
@@ -1222,11 +1232,13 @@
                   </div>
                </div>
                <div class="ui negative message hidden" id="wrn_msg_fact_tbl">
-                  <i class="close icon"></i>
-                  <div class="header">
-                     Wrong Selection!
+                    <i class="close icon"></i>
+                  <div style="display:inline;"> <i class="warning icon"></i></div>
+                  <div class="header" id="warn_msg_fact_content" style="display:inline;">
+                     
                   </div >
-                  </div id="warn_msg_fact_content">
+                </div>
+
                   <div class="ui grid">
                      <div class="sixteen wide column">
                         <div class="ui teal form raised segment">
@@ -1268,6 +1280,8 @@
                         <div class="ui axxium tiny button" onclick="RamqUpdateGlobalBill()">Générer la facture</div>
                         <!-- getAllTrData(); -->
                         <div class="ui axxium tiny button" onclick="robData();">RobData</div>
+                        
+                        <div class="ui axxium tiny button" onclick="modPaimnt();">PamntMOdalTEst</div>
 
                         <div class="ui axxium tiny button ok" onclick="">Facturation anticipée</div>
                      </div>
@@ -1324,7 +1338,7 @@
                               </div> -->
                         </div>
                         <div class="for_Facture_Drop down">
-                           <table class="ui striped  table" id="rgie_fact_table">
+                           <table class="ui striped  table" id="rgie_fact_table" >
                               <thead>
                                  <tr>
                                     <th>Dossier</th>
@@ -1388,7 +1402,24 @@
                   <div id="fact_regie_paiements" style="display: none;">
                      <div class="ui teal form segment">
                         <div class="for_Facture_Drop down">
-                           <table class="ui striped  table">
+                          
+                          <div class="inline four fields">
+                           <div class="three wide field">
+                              <label>Année</label>
+                              <input type="date" id="txtRamqPaymentDateFrom">
+                           </div>
+                           <div class="three wide field">
+                              <label>-</label>
+                              <input type="date" id="txtRamqPaymentDateTo">
+                           </div>
+                           <div class="ui axxium tiny button" onclick="RamqBillGetPaymentList()">Search</div>
+                           <div class="field" style="margin-left:30px"> 
+                            <input type="checkbox" name="" id="chkRamqPaymentDisplayAllPatient">
+                            <label>"Tous les patients</label>
+                           </div>
+                          </div>
+
+                           <table class="ui striped  table" id="tblRamqPaiments" width="100%">
                               <thead>
                                  <tr>
                                     <th>Dossier</th>
@@ -1405,9 +1436,7 @@
                                  </tr>
                               </thead>
                               <tbody>
-                                 <tr>
-                                    <td></td>
-                                 </tr>
+                                 
                               </tbody>
                            </table>
                            <div class="ui segment">
@@ -1415,38 +1444,43 @@
                                  <div class="four inline fields">
                                     <label>Factures non payées</label>
                                     <div class="field">
-                                       <input type="text" maxlength="5"></input>
+                                       <input type="text" maxlength="5" id="txtRamqPaymentNonPayedBill">
                                     </div>
                                     <label>Total Facture:</label>
                                     <div class="field">
-                                       <input type="text"></input>
+                                       <input type="text" id="txtRamqPaymentTotalBill">
                                     </div>
                                     <label>No de paiements</label>
                                     <div class="field">
-                                       <input type="text" maxlength="5"></input>
+                                       <input type="text" maxlength="5" id="txtRamqPaymentNoPayments">
                                     </div>
                                     <label>Total paiements</label>
                                     <div class="field">
-                                       <input type="text"></input>
+                                       <input type="text" id="txtRamqPaymentTotalPayments">
                                     </div>
                                  </div>
                               </div>
                            </div>
-                           <div class="three fields">
-                              <div class="inline field">
-                                 <input type="checkbox" ></input>
+                           <div class="fields">
+                              <div class="inline fields">
+                                 <input class="regi_pamnt_tbl_rad"  type="radio" id="optRamqPaymentAllBills" name="regi_pamnt_tbl_radio" checked="checked">
                                  <label>Tous les factures</label>
                               </div>
-                              <div class="inline field">
-                                 <input type="checkbox" ></input>
+                              <div class="inline fields">
+                                 <input class="regi_pamnt_tbl_rad" type="radio" id="optRamqPaymentPayedBills" name="regi_pamnt_tbl_radio">
                                  <label>Factures Payées</label>
                               </div>
-                              <div class="inline field">
-                                 <input type="checkbox" ></input>
+                              <div class="inline fields">
+                                 <input class="regi_pamnt_tbl_rad" type="radio" id="optRamqNonPayedBills" name="regi_pamnt_tbl_radio">
                                  <label>Factures non payées</label>
                               </div>
                            </div>
                         </div>
+                        <script type="text/javascript">
+                          $('.regi_pamnt_tbl_rad').change(function(){
+                            RamqBillPaymentUpdateTable();
+                          });
+                        </script>
                         <div class="ui grid">
                            <div class="seven column row">
                               <div class="column"></div>
@@ -1454,9 +1488,6 @@
                               <div class="column"></div>
                               <div class="column"></div>
                               <div class="column"></div>
-                              <div class="right floated column">
-                                 <div class="ui axxium tiny button">Exporter XLS</div>
-                              </div>
                               <div class="right floated column">
                                  <div class="ui axxium tiny button">Télé. Paiements</div>
                               </div>
@@ -1469,23 +1500,25 @@
                         <div class="inline four fields">
                            <div class="three wide field">
                               <label>Année</label>
-                              <input type="text"></input>
+                              <input type="date" id="reg_msg_date_frm"></input>
                            </div>
                            <div class="three wide field">
                               <label>-</label>
-                              <input type="text"></input>
+                              <input type="date" id="reg_msg_date_to"></input>
                            </div>
-                           <div class="four wide field">
+                           <div class="three wide field">
                               <label>No de facture</label>
-                              <input type="text"></input>
+                              <input type="text" id="reg_msg_no_fact_frm"></input>
                            </div>
                            <div class="three wide field">
                               <label>-</label>
-                              <input type="text"></input>
+                              <input type="text" id="reg_msg_no_fact_to"></input>
                            </div>
+                            <div class="ui axxium tiny button" onclick="RamqBillGetMessageLog()">Search</div>
+                           
                         </div>
                         <div class="for_Facture_Drop down">
-                           <table class="ui striped  table">
+                           <table class="ui striped  table" id="reg_msg_tbl" width="100%">
                               <thead>
                                  <tr>
                                     <th>#RAMQ</th>
@@ -1493,22 +1526,21 @@
                                     <th>Date</th>
                                     <th>Status de recevabilitié</th>
                                     <th>Messages</th>
+                                    <th>MessagesDetails</th>
                                  </tr>
                               </thead>
-                              <tbody>
-                                 <tr>
-                                    <td></td>
-                                 </tr>
+                              <tbody id="reg_msg_tbl_body">
+                                 
                               </tbody>
                            </table>
                         </div>
-                        <div class="two fields">
+                        <div class="fields">
                            <div class="inline field">
-                              <input type="checkbox" ></input>
+                              <input class="reg_fact_chck" type="radio" id="reg_fact_chck_tous" name="reg_fact_chck"></input>
                               <label>Tous les messages</label>
                            </div>
                            <div class="inline field">
-                              <input type="checkbox" ></input>
+                              <input class="reg_fact_chck" type="radio" id="reg_fact_chck_msg_der" name="reg_fact_chck"></input>
                               <label>Messages dérreur</label>
                            </div>
                         </div>
@@ -1519,13 +1551,12 @@
                               <div class="column"></div>
                               <div class="column"></div>
                               <div class="column"></div>
-                              <div class="right floated column">
-                                 <div class="ui axxium tiny button">Exporter XLS</div>
-                              </div>
+                              
                            </div>
                         </div>
                      </div>
                   </div>
+
                   <div id="fact_regie_etatCompte" style="display: none;">
                      <div class="ui teal form segment">
                         <div class="inline fields">
@@ -3081,6 +3112,7 @@
    </div>
    <div class="ui modal_regie_fact_modal large modal">
       <div class="header">
+        <i class="close icon"></i>
          <i class="money icon"></i>Regie Facture Modal
       </div>
       <div class="content">
@@ -3347,8 +3379,8 @@
                <div class="ui seven column grid">
                   <div class="seven column centered row">
                      <div class="nine wide column">
-                        <div class="ui axxium tiny button" onclick="RamqSoumissionDemandedAnnulation()">Annuler fact. à la Régie</div>
-                        <div class="ui axxium  tiny button" onclick="RamqBillReSendToRamq()">Transférer à la Régie</div>
+                        <button class="ui axxium tiny button" id="btn_anuler_fact" onclick="RamqSoumissionDemandedAnnulation()">Annuler fact. à la Régie</button>
+                        <button class="ui axxium  tiny button" id="btn_detail_trnsfr_regi" onclick="RamqBillReSendToRamq()">Transférer à la Régie</button>
                         <div class="ui axxium  tiny button" onclick="">Quitter</div>
                      </div>
                   </div>
@@ -3530,11 +3562,11 @@
                            <div class="two fields">
                               <div class="field">
                                  <label>No d'autorisation</label>
-                                 <input type="text" name="no_autor_proth_acryl_denti_upd">
+                                 <input type="text" name="no_autor_proth_acryl_denti">
                               </div>
                               <div class="field">
                                  <label>Date d'autorisation</label>
-                                 <input type="date" name="dat_autor_proth_acryl_denti_upd">
+                                 <input type="date" name="dat_autor_proth_acryl_denti">
                               </div>
                            </div>
                         </div>
@@ -3543,21 +3575,21 @@
                            <div class="two fields">
                               <div class="field">
                                  <label>Type </label>
-                                 <input type="text" name="typ_id_rais_trait_denta_denti_upd">
+                                 <input type="text" name="typ_id_rais_trait_denta_denti">
                               </div>
                               <div class="field">
                                  <label>Raison</label>
-                                 <input type="text" name="id_rais_trait_denta_denti_upd">
+                                 <input type="text" name="id_rais_trait_denta_denti">
                               </div>
                            </div>
                            <div class="two fields">
                               <div class="field">
                                  <label>Type </label>
-                                 <input type="text" name="typ_id_site_trait_denta_denti_upd">
+                                 <input type="text" name="typ_id_site_trait_denta_denti">
                               </div>
                               <div class="field">
                                  <label>Site</label>
-                                 <input type="text" name="id_site_trait_denta_denti_upd">
+                                 <input type="text" name="id_site_trait_denta_denti">
                               </div>
                            </div>
                         </div>
@@ -3571,7 +3603,7 @@
                               <div class="ui teal tiny button" onclick="add_list_medi_del()" style="margin-top: 23px">-</div>
                            </div>
                            <div class="field">
-                              <select id="medi_com_list" name="liste_med_consm_denti_upd" multiple="">
+                              <select id="medi_com_list" name="liste_med_consm_denti" multiple="">
                               </select>
                            </div>
                         </div>
@@ -3586,7 +3618,7 @@
                         </script>
                         <div class="field">
                            <label>Éléments de contexte</label>
-                           <select  id="dropD_dentiste" name="liste_elm_contx_denti_upd" multiple="multiple">
+                           <select  id="dropD_dentiste" name="liste_elm_contx_denti" multiple="multiple">
                               <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
                               <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
                               <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
@@ -3626,7 +3658,7 @@
                               <div class="ui teal tiny button" onclick="del_list_elem_meas()" style="margin-top: 23px">-</div>
                            </div>
                            <div class="field">
-                              <select id="elem_meas_list" name="liste_elm_mesur_denti_upd" multiple="">
+                              <select id="elem_meas_list" name="liste_elm_mesur_denti" multiple="">
                               </select>
                            </div>
                         </div>
@@ -3645,54 +3677,54 @@
                         <div class="ui form segment">
                            <div class="five wide field">
                               <label>Date De Service</label>
-                              <input type="date" id="date_de_service_dentiste" value="2017-01-01" name="dat_serv_elm_fact_denti_upd">
+                              <input type="date" id="date_de_service_dentiste" value="2017-01-01" name="dat_serv_elm_fact_denti">
                            </div>
                            <h4 class="ui horizontal divider header">Lieu de référence</h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
-                              <input type="text" name="typ_refre_lieu_denti_upd">
+                              <input type="text" name="typ_refre_lieu_denti">
                            </div>
                            <div class="ui form segment">
                               <h4 class="ui horizontal divider header">Identification du lieu</h4>
                               <div class="inline field">
-                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti_upd" id="lieu_codifie_dent" value="Lieu codifié á la Régie">
+                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti" id="lieu_codifie_dent" value="Lieu codifié á la Régie">
                                  <label>Lieu codifié à la Régie</label>
                               </div>
                               <div class="inline field">
-                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti_upd" id="lieu_codifie_non_dent" value="Lieu non codifié">
+                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti" id="lieu_codifie_non_dent" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
                               <div class="three wide field" id="codif_selection_lieu" style="display: none">
                                  <label>Numéro du lieu</label>
-                                 <input type="text" name="id_lieu_phys_denti_upd">
+                                 <input type="text" name="id_lieu_phys_denti">
                               </div>
                               <div class="three fields" id="codif_selection_non" style="display: none">
                                  <div class="field">
                                     <label>Code postal</label>
-                                    <input type="text" name="code_postal_geo_denti_upd">
+                                    <input type="text" name="code_postal_geo_denti">
                                  </div>
                                  <div class="field">
                                     <label>Code localité</label>
-                                    <input type="text" name="code_localite_geo_denti_upd">
+                                    <input type="text" name="code_localite_geo_denti">
                                  </div>
                                  <div class="field">
                                     <label>No. bureau.</label>
-                                    <input type="text" name="no_bureau_geo_denti_upd">
+                                    <input type="text" name="no_bureau_geo_denti">
                                  </div>
                               </div>
                               <div class="" id="type_lieu_cont" style="display: none">
                                  <strong><label>Type de lieu</label></strong>
                                  <div class="six inline fields">
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_denti_upd" value="Cabinet">
+                                       <input type="radio" name="typ_lieu_geo_denti" value="Cabinet">
                                        <label>Cabinet</label>
                                     </div>
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_denti_upd" value="Domicile">
+                                       <input type="radio" name="typ_lieu_geo_denti" value="Domicile">
                                        <label>Domicile</label>
                                     </div>
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_denti_upd" value="Autre">
+                                       <input type="radio" name="typ_lieu_geo_denti" value="Autre">
                                        <label>Autre</label>
                                     </div>
                                  </div>
@@ -3703,11 +3735,11 @@
                           <h4 class="ui horizontal divider header">Référant</h4>
                           <div class="field">
                             <label>No de référant</label>
-                            <input type="text" name="id_prof_refre_denti_upd" id="no_ref_dentis">
+                            <input type="text" name="id_prof_refre_denti" id="no_ref_dentis">
                           </div>
                           <div class="field">
                             <label>Type de référant</label>
-                            <select id="typ_ref_dentis" name="typ_refre_autre_prof_denti_upd">
+                            <select id="typ_ref_dentis" name="typ_refre_autre_prof_denti">
                               <option value="1">Professionnel référant</option>
                               <option value="6">Professionnel remplacé</option>
                             </select>
@@ -4036,11 +4068,11 @@
                            <div class="two fields">
                               <div class="field">
                                  <label>No d'autorisation</label>
-                                 <input type="text" name="no_autor_proth_acryl_denti_upd">
+                                 <input type="text" name="no_autor_proth_acryl_denti">
                               </div>
                               <div class="field">
                                  <label>Date d'autorisation</label>
-                                 <input type="date" name="dat_autor_proth_acryl_denti_upd">
+                                 <input type="date" name="dat_autor_proth_acryl_denti">
                               </div>
                            </div>
                         </div>
@@ -4049,21 +4081,21 @@
                            <div class="two fields">
                               <div class="field">
                                  <label>Type </label>
-                                 <input type="text" name="typ_id_rais_trait_denta_denti_upd">
+                                 <input type="text" name="typ_id_rais_trait_denta_denti">
                               </div>
                               <div class="field">
                                  <label>Raison</label>
-                                 <input type="text" name="id_rais_trait_denta_denti_upd">
+                                 <input type="text" name="id_rais_trait_denta_denti">
                               </div>
                            </div>
                            <div class="two fields">
                               <div class="field">
                                  <label>Type </label>
-                                 <input type="text" name="typ_id_site_trait_denta_denti_upd">
+                                 <input type="text" name="typ_id_site_trait_denta_denti">
                               </div>
                               <div class="field">
                                  <label>Site</label>
-                                 <input type="text" name="id_site_trait_denta_denti_upd">
+                                 <input type="text" name="id_site_trait_denta_denti">
                               </div>
                            </div>
                         </div>
@@ -4077,7 +4109,7 @@
                               <div class="ui teal tiny button" onclick="add_list_medi_del_Up()" style="margin-top: 23px">-</div>
                            </div>
                            <div class="field">
-                              <select id="medi_com_list_Up" name="liste_med_consm_denti_upd" multiple="">
+                              <select id="medi_com_list_Up" name="liste_med_consm_denti" multiple="">
                               </select>
                            </div>
                         </div>
@@ -4092,7 +4124,7 @@
                         </script>
                         <div class="field">
                            <label>Éléments de contexte</label>
-                           <select  id="dropD_dentiste" name="liste_elm_contx_denti_upd" multiple="multiple">
+                           <select  id="dropD_dentiste" name="liste_elm_contx_denti" multiple="multiple">
                               <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
                               <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
                               <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
@@ -4132,7 +4164,7 @@
                               <div class="ui teal tiny button" onclick="del_list_elem_meas_Up()" style="margin-top: 23px">-</div>
                            </div>
                            <div class="field">
-                              <select id="elem_meas_list_Up" name="liste_elm_mesur_denti_upd" multiple="">
+                              <select id="elem_meas_list_Up" name="liste_elm_mesur_denti" multiple="">
                               </select>
                            </div>
                         </div>
@@ -4151,54 +4183,54 @@
                         <div class="ui form segment">
                            <div class="five wide field">
                               <label>Date De Service</label>
-                              <input type="date" id="date_de_service_dentiste" value="" name="dat_serv_elm_fact_denti_upd">
+                              <input type="date" id="date_de_service_dentiste" value="" name="dat_serv_elm_fact_denti">
                            </div>
                            <h4 class="ui horizontal divider header">Lieu de référence</h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
-                              <input type="text" name="typ_refre_lieu_denti_upd">
+                              <input type="text" name="typ_refre_lieu_denti">
                            </div>
                            <div class="ui form segment">
                               <h4 class="ui horizontal divider header">Identification du lieu</h4>
                               <div class="inline field">
-                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti_upd" id="lieu_codifie_dent" value="Lieu codifié á la Régie">
+                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti" id="lieu_codifie_dent" value="Lieu codifié á la Régie">
                                  <label>Lieu codifié à la Régie</label>
                               </div>
                               <div class="inline field">
-                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti_upd" id="lieu_codifie_non_dent" value="Lieu non codifié">
+                                 <input type="radio" class="lieu" name="lieu_refre_phys_denti" id="lieu_codifie_non_dent" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
                               <div class="three wide field" id="codif_selection_lieu" style="display: none">
                                  <label>Numéro du lieu</label>
-                                 <input type="text" name="id_lieu_phys_denti_upd">
+                                 <input type="text" name="id_lieu_phys_denti">
                               </div>
                               <div class="three fields" id="codif_selection_non" style="display: none">
                                  <div class="field">
                                     <label>Code postal</label>
-                                    <input type="text" name="code_postal_geo_denti_upd">
+                                    <input type="text" name="code_postal_geo_denti">
                                  </div>
                                  <div class="field">
                                     <label>Code localité</label>
-                                    <input type="text" name="code_localite_geo_denti_upd">
+                                    <input type="text" name="code_localite_geo_denti">
                                  </div>
                                  <div class="field">
                                     <label>No. bureau.</label>
-                                    <input type="text" name="no_bureau_geo_denti_upd">
+                                    <input type="text" name="no_bureau_geo_denti">
                                  </div>
                               </div>
                               <div class="" id="type_lieu_cont" style="display: none">
                                  <strong><label>Type de lieu</label></strong>
                                  <div class="six inline fields">
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_denti_upd" value="Cabinet">
+                                       <input type="radio" name="typ_lieu_geo_denti" value="Cabinet">
                                        <label>Cabinet</label>
                                     </div>
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_denti_upd" value="Domicile">
+                                       <input type="radio" name="typ_lieu_geo_denti" value="Domicile">
                                        <label>Domicile</label>
                                     </div>
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_denti_upd" value="Autre">
+                                       <input type="radio" name="typ_lieu_geo_denti" value="Autre">
                                        <label>Autre</label>
                                     </div>
                                  </div>
@@ -4209,11 +4241,11 @@
                           <h4 class="ui horizontal divider header">Référant</h4>
                           <div class="field">
                             <label>No de référant</label>
-                            <input type="text" name="id_prof_refre_denti_upd" id="no_ref_dentis_Up">
+                            <input type="text" name="id_prof_refre_denti" id="no_ref_dentis_Up">
                           </div>
                           <div class="field">
                             <label>Type de référant</label>
-                            <select id="typ_ref_dentis_Up" name="typ_refre_autre_prof_denti_upd">
+                            <select id="typ_ref_dentis_Up" name="typ_refre_autre_prof_denti">
                               <option value="1">Professionnel référant</option>
                               <option value="6">Professionnel remplacé</option>
                             </select>
@@ -4257,11 +4289,11 @@
                            <h4 class="ui horizontal divider header"><label>Prothèse en acrylique</label></h4>
                            <div class="field">
                               <label>No d'autorisation</label>
-                              <input type="text" name="no_autor_proth_acryl_bucc_upd">
+                              <input type="text" name="no_autor_proth_acryl_bucc">
                            </div>
                            <div class="field">
                               <label>Date d'autorisation</label>
-                              <input type="date" name="dat_autor_proth_acryl_bucc_upd">
+                              <input type="date" name="dat_autor_proth_acryl_bucc">
                            </div>
                         </div>
                         <div class="ui segment">
@@ -4269,21 +4301,21 @@
                            <div class="two fields">
                               <div class="field">
                                  <label>Type </label>
-                                 <input type="text" name="typ_id_rais_trait_denta_bucc_upd">
+                                 <input type="text" name="typ_id_rais_trait_denta_bucc">
                               </div>
                               <div class="field">
                                  <label>Raison</label>
-                                 <input type="text" name="id_rais_trait_denta_bucc_upd">
+                                 <input type="text" name="id_rais_trait_denta_bucc">
                               </div>
                            </div>
                            <div class="two fields">
                               <div class="field">
                                  <label>Type</label>
-                                 <input type="text" name="typ_id_site_trait_denta_bucc_upd">
+                                 <input type="text" name="typ_id_site_trait_denta_bucc">
                               </div>
                               <div class="field">
                                  <label>Site</label>
-                                 <input type="text" name="id_site_trait_denta_bucc_upd">
+                                 <input type="text" name="id_site_trait_denta_bucc">
                               </div>
                            </div>
                         </div>
@@ -4297,7 +4329,7 @@
                               <div class="ui teal tiny button" onclick="add_list_medi_del()" style="margin-top: 23px">-</div>
                            </div>
                            <div class="field">
-                              <select id="medi_com_list_chir" name="liste_med_consm_bucc_upd" multiple="">
+                              <select id="medi_com_list_chir" name="liste_med_consm_bucc" multiple="">
                               </select>
                            </div>
                         </div>
@@ -4312,7 +4344,7 @@
                         </script>
                         <div class="field">
                            <label>Éléments de contexte</label>
-                           <select  id="dropD_chir" name="liste_elm_contx_bucc_upd" multiple="multiple">
+                           <select  id="dropD_chir" name="liste_elm_contx_bucc" multiple="multiple">
                               <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
                               <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
                               <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
@@ -4352,7 +4384,7 @@
                               <div class="ui teal tiny button" onclick="del_list_elem_meas_chir()" style="margin-top: 23px">-</div>
                            </div>
                            <div class="field">
-                              <select id="elem_meas_list" name="liste_elm_mesur_bucc_upd" multiple="">
+                              <select id="elem_meas_list" name="liste_elm_mesur_bucc" multiple="">
                               </select>
                            </div>
                         </div>
@@ -4371,54 +4403,54 @@
                         <div class="ui form segment">
                            <div class="five wide field">
                               <label>Date De Service</label>
-                              <input type="date" id="date_de_service_chirur" value="" name="dat_serv_elm_fact_bucc_upd">
+                              <input type="date" id="date_de_service_chirur" value="" name="dat_serv_elm_fact_bucc">
                            </div>
                            <h4 class="ui horizontal divider header"><label>Lieu de référence</label></h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
-                              <input type="text" name="typ_refre_lieu_bucc_upd">
+                              <input type="text" name="typ_refre_lieu_bucc">
                            </div>
                            <div class="ui form segment">
                               <h4 class="ui horizontal divider header"><label>Identification du lieu</label></h4>
                               <div class="inline field">
-                                 <input type="radio" class="lieu" name="lieu_refre_phys_bucc_upd" id="lieu_codifie_chir" value="Lieu codifié á la Régie">
+                                 <input type="radio" class="lieu" name="lieu_refre_phys_bucc" id="lieu_codifie_chir" value="Lieu codifié á la Régie">
                                  <label>Lieu codifié à la Régie</label>
                               </div>
                               <div class="inline field">
-                                 <input type="radio" class="lieu" name="lieu_refre_phys_bucc_upd" id="lieu_codifie_non_chir" value="Lieu non codifié">
+                                 <input type="radio" class="lieu" name="lieu_refre_phys_bucc" id="lieu_codifie_non_chir" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
                               <div class="three wide field" id="codif_selection_lieu" style="display: none">
                                  <label>Numéro du lieu</label>
-                                 <input type="text" name="id_lieu_phys_bucc_upd" id="id_lieu_phys_bucc_upd">
+                                 <input type="text" name="id_lieu_phys_bucc" id="id_lieu_phys_bucc">
                               </div>
                               <div class="three fields" style="display: none" id="codif_selection_non">
                                  <div class="field">
                                     <label>Code postal</label>
-                                    <input type="text" name="code_postal_geo_bucc_upd">
+                                    <input type="text" name="code_postal_geo_bucc">
                                  </div>
                                  <div class="field">
                                     <label>Code localité</label>
-                                    <input type="text" name="code_localite_geo_bucc_upd">
+                                    <input type="text" name="code_localite_geo_bucc">
                                  </div>
                                  <div class="field">
                                     <label>No. bureau</label>
-                                    <input type="text" name="no_bureau_geo_bucc_upd">
+                                    <input type="text" name="no_bureau_geo_bucc">
                                  </div>
                               </div>
                               <div class="" id="type_lieu_cont" style="display: none">
                                  <strong><label>Type de lieu</label></strong>
                                  <div class="six inline fields">
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_bucc_upd" value="Cabinet">
+                                       <input type="radio" name="typ_lieu_geo_bucc" value="Cabinet">
                                        <label>Cabinet</label>
                                     </div>
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_bucc_upd" value="Domicile">
+                                       <input type="radio" name="typ_lieu_geo_bucc" value="Domicile">
                                        <label>Domicile</label>
                                     </div>
                                     <div class="field">
-                                       <input type="radio" name="typ_lieu_geo_bucc_upd" value="Autre">
+                                       <input type="radio" name="typ_lieu_geo_bucc" value="Autre">
                                        <label>Autre</label>
                                     </div>
                                  </div>
@@ -4429,11 +4461,11 @@
                           <h4 class="ui horizontal divider header">Référant</h4>
                           <div class="field">
                             <label>No de référant</label>
-                            <input type="text" name="id_prof_refre_bucc_upd" id="no_ref_chir_Up">
+                            <input type="text" name="id_prof_refre_bucc" id="no_ref_chir_Up">
                           </div>
                           <div class="field">
                             <label>Type de référant</label>
-                            <select id="typ_ref_dentis" type="typ_refre_autre_prof_bucc_upd">
+                            <select id="typ_ref_dentis" name="typ_refre_autre_prof_bucc">
                               <option value="1">Professionnel référant</option>
                               <option value="6">Professionnel remplacé</option>
                             </select>
@@ -4476,17 +4508,17 @@
                     <h4 class="ui horizontal divider header">Prothése en acrylique</h4>
                     <div class="field">
                        <label>No d'autorisation</label>
-                       <input type="text" name="no_autor_proth_acryl_dentu_upd">
+                       <input type="text" name="no_autor_proth_acryl_dentu">
                     </div>
                     <div class="field">
                        <label>Date d'autorisation</label>
-                       <input type="date" name="dat_autor_proth_acryl_dentu_upd">
+                       <input type="date" name="dat_autor_proth_acryl_dentu">
                     </div>
                   </div>
                   <div calss="ui form segment">
                   <div class="field">
                      <h4 class="ui horizontal divider header">Éléments de contexte</h4>
-                     <select  id="dropD_denturologiste_Up" name="liste_elm_contx_dentu_upd" multiple="multiple">
+                     <select  id="dropD_denturologiste_Up" name="liste_elm_contx_dentu" multiple="multiple">
                         <option value="1740">Remplacement d une prothèse pour perte ou bris </option>
                         <option value="1741">Remplacement de deux prothèses pour perte ou bris</option>
                         <option value="1747">Séance différente </option>
@@ -4502,11 +4534,11 @@
                 <h4 class="ui horizontal divider header">Référant</h4>
                 <div class="field">
                   <label>No de référant</label>
-                  <input type="text" name="id_prof_refre_dentu_upd" id="no_ref_dentu_Up">
+                  <input type="text" name="id_prof_refre_dentu" id="no_ref_dentu_Up">
                 </div>
                 <div class="field">
                   <label>Type de référant</label>
-                  <select id="typ_ref_dentu_Up" name="typ_refre_autre_prof_dentu_upd">
+                  <select id="typ_ref_dentu_Up" name="typ_refre_autre_prof_dentu">
                     <option value="1">Professionnel référant</option>
                     <option value="6">Professionnel remplacé</option>
                   </select>
@@ -4596,6 +4628,41 @@
          </div>
       </div>
    </div>
+
+   <div class="ui modalPaiementRegie small modal">
+      <i class="close icon"></i>
+      <div class="header">
+         <i class="user icon"></i>Appliquer un paiement
+      </div>
+      <div class="content">
+        <div class="ui form segment">
+         <div class="four wide field">
+           <label>No de reçu</label>
+           <input type="text" name="" id="regi_pamnt_no_recu">
+         </div>
+         <div class="five wide field">
+           <label>Code</label>
+           <input type="text" name="" id="regi_pamnt_code">
+         </div>
+         <div class="five wide field">
+           <label>Raison</label>
+           <textarea name="" id="regi_pamnt_rason" rows="3" cols="10"></textarea>
+         </div>
+         <div class="five wide field">
+           <label>Paiement</label>
+           <input type="text" name="" id="regi_pamnt">
+         </div>
+         <div class="five wide field">
+           <label>Effectué le</label>
+           <input type="date" name="" id="regi_pamnt_effectu">
+         </div>
+         <div class="field">
+          <button class="ui axxium tiny button" onclick="RamqBillPaymentSendPaymentDetails()">Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+   </div>
+
    <div class="ui modalDoc modal">
       <i class="close icon"></i>
       <div class="header">
@@ -5317,7 +5384,11 @@
       $(document.body).on('focusout',"#factTableBody_regie td",function(){
                    $(this).text($(this).text().toUpperCase());
                  })
-      
+
+      $('.reg_fact_chck').change(function(){ 
+                      RamqBillUpdateMessageTable();
+                    });
+
       $('.modNoteProt.content .ui.form')
            .form({
            fields : {
@@ -5441,12 +5512,15 @@
       {
       $('.facture_response').modal('show');
       }
+
+      function modPaimnt(){
+        $('.modalPaiementRegie').modal('show');
+      }
       
       $('.coupled.modal')
       .modal({
        allowMultiple: true
       });
-      
       
       
       
@@ -5860,6 +5934,7 @@
    <script>
       var fact_tbl_row_id=0;
       var fact_tbl_row_id_Up=0;
+      var ramq_id=0;
       var ramq_id_Up=0;
       var arrGrilleDeFacturation=[]; 
       var arrGrilleDeFacturation_forms=[]; 
@@ -6046,12 +6121,8 @@
           .modal({
             allowMultiple: true
           });
-
-      $('.modal_regie_fact_modal.modal').
-          modal({
-            allowMultiple: true 
-          });    
-
+        $('.modalFactTableMore_Up.modal').modal('setting','allowMultiple',true);
+     
       loadParams();
         getPIN();
         loadQJSON(firstJSON);
@@ -6213,34 +6284,37 @@
       
       $(document).ready(function(){
       
-      //   var thisTag = [];
+        var thisTag = [];
       
-      // $('table th, table td,label,h4,h3,select option,a,div .item,div .button,div .header,strong,div .divider').each(function(){
+      $('table th, table td,label,h4,h3,select option,a,div .item,div .button,div .header,strong ,div .divider').each(function(){
       
-      //   var words=$(this).text();
+        var words=$(this).text();
       
-      //   if(words!=""  ){
+        if(words!=""  ){
       
-      //     var found=$.inArray(words,thisTag);
-      //     if(found <0){
-      //       thisTag.push($.trim(words));
+          var found=$.inArray(words,thisTag);
+          if(found <0){
+            thisTag.push($.trim(words));
           
-      //       }
-      // else{
-      //         // console.log('repeated:'+ $(this).text());
-      //      }
+            }
+      else{
+              // console.log('repeated:'+ $(this).text());
+           }
         
-      //   }
+        }
       
-      // });
+      });
       
-      // var thisData=[];
+      var thisData=[];
       
-      // $.each(thisTag,function(idx,val){
+      $.each(thisTag,function(idx,val){
       
-      //   thisData.push('"'+val+ '"'+' : { en:" " },' );
+        thisData.push('"'+val+ '"'+' : { en:" " },' );
       
-      // });
+      });
+
+      // thisData2={};
+      // thisData2={ thisData };
       
       
       // // thisData=JSON.stringify(thisData);
@@ -6249,8 +6323,9 @@
       //     console.log(result);
       //     });
       
-      
-      
+      // $.post("allScriptsv1.py", {tx: "uploadJSONP", sub: "patients", name: 'wordDict', json: JSON.stringify(thisData) }, function(result){
+      //   console.log(result);
+      // })
       });
    </script>
 </body>

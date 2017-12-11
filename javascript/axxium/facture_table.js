@@ -1,8 +1,5 @@
-
-  var arrGrilleDeFacturation=[];
-  var arrGrilleDeFacturation_forms=[];
-
-  // set TYPE from here globVisionRData.InsTypeList[0]
+var arrGrilleDeFacturation=[];
+var arrGrilleDeFacturation_forms=[];
 
 $(document).ready(function(){
 
@@ -17,7 +14,7 @@ $(document).ready(function(){
               });
   
   $(document.body).on("submit","#form_dentiste", function(event) {
-      console.log('form submit Fact called');
+      
                 submitForm(this);
               });
 
@@ -104,7 +101,7 @@ function getPrevRowType(idPrev){
 }
 
 function getAllTrData(){
-  console.log('getAlltrData called');
+  ramq_id=0;
   var count_ramq=0;
   var count_insur=0;
 
@@ -129,8 +126,9 @@ function getAllTrData(){
       if(key=='Type'&&(value=='AMQ'||value=='BES'||value=='HOP')) {
         // Count Table Row entries for type RAMQ
         count_ramq=count_ramq+1;
+        ramq_id=ramq_id+1;
         var ramqId='ramq_id';
-        var valID=count_ramq;
+        var valID=ramq_id;
         myObjects[ramqId]=valID;
       }
       if(key=='Type'&&((!(value=='AMQ'||value=='BES'||value=='HOP'))&&(!(value=='CAS')) )) {
@@ -169,7 +167,6 @@ function getAllTrData(){
 }
 
 function submitForm(thisForm){
-  console.log('fact submitfn called');
     event.preventDefault();
     var moreInfoArray=$(thisForm).serializeArray();
     var checkIfUpdate=updateArray('row_id',moreInfoArray[0].value,moreInfoArray);
@@ -248,30 +245,27 @@ function modFactTableMore(x)
 function getThisFormData(row_id){
 
   var arrayToPopulateForm=[];
-  console.log('in array to pop');
-  console.log(arrGrilleDeFacturation_forms);
   $.each(arrGrilleDeFacturation_forms,function(idx,value){
     
     
     $.each(value,function(id,val){
-     console.log(val);
+     
       if((val.name=="row_id")&&(val.value==row_id))
       {
-        console.log('Row id match with Form Id ');
         arrayToPopulateForm=value;
         
       }
       
     })
   })
-  console.log(arrayToPopulateForm);
+  
   return arrayToPopulateForm;
 }
 
 function populateForm(formname,thisFromData)
 { 
   
-    console.log(thisFromData);
+    
       $("#"+formname).deserialize(thisFromData);
     
       if(formname=='form_dentiste'){
@@ -284,14 +278,11 @@ function populateForm(formname,thisFromData)
 
         if(val.name=='liste_med_consm_denti'){
         
-        
-        $('#form_dentiste #medi_com_list').append('<option selected="selected">'+val.value+'</option>')
+          $('#form_dentiste #medi_com_list').append('<option selected="selected">'+val.value+'</option>')
         }
         
         if(val.name=='liste_elm_mesur_denti'){
-        
-        
-        $('#form_dentiste #elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
+          $('#form_dentiste #elem_meas_list').append('<option selected="selected">'+val.value+'</option>')
         }
 
 
@@ -300,7 +291,7 @@ function populateForm(formname,thisFromData)
       }
       else if(formname=='form_chirurgiens'){
 
-         $('#form_chirurgiens #medi_com_list_chir option').remove();
+        $('#form_chirurgiens #medi_com_list_chir option').remove();
         $('#form_chirurgiens #elem_meas_list option').remove();
 
          $.each(thisFromData,function(id,val){
@@ -349,7 +340,6 @@ function emptyTable (option){
 function deleteRow(x){
 
   var row_id_Del=$(x).closest('tr').attr('id');
-
   var row=$(x).closest('tr').remove();
   //remove this Row's Form too 
   var deleteThisIdForm=deleteFromArray('delete','row_id',row_id_Del);
@@ -386,7 +376,7 @@ function deleteFromArray(toDo,namR,valR){
 
 function updateArray(namR,valR,newArray){
    // Update complete array if Matched in its object nameR and valR send i.e : nameR=row_id valR=2
-   console.log('update array FACT call');
+   
   var nameD=namR;
   var valueD=valR;
   var newArray=newArray;
@@ -461,18 +451,36 @@ function closeModal(){
 }
 
 function robData(){
-  console.log('in function ');
+  var formData=[];
+  var rowData=[];
 
-  $.post("allScriptsv1.py", {tx: "getFactureInfo", patientId: '234577', nodossier: '39' , nofact: '30'}, 
-            function(result){
-                debugger;
+                  var row_id_count=[];
+  $.post("allScriptsv1.py", {tx: "getFactureInfo", patientId: '234577', nodossier: '39' , nofact: '30'},
+          function(result){
                 if(result.outcome == 'error')
                     $("#message").append(result.message);
                 else
                     $("#message").append("<h2>&nbsp;Creation of the file was .... </h2>");        
                   console.log(result);
-                  populate_tbl_from(result.infos,result.rows)
+                  formData=result.infos;
+                  rowData=result.rows;
+                  populate_tbl_from(formData,rowData);
+
+
+                  $.each(rowData,function(idx,value){
+                    $.each(value,function(id,val){
+                     if(id=="row_id"){
+                        row_id_count.push(val);
+                      }
+                     })
+                  })
+                  var max = Math.max.apply(Math, row_id_count);
+                  
+                  fact_tbl_row_id=max;
             });
+  
+
+
 }
 
 function populate_tbl_from(arrayForm,arrayTbl)
@@ -560,3 +568,4 @@ function populate_table_fact(arrToPopTabl){
         });
 
 }
+
