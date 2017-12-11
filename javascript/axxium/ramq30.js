@@ -210,6 +210,7 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
     '</exped_difrn_demdr>' +
     '<moda_paimt>' +
         '<typ_moda_paimt>' + _arrData[0][1].TypModaPaimt + '</typ_moda_paimt>' + //1 : Compte personnel du professionnel 2 : Compte administratif
+        RamqGenerateNoCpteAdmin(_arrData[0][1].TypModaPaimt, _arrData[0][1].NoCpteAdmin) + 
     '</moda_paimt>' +
     '<liste_fact>' +
         RamqGetListFact(_arrData) +
@@ -816,6 +817,15 @@ function RamqGetListeSurfDentTraitXml(strSurf)
     return xml;
 }
 
+function RamqGenerateNoCpteAdmin(pTypModaPaimt, pNoCpteAdmin)
+{
+    var res = '';
+    if (pTypModaPaimt == '2' && pNoCpteAdmin)
+    {
+        res = '<no_cpte_admin>' + pNoCpteAdmin + '<no_cpte_admin/>';
+    }
+}
+
 function RamqGetCurrentDate()
 {
     var date = '';
@@ -1318,29 +1328,50 @@ function RamqSoumissionDemandesPaiementGetData()
     //For Test only
     $('#num_lieu_genr_fact').val('99999');
     $('#lieu_codifie').prop('checked', true);
+
     if (dent_Type == 'Dentiste')
     {
-        $('#pamnt_no_prof').val('299801');
+        if ($('#optRegiePaimentComptePers').is(':checked')) {
+            $('#pamnt_no_prof').val('299801');
+
+        }
+        else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
+            $('#pamnt_no_prof').val('299797');
+            $('#txtRegiPaimentNoCompteAdmin').val('54337');
+        }
+
         globVisionRData.IdProf = $('#pamnt_no_prof').val();
         globVisionRData.DemdrIdIntvn = globVisionRData.IdProf;
         globVisionRData.TypProf = dent_Type;
     }
     else if (dent_Type == 'Chirurgiens')
     {
-        $('#pamnt_no_prof').val('299741');
+        if ($('#optRegiePaimentComptePers').is(':checked')) {
+            $('#pamnt_no_prof').val('299741');
+        }
+        else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
+            $('#pamnt_no_prof').val('298793');
+            $('#txtRegiPaimentNoCompteAdmin').val('54348');
+        }
+
         globVisionRData.IdProf = $('#pamnt_no_prof').val();
         globVisionRData.DemdrIdIntvn = globVisionRData.IdProf;
         globVisionRData.TypProf = dent_Type;
     }
     else if (dent_Type == 'Denturologiste') {
-        $('#pamnt_no_prof').val('741789');
+        if ($('#optRegiePaimentComptePers').is(':checked')) {
+            $('#pamnt_no_prof').val('741788');
+        }
+        else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
+            $('#pamnt_no_prof').val('741789');
+            $('#txtRegiPaimentNoCompteAdmin').val('54355');
+        }
+        
         globVisionRData.IdProf = $('#pamnt_no_prof').val();
         globVisionRData.DemdrIdIntvn = globVisionRData.IdProf;
+        globVisionRData.NoCpteAdmin = $('#txtRegiPaimentNoCompteAdmin').val();
         globVisionRData.TypProf = dent_Type;
     }
-
-
-
 
     var objVisionRData = globVisionRData;
     //var objBillData = RamqGetBillData();
@@ -1454,6 +1485,7 @@ function RamqGetVisionRData()
     res.ExpedTypIdIntvn = '3';//const
     res.ExpedIdIntvn = '18011';//?
     res.TypModaPaimt = '1';//1 : Compte personnel du professionnel 2 : Compte administratif
+    res.NoCpteAdmin = '';
     res.TypIdProf = '1';//const 1 : Numéro dispensateur RAMQ
     res.IdProf = '299801';// 
     res.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
@@ -1465,6 +1497,7 @@ function RamqGetVisionRData()
     res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
     res.InsTypeList = ['ACE', 'AGA'];
     res.TypProf = 'Dentiste'; //TODO: For test only Dentiste , Chirurgiens , Denturologiste
+    //res.TypProf = dent_Type;
 
     //Patient without NAM
     res.NomPers='Smith';
@@ -1477,7 +1510,7 @@ function RamqGetVisionRData()
     res.RepdnIdPers = 'DISL14082217';
 
     $('#pamnt_no_prof').val(res.IdProf);
-    
+
     return res;
 }
 
