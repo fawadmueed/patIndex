@@ -15,6 +15,20 @@ var globRamqBillArrDataForPaymentTable = [];
 $(document).ready(function () {
     //Payment table
     globRamqBillPaymentTable = $('#tblRamqPaiments').DataTable({
+        "columns": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            { "visible": false }
+        ],
         dom: 'Bfrtip',
         buttons: ['excelHtml5'],
         searching:false
@@ -656,6 +670,7 @@ function RamqBillCreateDataArrForPaymentTable(pArrPayment)
             arr.push(ramqPayment.toFixed(2));//Paiment
             arr.push((pArrPayment[i].Payment && pArrPayment[i].Payment.Effectue) ? pArrPayment[i].Payment.Effectue : '');//effectue 
             arr.push(payeeStatus);
+            arr.push(pArrPayment[i].patientId);//billNumber.
         }
         arrRes.push(arr);
     }
@@ -692,7 +707,7 @@ function RamqBillPaymentSendPaymentDetails()
     var payment = $('#regi_pamnt').val();
     var effectue = $('#regi_pamnt_effectu').val();
     //TODO: change globPatientId to patId from table payment.
-    $.post("allScriptsv1.py", { tx: "addpayment", clinicId: globClinicId, patientId: globPatientId, nodossier: noDossier, nofact: billNo, NoRecu: noRecu, Code: code, Raison: raison, Payment: payment, Effectue: effectue },
+    $.post("allScriptsv1.py", { tx: "addpayment", clinicId: globClinicId, patientId: globRamqBillPaymentObjRowData[11], nodossier: noDossier, nofact: billNo, NoRecu: noRecu, Code: code, Raison: raison, Payment: payment, Effectue: effectue },
         function (result) {
             if (result.outcome == 'error')
                 alert(result.message);
