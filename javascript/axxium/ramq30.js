@@ -13,7 +13,7 @@ function SoumissionDemandesPaiement()
     RamqBillClearFormFactures();
     globRamqOperationType = "New";
     var objSoumissionDemandesPaiementData = RamqSoumissionDemandesPaiementGetData();
-    if (objSoumissionDemandesPaiementData != null) //TODO: empty line shouldn't be added to an array.
+    if (objSoumissionDemandesPaiementData != null && objSoumissionDemandesPaiementData[1].length != 0)
     {
         var operationName = "Paiement";
         var inputXMl = RamqGetXmlToSend(operationName, objSoumissionDemandesPaiementData); //This data is used to send to RAMQ.
@@ -500,7 +500,7 @@ function RamqGetListeLigneFactServDenta(pArrGridData, pArrFormMoreData, pTypProf
     if (pTypProf == 'Dentiste' || pTypProf == 'Chirurgiens')
         xml = RamqGetListe_ligne_fact_serv_denta_chirg(pArrGridData, pArrFormMoreData, pTypProf);
     else if (pTypProf == 'Denturologiste')
-        xml = RamqGetListe_ligne_fact_serv_denta_dentu(pArrGridData, pArrFormMoreData);
+        xml = RamqGetListe_ligne_fact_serv_denta_dentu(pArrGridData, pArrFormMoreData, pTypProf);
     return xml;
 }
 
@@ -623,7 +623,7 @@ function RamqGetNoDentXml(pDent)
     return res;
 }
 
-function RamqGetListe_ligne_fact_serv_denta_dentu(pArrGridData, pArrFormMoreData)
+function RamqGetListe_ligne_fact_serv_denta_dentu(pArrGridData, pArrFormMoreData, ptypProf)
 {
     var xml = '';
     var ligneNum = 1;
@@ -641,7 +641,7 @@ function RamqGetListe_ligne_fact_serv_denta_dentu(pArrGridData, pArrFormMoreData
         var pObjFormMoreData;
 
         if (pObjGridData.Type == 'AMQ' || pObjGridData.Type == 'BES' || pObjGridData.Type == 'HOP') {
-            pObjFormMoreData = GetObjFormMoreData(pObjGridData.row_id, pArrFormMoreData);
+            pObjFormMoreData = GetObjFormMoreData(pObjGridData.row_id, pArrFormMoreData, ptypProf);
 
             var dateServ;
             if (pObjFormMoreData && pObjFormMoreData.dat_serv_elm_fact) {
@@ -866,14 +866,26 @@ function RamqGetRefreAutreProfXml(pObjFormMoreData)
 
 function RamqGetMntPrcuPatntXml(p_mnt_prcu_patnt)
 {
-    var amount = 0
-    if ($("#remb_dem_oui").is(':checked'))
-    {
-        amount = p_mnt_prcu_patnt;
-    }
     var res = '';
-    if (p_mnt_prcu_patnt)
-        res = '<mnt_prcu_patnt>' + amount + '</mnt_prcu_patnt>';
+    if (globRamqOperationType == "New")
+    {
+        if ($("#remb_dem_oui").is(':checked')) {
+            var amount = 0;
+            amount = p_mnt_prcu_patnt;
+            if (p_mnt_prcu_patnt)
+                res = '<mnt_prcu_patnt>' + amount + '</mnt_prcu_patnt>';
+        }
+    }
+    else if (globRamqOperationType == "Update")
+    {
+        if ($("#remb_dem_oui_regie_fact").is(':checked')) {
+            var amount = 0;
+            amount = p_mnt_prcu_patnt;
+            if (p_mnt_prcu_patnt)
+                res = '<mnt_prcu_patnt>' + amount + '</mnt_prcu_patnt>';
+        }
+    }
+
     return res;
 }
 
@@ -1298,11 +1310,12 @@ function RamqSoumissionDemandesPaiementGetData()
         }
         else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
             $('#pamnt_no_prof').val('299797');
-            //$('#txtRegiPaimentNoCompteAdmin').val('54337');
+            $('#txtRegiPaimentNoCompteAdmin').val('54337');
         }
 
         globVisionRData.IdProf = $('#pamnt_no_prof').val();
         globVisionRData.DemdrIdIntvn = globVisionRData.IdProf;
+        //
         globVisionRData.IdPers = $('#ramq_no').val();
         globVisionRData.TypProf = dent_Type;
     }
@@ -1313,7 +1326,7 @@ function RamqSoumissionDemandesPaiementGetData()
         }
         else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
             $('#pamnt_no_prof').val('298793');
-            //$('#txtRegiPaimentNoCompteAdmin').val('54348');
+            $('#txtRegiPaimentNoCompteAdmin').val('54348');
         }
 
         globVisionRData.IdProf = $('#pamnt_no_prof').val();
@@ -1327,7 +1340,7 @@ function RamqSoumissionDemandesPaiementGetData()
         }
         else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
             $('#pamnt_no_prof').val('741789');
-            //$('#txtRegiPaimentNoCompteAdmin').val('54355');
+            $('#txtRegiPaimentNoCompteAdmin').val('54355');
         }
         
         globVisionRData.IdProf = $('#pamnt_no_prof').val();
@@ -1458,7 +1471,7 @@ function RamqGetVisionRData()
     res.IdPers = '';//NAM
     res.NamExpDate = '2018-01-01';
     //res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
-    res.InsTypeList = ['ACE', 'AGA'];
+    res.InsTypeList = ['AMQ', 'AGA'];
     res.TypProf = 'Dentiste'; //TODO: For test only Dentiste , Chirurgiens , Denturologiste
     //res.TypProf = dent_Type;
 
@@ -1472,7 +1485,7 @@ function RamqGetVisionRData()
     res.AdrPersPatnt='333 Place de la Belle-rive, Laval, QC, H7X3R5';
     res.RepdnIdPers = 'DISL14082217';
 
-    $('#pamnt_no_prof').val(res.IdProf);
+    //$('#pamnt_no_prof').val(res.IdProf);
 
     return res;
 }
@@ -1489,6 +1502,7 @@ function RamqGetAdditionalData()//Data from Payment form "Renseignements complem
 
     res.IndFactAssosDr = ($('#optRegiIndFactAssosDrYes').is(':checked')) ? 'true' : 'false';
     res.TypModaPaimt = ($('#optRegiePaimentComptePers').is(':checked')) ? '1' : '2';
+    res.IsComptePersonnel = ($('#optRegiePaimentComptePers').is(':checked'));
     res.NoCpteAdmin = $('#txtRegiPaimentNoCompteAdmin').val();
 
     res.CodDiagnMdcal = $('#code_diagn').val(); //separated by comma
@@ -1576,7 +1590,7 @@ function GetObjFormMoreData(pRowId, pArrFormMoreData, ptypProf)
                     var dateDebutEven = RamqGetValueFromArrByName('date_debu_lev', pArrFormMoreData[i]);
                     var timeDebutEven = RamqGetValueFromArrByName('time_debu_lev', pArrFormMoreData[i]);
                     if (dateDebutEven && timeDebutEven) {
-                        objRes.dhd_elm_fact = timeDebutEven + 'T' + timeDebutEven + ':00';
+                        objRes.dhd_elm_fact = dateDebutEven + 'T' + timeDebutEven + ':00';
                     }
                     else
                         objRes.dhd_elm_fact = null;
@@ -1630,7 +1644,7 @@ function GetObjFormMoreData(pRowId, pArrFormMoreData, ptypProf)
                     var dateDebutEven = RamqGetValueFromArrByName('date_debu_lev', pArrFormMoreData[i]);
                     var timeDebutEven = RamqGetValueFromArrByName('time_debu_lev', pArrFormMoreData[i]);
                     if (dateDebutEven && timeDebutEven) {
-                        objRes.dhd_elm_fact = timeDebutEven + 'T' + timeDebutEven + ':00';
+                        objRes.dhd_elm_fact = dateDebutEven + 'T' + timeDebutEven + ':00';
                     }
                     else
                         objRes.dhd_elm_fact = null;
@@ -1662,6 +1676,7 @@ function GetObjFormMoreData(pRowId, pArrFormMoreData, ptypProf)
                         objRes.dh_dem_cnsul = null;
                 }
                 else if (ptypProf == 'Denturologiste' && globRamqOperationType == "New") {//TODO: 
+                    objRes.dat_serv_elm_fact = RamqGetArrayValueFromArrByName('dat_serv_elm_fact_dentu', pArrFormMoreData[i]);
                     objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('dat_autor_proth_acryl_dentu', pArrFormMoreData[i]);
 
                     objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_dentu', pArrFormMoreData[i]);
@@ -1692,7 +1707,7 @@ function GetObjFormMoreData(pRowId, pArrFormMoreData, ptypProf)
                     var dateDebutEven = RamqGetValueFromArrByName('date_debu_lev', pArrFormMoreData[i]);
                     var timeDebutEven = RamqGetValueFromArrByName('time_debu_lev', pArrFormMoreData[i]);
                     if (dateDebutEven && timeDebutEven) {
-                        objRes.dhd_elm_fact = timeDebutEven + 'T' + timeDebutEven + ':00';
+                        objRes.dhd_elm_fact = dateDebutEven + 'T' + timeDebutEven + ':00';
                     }
                     else
                         objRes.dhd_elm_fact = null;
@@ -1745,7 +1760,7 @@ function GetObjFormMoreData(pRowId, pArrFormMoreData, ptypProf)
                     var dateDebutEven = RamqGetValueFromArrByName('date_debu_lev', pArrFormMoreData[i]);
                     var timeDebutEven = RamqGetValueFromArrByName('time_debu_lev', pArrFormMoreData[i]);
                     if (dateDebutEven && timeDebutEven) {
-                        objRes.dhd_elm_fact = timeDebutEven + 'T' + timeDebutEven + ':00';
+                        objRes.dhd_elm_fact = dateDebutEven + 'T' + timeDebutEven + ':00';
                     }
                     else
                         objRes.dhd_elm_fact = null;
@@ -1779,6 +1794,7 @@ function GetObjFormMoreData(pRowId, pArrFormMoreData, ptypProf)
 
                 }
                 else if (ptypProf == 'Denturologiste' && globRamqOperationType == "Update") {
+                    objRes.dat_serv_elm_fact = RamqGetArrayValueFromArrByName('dat_serv_elm_fact_dentu', pArrFormMoreData[i]);
                     objRes.dat_autor_proth_acryl = RamqGetValueFromArrByName('dat_autor_proth_acryl_dentu', pArrFormMoreData[i]);
 
                     objRes.liste_elm_contx = RamqGetArrayValueFromArrByName('liste_elm_contx_dentu', pArrFormMoreData[i]);

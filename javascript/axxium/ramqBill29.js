@@ -257,6 +257,13 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     //professionel
     $('#pamnt_no_prof_regie_fact').val((objVisionRData && objVisionRData.IdProf) ? objVisionRData.IdProf : '');
     $('#pamnt_no_grp_regie_fact').val('');//TODO:
+    if (objAdditionalData.IsComptePersonnel)
+    {
+        $('#optRegiePaimentComptePers_upd').prop('checked', true);
+    }
+    else
+        $('#optRegiePaimentCompteAdmin_upd').prop('checked', true);
+    
 
     //evenement //TODO: Josee should change layout
     $('#pamnt_even_date_regie_fact').val((objAdditionalData && objAdditionalData.DatEvenePers) ? objAdditionalData.DatEvenePers : '');
