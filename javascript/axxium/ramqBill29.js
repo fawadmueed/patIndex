@@ -11,6 +11,8 @@ var globRamqBillPaymentObjRowData;
 
 var globRamqBillArrDataForMessageTable = [];
 var globRamqBillArrDataForPaymentTable = [];
+//Global variable for printing report.
+var qFACT;
 
 $(document).ready(function () {
     //Payment table
@@ -83,6 +85,8 @@ function RamqBillGetDataFromServer()
                     alert(result.message);
                 else {
                     if (result.factures.length > 0) {
+                        // put result to global variable for further using in report.
+                        //qFACT = result.factures;
                         var arrDataForTable = RamqBillGetDataForTable(result.factures);
                         RamqBillPopulateTable(arrDataForTable);
                     }
