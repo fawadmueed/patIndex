@@ -22,8 +22,10 @@ function SoumissionDemandesPaiement()
             "request": inputXMl,
             "info": objSoumissionDemandesPaiementData //this data is used to store bill info on the server
         }
+
+        var strJsonXML = JSON.stringify(jsonXML)
         
-        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, json: JSON.stringify(jsonXML) },
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, json: strJsonXML },
                     function (result) {
                         if (result.outcome === 'error')//Display python Error
                         {
@@ -1554,21 +1556,22 @@ function RamqGetVisionRData()
 function RamqGetAdditionalData()//Data from Payment form "Renseignements complementaires Regie"
 {
     var res = {};
-    //if ($('#even_carie').is(':checked'))
-    //    res.TypEvenePers = 0; //TODO: add real code.
-    //else if ($('#even_etat').is(':checked'))
-    //    res.TypEvenePers = 0; //TODO: add real code.
-    //else if ($('#even_autre_rad').is(':checked'))
-    //    res.TypEvenePers = $('#even_autre_cont').val();
 
+    res.RembDemParPatient = $('#remb_dem_oui').is(':checked');
     res.IndFactAssosDr = ($('#optRegiIndFactAssosDrYes').is(':checked')) ? 'true' : 'false';
+
     res.TypModaPaimt = ($('#optRegiePaimentComptePers').is(':checked')) ? '1' : '2';
     res.IsComptePersonnel = ($('#optRegiePaimentComptePers').is(':checked'));
     res.NoCpteAdmin = $('#txtRegiPaimentNoCompteAdmin').val();
 
-    res.CodDiagnMdcal = $('#code_diagn').val(); //separated by comma
-    res.RembDemParPatient = $('#remb_dem_oui').is(':checked');
-
+    //code Diagnostic
+    if ($('#code_diag_carie_dent').is(':checked'))
+        res.CodDiagnMdcal = '5210';
+    else if ($('#code_diag_etat_norm').is(':checked'))
+        res.CodDiagnMdcal = 'V909';
+    else if ($('#code_diag_autre_radio').is(':checked'))
+        res.CodDiagnMdcal = $('#code_diag_autre_field').val(); //separated by comma
+        
     res.DatEvenePers = $('#pamnt_even_date').val();
 
     res.DatEntrePersLieu = $('#pamnt_date_entre').val();
@@ -1592,6 +1595,8 @@ function RamqGetAdditionalData()//Data from Payment form "Renseignements complem
         res.TypeDeLieu = "D";
     if ($('#type_lieu_aut').is(':checked'))
         res.TypeDeLieu = "A";
+
+    res.NoRamqSpecial = $('#txtRamqSpecialNams').val();
 
     return res;
 }
