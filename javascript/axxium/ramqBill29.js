@@ -137,7 +137,7 @@ function RamqBillPopulateTable(pArrDataForTable)
         tableContent += "<td>" + pArrDataForTable[i].Montant + "</td>"; //Montant
         tableContent += "<td>" + ((pArrDataForTable[i].Status == 1) ? 'Accepté':((pArrDataForTable[i].Status == 3) ? "Annulé":'Non transmis')) + "</td>"; //Status
         tableContent += "</tr>";
-        totalAmount += pArrDataForTable[i].Montant;
+        totalAmount += parseFloat(pArrDataForTable[i].Montant);
     }
 
     $('#rgie_fact_table tbody').append(tableContent);
@@ -242,8 +242,8 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     $('#ancienne_montant_regie_fact').val(RamqBillGetMontant(pArrBilldata.xml));
 
     //Nouvelle facture
-    $('#nouvel_no_facture').val(''); //TODO:
-    $('#novl_montant_regie_fact').val(''); //TODO:
+    //$('#nouvel_no_facture').val(''); //TODO:
+    //$('#novl_montant_regie_fact').val(''); //TODO:
 
     //renseignements complementaires regie
     if (objVisionRData && objVisionRData.IdPers)
@@ -391,8 +391,8 @@ function RamqBillUpdateBillInfo() {
 
     //professionel
     objVisionRData.IdProf = $('#pamnt_no_prof_regie_fact').val();
-    objAdditionalData.TypModaPaimt = ($('#optRegiePa_radio_upd').is(':checked')) ? '1' : '2';
-    objAdditionalData.IsComptePersonnel = ($('#optRegiePa_radio_upd').is(':checked'));
+    objAdditionalData.TypModaPaimt = ($('#optRegiePaimentComptePers_upd').is(':checked')) ? '1' : '2';
+    objAdditionalData.IsComptePersonnel = ($('#optRegiePaimentComptePers_upd').is(':checked'));
     objAdditionalData.NoCpteAdmin = $('#txtRegiPaimentNoCompteAdmin_upd').val();
 
     //code diagnostic
@@ -563,8 +563,8 @@ function RamqBillClearFormFactureDetails()
     $('#ancienne_montant_regie_fact').val('');
 
     //Nouvelle facture
-    $('#nouvel_no_facture').val('');
-    $('#novl_montant_regie_fact').val('');
+    //$('#nouvel_no_facture').val('');
+    //$('#novl_montant_regie_fact').val('');
 
     //Renseignement complementaires regie
     $('#carte_as_malad_oui_regie_fact').prop('checked', false);
