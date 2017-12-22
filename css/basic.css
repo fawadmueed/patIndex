@@ -1,5 +1,5 @@
 /* page styles */
-/*body { font-family: "Segoe UI", Frutiger,Tahoma,Helvetica,"Helvetica Neue", Arial, sans-serif; }
+body { font-family: "Segoe UI", Frutiger,Tahoma,Helvetica,"Helvetica Neue", Arial, sans-serif; }
 table {  border-collapse: collapse; }
 td, th { 
    text-align: center; 
@@ -7,42 +7,4 @@ td, th {
    padding:2px 5px; 
    }
    
-caption {margin: 0 0 .5em; font-weight: bold; }*/
-
-/* Pat Photo Image CSS */
- .file-input-wrapper {
- width: 200px;
- height: 40px;
- overflow: hidden;
- position: relative;
- }
- .file-input-wrapper > input[type="file"] {
- font-size: 200px;
- position: absolute;
- top: 0;
- right: 0;
- opacity: 0;
- }
- .file-input-wrapper > .btn-file-input {
- display: inline-block;
- width: 200px;
- height: 40px;
- }
-
-/*$ TD for Facture Table & Fact Table Update*/
-.dol{
-                
-     border-collapse: collapse;
-     text-align: left !important;
-     margin:0px !important;
-     padding: 0px !important;
-     padding-left: 0px !important;
-     padding-right: 0px !important;
-  }
-
-   .mont{
-     text-align: right !important;
-     margin:0px !important;
-     padding-left: 0px !important;
-     padding-right: 0px !important;
-  }
+caption {margin: 0 0 .5em; font-weight: bold; }

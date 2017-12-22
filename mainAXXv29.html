@@ -11,8 +11,6 @@
    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
    <link rel="stylesheet" type="text/css" class="ui" href="css/dist/semantic.min.css">
    <link rel="stylesheet" type="text/css" class="ui" href="css/axxium.css">
-   <link rel="stylesheet" type="text/css" class="ui" href="css/basic.css">
-
    <script src="javascript/library/jquery.min.js"></script>
    <script src="javascript/library/tablesort.js"></script>
    <script src="javascript/dist/semantic.min.js"></script>
@@ -30,8 +28,6 @@
    <script src="javascript/axxium/labos22.js"></script>
    <script src="javascript/axxium/modals-facturation.js"></script>
    <script src="javascript/axxium/factTable_validation.js"></script>
-   <script src="javascript/axxium/code_validation.js"></script>
-   <script src="javascript/axxium/code_validation_function.js"></script>
    <script src="javascript/axxium/Fact_Regie.js"></script>
    <script src="javascript/jquery.deserialize.js"></script>
    <!-- Translation File & Dictionary English French -->
@@ -41,29 +37,18 @@
    <script src="javascript/pdf/jspdf.min.js"></script>
    <!-- Alex Files -->
    <script src="javascript/axxium/facture28.js"></script>
-   <script src="javascript/axxium/ramq31.js"></script>
+   <script src="javascript/axxium/ramq30.js"></script>
    <script src="javascript/axxium/ramqCredentials28.js"></script>
    <script src="javascript/axxium/ramqEC29.js"></script>
    <script src="javascript/axxium/ramqBill29.js"></script>
    <script src="javascript/axxium/fact_detail_regi_table.js"></script>
 
-   <script src="javascript/axxium/printing1.js"></script>
-
+   
    <!-- <script type="text/javascript"> var translator = $('body').translate({lang:"", t:dict});  </script> -->
    <!-- Alexey JS FILE -->
    <style type="text/css">
       *[contenteditable]{
       text-transform:uppercase;
-.disb{
-  cursor: default;
-  background-color: #dcddde !important;
-  color: rgba(0, 0, 0, 0.4) !important;
-  opacity: 0.3 !important;
-  background-image: none !important;
-  box-shadow: none !important;
-  pointer-events: none;
-}
-
       }
    </style>
    <script src="javascript/tables/jquery.dataTables.min.js"></script>
@@ -223,8 +208,8 @@
             Print
          </a>
          <a class="item" onclick="showLabos();"><i class="emergency red icon"></i>Laboratories</a>
-         <a class="item" onclick="changeLang('en')">En</a>
-         <a class="item" onclick="changeLang(' ')">Fr</a>  
+         <a class="item" onclick="changeLang('en')">En <i class="us flag "></i></a>
+         <a class="item" onclick="changeLang(' ')"><i class="fr flag "></i> Fr</a>  
       </div>
       <h4 class="ui center aligned header" id="patNameSub"></h4>
    </div>
@@ -237,16 +222,16 @@
          <div class="ui top attached tabular menu active">
             <div class="item" data-tab="patient"><i class="user circular orange icon trn" data-trn-key=""></i>Patient</div>
             <div class="item active" data-tab="facturation" id="facturation" onclick="checkDentType();"><i class="dollar circular  blue icon trn" data-trn-key=""></i>Facturation</div>
-            <div class="item " id="disb" data-tab="documents"><i class="file image outline circular yellow icon trn" data-trn-key=""></i>Docs</div>
-            <div class="item " id="disb1" data-tab="antecedents"><i class="heartbeat circular red icon trn" data-trn-key=""></i>Hist</div >
-            <div class="item " id="disb2" data-tab="examens"><i class="doctor circular purple icon trn" data-trn-key=""></i>Exam</div>
+            <div class="item" data-tab="documents"><i class="file image outline circular yellow icon trn" data-trn-key=""></i>Docs</div>
+            <div class="item" data-tab="antecedents"><i class="heartbeat circular red icon trn" data-trn-key=""></i>Hist</div>
+            <div class="item" data-tab="examens"><i class="doctor circular purple icon trn" data-trn-key=""></i>Exam</div>
             <div class="item" data-tab="odontos"><i class="crosshairs circular orange icon trn" data-trn-key=""></i>Odon</div>
-            <div class="item" id="disb3" data-tab="plans"><i class="list circular blue icon trn" data-trn-key=""></i>Plan RDV</div>
-            <div class="item" id="disb4" data-tab="traitements"><i class="treatment circular yellow icon trn" data-trn-key=""></i>Traits</div>
-            <div class="item" id="disb5" data-tab="ordonnances"><i class="lab circular green icon trn" data-trn-key=""></i>Rx</div>
-            <div class="item" id="disb6" data-tab="paros"><i class="crosshairs circular red icon trn" data-trn-key=""></i>Paro</div>
-            <div class="item" id="disb7" data-tab="ententes"><i class="thumbs circular up blue icon trn" data-trn-key=""></i>Entente</div>
-            <div class="item" id="disb8" data-tab="codes"><i class="plus circular red icon trn" data-trn-key=""></i>Code Edit Prix</div>
+            <div class="item" data-tab="plans"><i class="list circular blue icon trn" data-trn-key=""></i>Plan RDV</div>
+            <div class="item" data-tab="traitements"><i class="treatment circular yellow icon trn" data-trn-key=""></i>Traits</div>
+            <div class="item" data-tab="ordonnances"><i class="lab circular green icon trn" data-trn-key=""></i>Rx</div>
+            <div class="item" data-tab="paros"><i class="crosshairs circular red icon trn" data-trn-key=""></i>Paro</div>
+            <div class="item" data-tab="ententes"><i class="thumbs circular up blue icon trn" data-trn-key=""></i>Entente</div>
+            <div class="item" data-tab="codes"><i class="plus circular red icon trn" data-trn-key=""></i>Code Edit Prix</div>
          </div>
       </div>
       <script>
@@ -254,10 +239,7 @@
            $(".teal item").removeClass("active");
            $(this).addClass("active");
          });
-
-
       </script>
-      <br>
       <div class="ui content" id="updateAvail">
          <!-- 2nd Tab Contents Vary here by 1st Tabs -->
          <!-- Buttons -->
@@ -364,7 +346,7 @@
                <div class=" ui axxium segment">
                   <div class="ui grid">
                      <div class="two column row">
-                        <!-- <div class="seven wide column">
+                        <div class="seven wide column">
                            <img id="patPhoto" class="ui fluid rounded image patPhoto" src="json/images/square-image.png">
                            <div class="field">
                               <div class="file-input-wrapper">
@@ -392,39 +374,16 @@
                                  }
                               </style>
                            </div>
-                        </div> -->
-                        <div class="seven wide column">
-                        <div class="ui card">
-                        <div class="image dimmable">
-                          <div class="ui dimmer">
-                            <div class="content">
-                              <div class="center">
-                                
-                                <div class="tiny ui inverted  button file-input-wrapper" >
-                                  <!-- Changer la photo -->
-                                  
-                                  <input type="file" name="file" id="photoCapture" capture="camera" accept="image/*" onchange="uploadPhoto()"/>Changer La Photo
-                                  
-                              </div>
-                              </div>
-                            </div>
-                          </div>
-                          <img id="patPhoto" class="ui fluid rounded image patPhoto" src="json/images/square-image.png">
-                          </div>
-                        
-                             
                         </div>
-                      </div>
-
                         <div class="nine wide column">
                            <div class="ui tiny equal width form">
                               <div class="six wide field">
-                                 <label>No Dossier</label>
+                                 <label>No Dossier </label>
                                  <input id="EID" readonly=""  type="text">
                               </div>
                               <div class="two fields">
                                  <div class="field">
-                                    <label>Nom</label>
+                                    <label>Nom </label>
                                     <input id="Efirst"  type="text" >
                                  </div>
                                  <div class="field">
@@ -565,7 +524,9 @@
                               </div>
                               <div class="ui form segment">
                                  <h4 class="ui horizontal divider header">
-                                    <i class="info icon" style="color: #138d30!important;"></i>Infos Patient</h4>
+                                    <i class="info icon" style="color: #138d30!important;"></i>
+                                    Infos Patient
+                                 </h4>
                                  <div class="ui grid">
                                     <div class="sixteen wide column"></div>
                                     <div class="sixteen wide column"></div>
@@ -584,8 +545,6 @@
                                  <div class="three wide column"></div>
                               </div>
                            </div>
-                           <br><br><br><br><br><br><br><br><br><br>
-                           
                         </div>
                      </div>
                   </div>
@@ -614,7 +573,9 @@
                   </div>
                   <br>
                   <h4 class="ui horizontal divider header" >
-                     <i class="history icon" style="color: #138d30!important;"></i>Historique des rendez-vous</h4>
+                     <i class="history icon" style="color: #138d30!important;"></i>
+                     Historique des rendez-vous
+                  </h4>
                   <div class="ui form segment">
                      <table class="ui table">
                         <thead>
@@ -689,37 +650,37 @@
                      </div>
                   </div>
                   <h4 class="ui horizontal divider header">
-                     <i class="call icon" style="color: #138d30!important;"></i>Rappel</h4>
+                     <i class="call icon" style="color: #138d30!important;"></i>
+                     Rappel
+                  </h4>
                   <div class="ui form segment">
-                    <div class="ui horizontal divider">Rappel #1</div>
                      <div class="three field">
                         <div class="inline fields">
                            <label>Date</label>
                            <div class="four wide field">
-                              <input type="date" readonly="" name="">
+                              <input type="text" readonly="" name="">
                            </div>
-                           <label>Raison</label>
+                           <label>Raison de rappel #1</label>
                            <div class="six wide field">
                               <input type="text" readonly="" name="">
                            </div>
-                           <label>Action</label>
+                           <label>Action rappel 1</label>
                            <div class="four wide field">
                               <input type="text" readonly="" name="">
                            </div>
                         </div>
                      </div>
-                     <div class="ui horizontal divider">Rappel #2</div>
                      <div class="three field">
                         <div class="inline fields">
                            <label>Date</label>
                            <div class="four wide field">
-                              <input type="date" readonly="" name="">
+                              <input type="text" readonly="" name="">
                            </div>
-                           <label>Raison</label>
+                           <label>Raison de rappel #2</label>
                            <div class="six wide field">
                               <input type="text" readonly="" name="">
                            </div>
-                           <label>Action</label>
+                           <label>Action rappel 2</label>
                            <div class="four wide field">
                               <input type="text" readonly="" name="">
                            </div>
@@ -733,7 +694,9 @@
                      </div>
                   </div>
                   <h4 class="ui horizontal divider header" >
-                     <i class="credit card alternative icon" style="color: #138d30!important";></i>Types de paiements ou d'assurances</h4>
+                     <i class="credit card alternative icon" style="color: #138d30!important";></i>
+                     Types de paiements ou d'assurances
+                  </h4>
                   <div class="ui form segment">
                      <div class="four field">
                         <div class="inline fields">
@@ -1228,7 +1191,7 @@
             <div class="ui form ">
                <div class="ui two column grid">
                   <div class="row">
-                     <div class="eleven wide column">
+                     <div class="eight wide column">
                         <div class="ui grid">
                            <div class="sixteen wide column"></div>
                         </div>
@@ -1238,18 +1201,18 @@
                            </canvas>
                         </div>
                      </div>
-                     <div class="five wide left aligned column">
-                        <div class="ui green form segment" style="margin-left: 50px">
+                     <div class="three wide column">
+                        <div class="ui green form segment">
                            <div class="inline field">
-                              <input type="radio" name="tarif_fact" value="1" class="type_rate">
+                              <input type="radio" name="tarif_fact">
                               <label>Tarif régulier</label>
                            </div>
                            <div class="inline field">
-                              <input type="radio" name="tarif_fact" value="2" class="type_rate">
+                              <input type="radio" name="tarif_fact">
                               <label>Tarif spécial</label>
                            </div>
                            <div class="inline field">
-                              <input type="radio" name="tarif_fact" value="3" class="type_rate">
+                              <input type="radio" name="tarif_fact">
                               <label>Régie</label>
                            </div>
                            <div class="inline field">
@@ -1260,7 +1223,6 @@
                                  <option>Non applicable</option>
                               </select>
                            </div>
-                           
                            <div class="field">
                             <button class="ui axxium tiny button" onclick="RamqCreateNewGlobalBill()">OK</button>
                           </div>
@@ -1276,14 +1238,7 @@
                      
                   </div >
                 </div>
-               <!--  <div class="ui grid">
-                  <div class="right aligned column">
-                    <div class="inline field">
-                      <input type="checkbox" name="" id="bypass_valid">
-                      <label>Developer Mode (Bypass Validation)</label>
-                    </div>
-                  </div>
-                </div> -->
+
                   <div class="ui grid">
                      <div class="sixteen wide column">
                         <div class="ui teal form raised segment">
@@ -1295,14 +1250,11 @@
                                     <th>Surface</th>
                                     <th>Code</th>
                                     <th>Description</th>
-                                    <th class="mont">Frais Lab.</th>
-                                    <th></th>
-                                    <th class="mont">Honoraires</th>
-                                    <th></th>
-                                    <th class="mont">Total</th>
-                                    <th></th>
+                                    <th>Frais Lab.</th>
+                                    <th>Honoraires</th>
+                                    <th>Total</th>
                                     <th>Prod</th>
-                                    <th>Rôle</th>
+                                    <th>Role</th>
                                     <th></th>
                                  </tr>
                                  <!-- NOTE : Role : By default 1 In every field -->
@@ -1329,7 +1281,7 @@
                         <!-- getAllTrData(); -->
                         <div class="ui axxium tiny button" onclick="robData();">RobData</div>
                         
-                       <!--  <div class="ui axxium tiny button" onclick="modPaimnt();">PamntMOdalTEst</div> -->
+                        <div class="ui axxium tiny button" onclick="modPaimnt();">PamntMOdalTEst</div>
 
                         <div class="ui axxium tiny button ok" onclick="">Facturation anticipée</div>
                      </div>
@@ -1337,139 +1289,14 @@
                </div>
             </div>
             <div class="ui tab segment " data-tab="RapelFacture-sub">
-               Rappel Facture
+               Rapel Facture
             </div>
             <div class="ui tab segment " data-tab="FactAnticip-sub">
                Fact Aniticp
             </div>
             <div class="ui tab segment " data-tab="cdanEt-sub">
-               <div class="ui two column grid">
-                <div class="three wide column ui form">
-                  <select id="cdan_select_dd" >
-                    <option value="Transactions" selected>Transactions</option>
-                    <option value="Soumission">Soumission de plan de traitement</option>
-                    <option value="Interrogation">Interrogation sur l'admissibilité</option>
-                  </select>
-                </div>
-                <div class="twelve wide column">
-                  <!-- ================ -->
-                  <div class="ui form segment" style="" id="cdan_transac">
-                    <h4 class="ui horizontal divider header">Historique des transactions</h4>
-                    
-                      <table class="ui striped axxium compact table segment" id="cdan_table">
-                        <thead>
-                          <tr>
-                            <th>No séq</th>
-                            <th>Description</th>
-                            <th>No Dossier</th>
-                            <th>Prénom</th>
-                            <th>Nom</th>
-                            <th>Ass.</th>
-                            <th>Couver</th>
-                            <th>Date</th>
-                            <th>Date</th>
-                          </tr>
-                        </thead>
-                        <tbody id="cdan_tableBody">
-                          <tr>
-                            <td></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    
-                    <div class="ui form segment">
-                      <h4 class="ui horizontal divider header">Détails</h4>
-                      <div class="field">
-                        <textarea></textarea>
-                      </div>
-
-                    </div>
-                    <div class="fields">
-                      <div class="left floated field">
-                        <select id="cdan_transc_dd">
-                          <option>Trier par</option>
-                          <option>No séquence</option>
-                          <option>No de dossier</option>
-                          <option>Nom</option>
-                          <option>Cie d'assurance</option>
-                          <option>Date</option>
-                          <option>Type de transaction</option>
-                        </select>
-                      </div>
-                      <div class="row">
-                        <button class="ui axxium tiny right floated button">Retransmission réclamation</button>
-                        <button class="ui axxium tiny right floated button">Interroger réclamation en suspens</button>
-                        <button class="ui axxium tiny right floated button">Annuler réclamation</button>
-                        <button class="ui axxium tiny right floated button">Imprimer</button>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- ================================== -->
-                  <div class="ui form segment" style="display:none" id="cdan_soum">
-                    <h4 class="ui horizontal divider header">Plan de traitement</h4>
-                    
-                      <table class="ui striped axxium compact table segment" id="cdan_table_soum">
-                        <thead>
-                          <tr>
-                            <th>Numéro</th>
-                            <th>Facturer</th>
-                            <th>Référence</th>
-                            <th>Confirmation</th>
-                            <th>Date</th>
-                            <th>Réclamation</th>
-                            <th>Déductible</th>
-                            <th>Remboursement</th>
-                          </tr>
-                        </thead>
-                        <tbody id="cdan_table_soum_body">
-                          <tr>
-                            <td></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <div class="ui grid">
-                      <div class="row">
-                          <button class="ui axxium tiny right floated button">Nouveau</button>
-                          <button class="ui axxium tiny right floated button">Effacer</button>
-                          <button class="ui axxium tiny right floated button">Soumettre</button>
-                        </div>
-                      </div>
-                  </div>
-                  <!-- ================= -->
-                  <div id="cdan_inter" style="display: none">
-                    <div class="ui form segment">
-                      <h4 class="ui horizontal divider header">Interrogation d'admissibilité</h4>
-                      
-                      <div class="field">
-                        <label>Veuillez saisir la date pour laquelle vous voulez vérifier l'admissibilité du patient</label>
-                        <div class="three wide field">
-                          <input type="text" name="" id="">
-                        </div>
-                      </div>
-                      <div class="field">
-                        <label>S'il s'agit d'un patient autochtone, veuillez saisir ce qui suit</label>
-                        <div class="two fields">
-                          <div class="two wide field">
-                            <label>No de bande</label>
-                            <input type="text" name="">
-                          </div>
-                          <div class="two wide field">
-                            <label>No de famille</label>
-                            <input type="text" name="">
-                          </div>
-                        </div>
-                      </div>
-                      <button class="ui axxium tiny button">OK</button>
-                      
-                      
-                    </div>
-                  </div>
-                </div>
-
-               </div>
+               CdanEt
             </div>
-
-            
             <div class="ui tab segment " data-tab="Regie-sub">
                <div class="ui selection dropdown fact_regie">
                   <input type="hidden" name="gender">
@@ -1498,7 +1325,7 @@
                               <label>-</label>
                               <input type="date" id="rgie_fact_ane_end"></input>
                            </div>
-                           <div class="ui axxium tiny button" onclick="RamqBillGetList()">Chercher</div>
+                           <div class="ui axxium tiny button" onclick="RamqBillGetList()">Search</div>
                            <div class="ui axxium tiny button" onclick="Regie_fact_modal()">TestModal</div>
                            <div class="ui axxium tiny button" onclick="TestData()">LoadTestData</div>
                            <!-- <div class="four wide field">
@@ -1515,7 +1342,7 @@
                               <thead>
                                  <tr>
                                     <th>Dossier</th>
-                                    <th># RAMQ</th>
+                                    <th>#RAMQ</th>
                                     <th>Date</th>
                                     <th>No de Facture</th>
                                     <th>Nom</th>
@@ -1536,10 +1363,9 @@
                                  <div class="one wide field">
                                     <input type="text" maxlength="5" id="nombre_factures_regie">
                                  </div>
-                                 <label>Montant total</label>
-                                 <div class="one wide field">
+                                 <label>Montant total:</label>
+                                 <div class="three wide field">
                                     <input type="text" id="total_factures_regie">
-                                    <div class="ui basic label">$</div>
                                  </div>
                               </div>
                               <!-- 
@@ -1586,10 +1412,10 @@
                               <label>-</label>
                               <input type="date" id="txtRamqPaymentDateTo">
                            </div>
-                           <div class="ui axxium tiny button" onclick="RamqBillGetPaymentList()">Chercher</div>
+                           <div class="ui axxium tiny button" onclick="RamqBillGetPaymentList()">Search</div>
                            <div class="field" style="margin-left:30px"> 
                             <input type="checkbox" name="" id="chkRamqPaymentDisplayAllPatient">
-                            <label>Tous les patients</label>
+                            <label>"Tous les patients</label>
                            </div>
                           </div>
 
@@ -1597,9 +1423,9 @@
                               <thead>
                                  <tr>
                                     <th>Dossier</th>
-                                    <th># AMQ</th>
+                                    <th>#AMQ</th>
                                     <th>Date</th>
-                                    <th>No de facture</th>
+                                    <th>No de Facture</th>
                                     <th>Honoraires</th>
                                     <th>No reçu</th>
                                     <th>Code</th>
@@ -1620,7 +1446,7 @@
                                     <div class="field">
                                        <input type="text" maxlength="5" id="txtRamqPaymentNonPayedBill">
                                     </div>
-                                    <label>Total facture</label>
+                                    <label>Total Facture:</label>
                                     <div class="field">
                                        <input type="text" id="txtRamqPaymentTotalBill">
                                     </div>
@@ -1638,15 +1464,15 @@
                            <div class="fields">
                               <div class="inline fields">
                                  <input class="regi_pamnt_tbl_rad"  type="radio" id="optRamqPaymentAllBills" name="regi_pamnt_tbl_radio" checked="checked">
-                                 <label style="margin-left: 8px">Tous les factures</label>
+                                 <label>Tous les factures</label>
                               </div>
                               <div class="inline fields">
                                  <input class="regi_pamnt_tbl_rad" type="radio" id="optRamqPaymentPayedBills" name="regi_pamnt_tbl_radio">
-                                 <label style="margin-left: 8px">Factures payées</label>
+                                 <label>Factures Payées</label>
                               </div>
                               <div class="inline fields">
                                  <input class="regi_pamnt_tbl_rad" type="radio" id="optRamqNonPayedBills" name="regi_pamnt_tbl_radio">
-                                 <label style="margin-left: 8px">Factures non payées</label>
+                                 <label>Factures non payées</label>
                               </div>
                            </div>
                         </div>
@@ -1680,7 +1506,7 @@
                               <label>-</label>
                               <input type="date" id="reg_msg_date_to"></input>
                            </div>
-                           <div class="three wide field" style="margin-left:30px">
+                           <div class="three wide field">
                               <label>No de facture</label>
                               <input type="text" id="reg_msg_no_fact_frm"></input>
                            </div>
@@ -1688,15 +1514,15 @@
                               <label>-</label>
                               <input type="text" id="reg_msg_no_fact_to"></input>
                            </div>
-                            <div class="ui axxium tiny button" onclick="RamqBillGetMessageLog()">Chercher</div>
+                            <div class="ui axxium tiny button" onclick="RamqBillGetMessageLog()">Search</div>
                            
                         </div>
                         <div class="for_Facture_Drop down">
                            <table class="ui striped  table" id="reg_msg_tbl" width="100%">
                               <thead>
                                  <tr>
-                                    <th># RAMQ</th>
-                                    <th># Facture</th>
+                                    <th>#RAMQ</th>
+                                    <th>#Facture</th>
                                     <th>Date</th>
                                     <th>Status de recevabilitié</th>
                                     <th>Messages</th>
@@ -1708,14 +1534,14 @@
                               </tbody>
                            </table>
                         </div>
-                        <div class="fields" style="margin-top:10px">
+                        <div class="fields">
                            <div class="inline field">
-                              <input class="reg_fact_chck" type="radio" id="reg_fact_chck_tous" name="reg_fact_chck">
+                              <input class="reg_fact_chck" type="radio" id="reg_fact_chck_tous" name="reg_fact_chck"></input>
                               <label>Tous les messages</label>
                            </div>
                            <div class="inline field">
-                              <input class="reg_fact_chck" type="radio" id="reg_fact_chck_msg_der" name="reg_fact_chck">
-                              <label>Messages d'erreur</label>
+                              <input class="reg_fact_chck" type="radio" id="reg_fact_chck_msg_der" name="reg_fact_chck"></input>
+                              <label>Messages dérreur</label>
                            </div>
                         </div>
                         <div class="ui grid">
@@ -1743,7 +1569,7 @@
                               <input type="date" id="date_entre_etat_compte2"></input>
                            </div>
                            <div class="field">
-                              <div class="ui axxium tiny button" onclick="RamqECGetList()">Chercher</div>
+                              <div class="ui axxium tiny button" onclick="RamqECGetList()">Search</div>
                            </div>
                         </div>
                         <div class="for_Facture_Drop down">
@@ -1751,7 +1577,7 @@
                               <thead>
                                  <tr>
                                     <th>Date</th>
-                                    <th># État de compte</th>
+                                    <th>#État de compte</th>
                                  </tr>
                               </thead>
                               <tbody>
@@ -1761,7 +1587,7 @@
                               <div class="column"></div>
                            </div>
                         </div>
-                        <div class="ui axxium tiny button" onclick="RamqECDownloadNew()">Télécharger État de compte</div>
+                        <div class="ui axxium tiny button" onclick="RamqECDownloadNew()">Télé Etat. compte</div>
                         <div class="ui axxium tiny button" style="display: none;">Imprimer</div>
                      </div>
                   </div>
@@ -1800,7 +1626,6 @@
       </div>
    </div>
    <div class="ui bottom attached tab segment" data-tab="odontos">
-    
       <div class="ui grid">
          <div class="sixteen wide column">
             <!--<canvas id="odonto" width="600" height="395" style="border:1px solid #c3c3c3;">
@@ -2601,7 +2426,6 @@
                <div class=' field'>
                   <label>Montant admissible</label>
                   <input type="text" name="">
-                  <div class="ui basic label">$</div>
                </div>
             </div>
             <div class="two fields">
@@ -2612,7 +2436,6 @@
                <div class=' field'>
                   <label>Montant utilise</label>
                   <input type="text" name="">
-                  <div class="ui basic label">$</div>
                </div>
             </div>
             <div class="two fields">
@@ -2968,7 +2791,7 @@
                         <div class="inline fields">
                            <label>Carte d'assurance-maladie</label>
                            <div class="field">
-                              <input type="radio" id="carte_as_malad_oui" name="cart_malad" checked="checked">
+                              <input type="radio" id="carte_as_malad_oui" name="cart_malad" >
                               <label>Oui</label>
                            </div>
                            <div class="field">
@@ -2979,22 +2802,11 @@
                         <div class="inline fields">
                            <label>Remboursement demandé par Patient</label>
                            <div class="field">
-                              <input type="radio" id="remb_dem_oui" name="rem_dem" checked="checked">
+                              <input type="radio" id="remb_dem_oui" name="cart_malad">
                               <label>Oui</label>
                            </div>
                            <div class="field">
-                              <input type="radio"  id="remb_dem_non" name="rem_dem">
-                              <label>Non</label>
-                           </div>
-                        </div>
-                         <div class="inline fields">
-                           <label>La facture est associée à une demande de remboursement d'un bénéficiare.</label>
-                           <div class="field">
-                              <input type="radio" id="optRegiIndFactAssosDrYes" name="rem_ben" checked="checked">
-                              <label>Oui</label>
-                           </div>
-                           <div class="field">
-                              <input type="radio" id="optRegiIndFactAssosDrNo" name="rem_ben">
+                              <input type="radio"  id="remb_dem_non" name="cart_malad">
                               <label>Non</label>
                            </div>
                         </div>
@@ -3010,26 +2822,6 @@
                                     <label>No du groupe</label>
                                     <input type="text" name="" id="pamnt_no_grp">
                                  </div>
-
-                                 <div class="inline field">
-                                    <input type="radio" class="optRegiePa_radio" name="fact_paimn_radio" id="optRegiePaimentComptePers" checked="checked">
-                                    <label>Compte Personnel</label>
-                                 </div>
-
-                                 <div class="inline field">
-                                    <input class="optRegiePa_radio" type="radio" name="fact_paimn_radio" id="optRegiePaimentCompteAdmin">
-                                    
-                                    <label>Compte Administratif</label>
-                                 </div>
-
-                                 <div class="txtRegiPa" style="display: none">
-                                   <div class="field" >
-                                      <label>Numero de compte administratif</label>
-                                      <input type="text"   id="txtRegiPaimentNoCompteAdmin">
-                                   </div>
-                                </div>
-
-                                 
                               </div>
                               <div class="ui form segment">
                                  <div class="ui horizontal divider"> <strong>Lieu de dispensation</strong></div>
@@ -3064,38 +2856,36 @@
                                  </div>
                                  <div class="field">
                                     <label>Secteur d'activité</label>
-                                    <select  type="hidden" name="secteur_active" id="secteur_active">
+                                    <select class="" type="hidden" name="secteur_active" id="secteur_active">
                                        <option selected="selected"></option>
-                                       <option value="01"> Clinique externe </option>
-                                       <option value="35"> Clinique d’urgence  </option>
-                                       <option value="53"> Centre de douleur chronique  </option>
-                                       <option value="02"> Section gériatrique</option>
-                                       <option value="08"> Section psychiatrique </option>
-                                       <option value="15"> Unité coronarienne </option>
-                                       <option value="05"> Unité de soins de longue durée (hébergement) </option>
-                                       <option value="04"> Unité de soins de longue durée (prolongés) </option>
-                                       <option value="03"> Unité de soins généraux et spécialisés </option>
-                                       <option value="16"> Unité de soins intensifs </option>
+                                       <option class="item" data-value="01"> Clinique externe </option>
+                                       <option class="item" data-value="35"> Clinique d’urgence  </option>
+                                       <option class="item" data-value="53"> Centre de douleur chronique  </option>
+                                       <option class="item" data-value="02"> Section gériatrique</option>
+                                       <option class="item" data-value="08"> Section psychiatrique </option>
+                                       <option class="item" data-value="15"> Unité coronarienne </option>
+                                       <option class="item" data-value="05"> Unité de soins de longue durée (hébergement) </option>
+                                       <option class="item" data-value="04"> Unité de soins de longue durée (prolongés) </option>
+                                       <option class="item" data-value="03"> Unité de soins généraux et spécialisés </option>
+                                       <option class="item" data-value="16"> Unité de soins intensifs </option>
                                     </select>
                                  </div>
                                  <script type="text/javascript">
                                     $('.ui.dropdown').dropdown();                                  
                                  </script>
-                                 <!--  -->                                 
-                                  <script type="text/javascript">
-
+                                 <!--  -->                                  <script type="text/javascript">
                                     $(document).on('change','.lieu',function(){
                                     if($('#lieu_codifie').is(':checked')){
                                                                             
-                                        $('.codif_selection_lieu').show();
-                                        $('.codif_selection_non').hide();
-                                      };
-                                      if($('#lieu_codifie_non').is(':checked')){
-                                        $('.codif_selection_non').show();
-                                        $('.codif_selection_lieu').hide();
-                                      };
-                                      // alert($('#lieu_codifie_non').checked());
-                                    })
+                                                                            $('.codif_selection_lieu').show();
+                                                                            $('.codif_selection_non').hide();
+                                                                          };
+                                                                          if($('#lieu_codifie_non').is(':checked')){
+                                                                            $('.codif_selection_non').show();
+                                                                            $('.codif_selection_lieu').hide();
+                                                                          };
+                                                                          // alert($('#lieu_codifie_non').checked());
+                                                                        })
                                                                      
                                  </script>
                                  <label>Type de lieu</label>
@@ -3115,25 +2905,25 @@
                            </div>
                            <div class="eight wide column">
                               <div class="ui form segment">
-                                 <div class="ui horizontal divider"> <strong>Code diagnostic</strong></div>
+                                 <div class="ui horizontal divider"> <strong>Événement</strong></div>
                                  <div class="ui form segment">
-                                    
+                                    <div class="inline field">
+                                       <input type="radio" name="evenement" id="even_carie">
+                                       <label>Carie dentaire</label>
+                                    </div>
+                                    <div class="inline field">
+                                       <input type="radio" name="evenement" id="even_etat">
+                                       <label>Etat normal</label>
+                                    </div>
+                                    <div class="two fields">
                                        <div class="inline field">
-                                        <input type="radio" name="cod_diag" id="code_diag_carie_dent" value="5210">
-                                        <label>Carie dentaire</label>
+                                          <input type="radio" name="evenement" id="even_autre_rad">
+                                          <label>Autre</label>
                                        </div>
-                                       <div class="inline field">
-                                        <input type="radio" name="cod_diag" id="code_diag_etat_norm" value="V909">
-                                        <label>État normal</label>
+                                       <div class="field">
+                                          <input type="text" name="" id="even_autre_cont">
                                        </div>
-                                       <div class="inline field">
-                                        <input type="radio" name="cod_diag" id="code_diag_autre_radio" value="">
-                                        <label>Autre</label>
-                                       </div>
-                                       <div class="four wide field">
-                                        <input type="text" name="cod_diag" id="code_diag_autre_field">
-                                       </div>
-                                    
+                                    </div>
                                  </div>
                                  <div class="field">
                                     <label>Date de l'événement</label>
@@ -3150,10 +2940,6 @@
                                        <input type="date" name="" id="pamnt_date_sorti">
                                     </div>
                                  </div>
-                              </div>
-                              <div class="field" id="spec_ramq_numb">
-                                <label>Numéro de AMQ Spécial</label>
-                                <input type="text" name="" id="txtRamqSpecialNams">
                               </div>
                            </div>
                         </div>
@@ -3213,8 +2999,8 @@
                         </div>
                         <div class="ui form segment">
                            <div class="two fields">
-                              <div class="field"><label>ARGENT</label> <input type="text" name="" id="argnt_pamnt"></div>
-                              <div class="field"><label>DÉBIT </label> <input type="text" name="" id="debit_pamnt"></div>
+                              <div class="inline fields"><label>ARGENT</label> <input type="text" name="" id="argnt_pamnt"></div>
+                              <div class="inline field"><label>DÉBIT </label> <input type="text" name="" id="debit_pamnt"></div>
                            </div>
                            <div class="ui form segment">
                               <div class="ui horizontal divider"><label>CRÉDIT</label></div>
@@ -3249,10 +3035,9 @@
                               <input type="checkbox" name="" id="fract_pmnt_check">
                               <label>Fractioner les paiements</label>
                            </div>
-                           <div class="field ">
+                           <div class="inline field">
                               <label style="color: RED">TOTAL</label>
-                              <input type="text" name="" id="total_pamnt" class="ui right labeled input">
-                               <div class="ui basic label ">$</div>
+                              <input type="text" name="" id="total_pamnt">
                            </div>
                         </div>
                         <div class="five wide field"> <label>Lab %</label><input type="text" name="" id="lab_prcnt"></div>
@@ -3327,15 +3112,15 @@
    </div>
    <div class="ui modal_regie_fact_modal large modal">
       <div class="header">
-       
-         <i class="money icon"></i>Facture Régie
+        <i class="close icon"></i>
+         <i class="money icon"></i>Regie Facture Modal
       </div>
       <div class="content">
          <div class="ui two column grid">
             <div class="eight wide column">
                <div class="ui form segment">
                   <h4 class="ui horizontal divider header">Identification du patient</h4>
-                  <div class="four wide field">
+                  <div class="field">
                      <label>No dossier</label>
                      <input type="text" name="" id="no_dosir_regie_fact">
                   </div>
@@ -3355,14 +3140,13 @@
                   </div>
                   <div class="two fields">
                      <div class="field" >
-                        <label>Exp</label>
-                        <input type="date" name="" id="exp_regie_fact">
-                     </div>
-                     <div class="field" >
                         <label>Sexe</label>
                         <input type="text" name="" id="sexe_regie_fact">
                      </div>
-                     
+                     <div class="field" >
+                        <label>Exp</label>
+                        <input type="date" name="" id="exp_regie_fact">
+                     </div>
                   </div>
                </div>
             </div>
@@ -3428,78 +3212,51 @@
                      <label>Non</label>
                   </div>
                </div>
-               <div class="inline fields">
-                   <label>La facture est associée à une demande de remboursement d'un bénéficiare.</label>
-                   <div class="field">
-                      <input type="radio" id="optRegiIndFactAssosDrYes_Upd" name="rem_ben" checked="checked">
-                      <label>Oui</label>
-                   </div>
-                   <div class="field">
-                      <input type="radio" id="optRegiIndFactAssosDrNo_Upd" name="rem_ben">
-                      <label>Non</label>
-                   </div>
-                </div>
                <div class="ui grid">
                   <div class="eight wide column">
                      <div class="ui form segment">
                         <div class="ui horizontal divider"> <strong>PROFESSIONEL</strong></div>
-                        <div class="seven wide field">
+                        <div class="field">
                            <label>No du professionel</label>
                            <input type="text" name="" id="pamnt_no_prof_regie_fact">
                         </div>
-                        <div class="seven wide field">
+                        <div class="field">
                            <label>No du groupe</label>
                            <input type="text" name="" id="pamnt_no_grp_regie_fact">
                         </div>
-
-                       <div class="inline field">
-                          <input type="radio" class="optRegiePa_radio_upd" name="fact_paimn_radio" 
-                          id="optRegiePaimentComptePers_upd" checked="checked"'>
-                          <label>Compte Personnel</label>
-                       </div>
-                       <div class="inline field">
-                          <input class="optRegiePa_radio_upd" type="radio" name="fact_paimn_radio" id="optRegiePaimentCompteAdmin_upd">
-                          <label>Compte Administratif</label>
-                       </div>
-                       <div class="txtRegiPa_upd" style="display: none">
-                         <div class="seven wide field" >
-                            <label>Numero de compte administratif</label>
-                            <input type="text"   id="txtRegiPaimentNoCompteAdmin_upd">
-                         </div>
-                      </div>
-
                      </div>
                      <div class="ui form segment">
-                        <div class="ui horizontal divider"> <strong>Code diagnostic</strong></div>
-                                 <div class="ui form segment">
-                                  <div class="inline field">
-                                        <input type="radio" name="cod_diag_upd" id="code_diag_carie_dent_Upd" value="5210">
-                                        <label>Carie dentaire</label>
-                                       </div>
-                                       <div class="inline field">
-                                        <input type="radio" name="cod_diag_upd" id="code_diag_etat_norm_Upd" value="V909">
-                                        <label>état normal</label>
-                                       </div>
-                                       <div class="inline field">
-                                        <input type="radio" name="cod_diag_upd" id="code_diag_autre_radio_Upd" value="">
-                                        <label>Autre</label>
-                                       </div>
-                                       <div class="four wide field">
-                                        <input type="text" name="cod_diag_upd" id="code_diag_autre_field_Upd" value="">
-                                       </div>
-                                    
-                                 </div>
+                        <div class="ui horizontal divider"> <strong>Événement</strong></div>
+                        <div class="ui form segment">
+                           <div class="inline field">
+                              <input type="radio" name="evenement_regie_fact" id="even_carie_regie_fact">
+                              <label>Carie dentaire</label>
+                           </div>
+                           <div class="inline field">
+                              <input type="radio" name="evenement_regie_fact" id="even_etat_regie_fact">
+                              <label>Etat normal</label>
+                           </div>
+                           <div class="two fields">
+                              <div class="inline field">
+                                 <input type="radio" name="evenement_regie_fact" id="even_autre_rad_regie_fact">
+                                 <label>Autre</label>
+                              </div>
+                              <div class="field">
+                                 <input type="text" name="" id="even_autre_cont_regie_fact">
+                              </div>
+                           </div>
+                        </div>
                         <div class="field">
                            <label>Date de l'événement</label>
                            <input type="date" name="" id="pamnt_even_date_regie_fact">
                         </div>
                         <div class="ui form segment">
-                           <div class="ui horizontal divider"><label>Période d'hospitalisation</label></div>
-                           <div class="five wide field">
+                           <div class="ui horizontal divider"><label>Période d'hospi.</label></div>
+                           <div class="field">
                               <label>Date d'entrée</label>
                               <input type="date" name="" id="pamnt_date_entre_regie_fact">
                            </div>
-                           <div class="five wide field">
+                           <div class="field">
                               <label>Date de sortie</label>
                               <input type="date" name="" id="pamnt_date_sorti_regie_fact">
                            </div>
@@ -3542,16 +3299,16 @@
                            <label>Secteur d'activité</label>
                            <select type="hidden" name="secteur_active" id="secteur_active_regie_fact">
                               <option></option>
-                              <option class="item" value="01"> Clinique externe </option>
-                              <option class="item" value="35"> Clinique d’urgence  </option>
-                              <option class="item" value="53"> Centre de douleur chronique  </option>
-                              <option class="item" value="02"> Section gériatrique</option>
-                              <option class="item" value="08"> Section psychiatrique </option>
-                              <option class="item" value="15"> Unité coronarienne </option>
-                              <option class="item" value="05"> Unité de soins de longue durée (hébergement) </option>
-                              <option class="item" value="04"> Unité de soins de longue durée (prolongés) </option>
-                              <option class="item" value="03"> Unité de soins généraux et spécialisés </option>
-                              <option class="item" value="16"> Unité de soins intensifs </option>
+                              <option class="item" data-value="01"> Clinique externe </option>
+                              <option class="item" data-value="35"> Clinique d’urgence  </option>
+                              <option class="item" data-value="53"> Centre de douleur chronique  </option>
+                              <option class="item" data-value="02"> Section gériatrique</option>
+                              <option class="item" data-value="08"> Section psychiatrique </option>
+                              <option class="item" data-value="15"> Unité coronarienne </option>
+                              <option class="item" data-value="05"> Unité de soins de longue durée (hébergement) </option>
+                              <option class="item" data-value="04"> Unité de soins de longue durée (prolongés) </option>
+                              <option class="item" data-value="03"> Unité de soins généraux et spécialisés </option>
+                              <option class="item" data-value="16"> Unité de soins intensifs </option>
                            </select>
                         </div>
                         <script type="text/javascript">
@@ -3586,27 +3343,16 @@
                            <label>Autre</label>
                         </div>
                      </div>
-                     <div class="field" id="spec_ramq_numb">
-                                <label class="trn">Numéro de AMQ Spécial</label>
-                                <input type="text" name="" id="txtRamqSpecialNams_Upd">
-                              </div>
                      <div class="ui axxium right floated tiny button" onclick="">Transférer à la Régie</div>
                   </div>
                </div>
             </div>
             <div class="ui form segment sixteen wide column">
                <div class="ui teal form raised segment">
-                <div class="ui negative message hidden" id="wrn_msg_fact_tbl">
-                    <i class="close icon"></i>
-                  <div style="display:inline;"> <i class="warning icon"></i></div>
-                  <div class="header" id="warn_msg_fact_content" style="display:inline;">
-                     
-                  </div >
-                </div>
                   <h4 class="ui horizontal divider header">Detail facture</h4>
                   <div class="ui grid">
                      <div class="column">
-                        <!-- <div class="ui axxium right floated button" onclick="allTrData_update()">Update</div> -->
+                        <div class="ui axxium right floated button" onclick="allTrData_update()">Update</div>
                         <div class="ui axxium right floated button" onclick="">Liste des codes et tarifs</div>
                      </div>
                   </div>
@@ -3619,13 +3365,10 @@
                            <th>Code</th>
                            <th>Description</th>
                            <th>Frais Lab.</th>
-                           <th></th>
                            <th>Honoraires</th>
-                           <th></th>
                            <th>Total</th>
-                           <th></th>
                            <th>Prod</th>
-                           <th>Rôle</th>
+                           <th>Role</th>
                            <th>--</th>
                         </tr>
                      </thead>
@@ -3639,7 +3382,6 @@
                         <button class="ui axxium tiny button" id="btn_anuler_fact" onclick="RamqSoumissionDemandedAnnulation()">Annuler fact. à la Régie</button>
                         <button class="ui axxium  tiny button" id="btn_detail_trnsfr_regi" onclick="RamqBillReSendToRamq()">Transférer à la Régie</button>
                         <div class="ui axxium  tiny button" onclick="">Quitter</div>
-                        <div class="ui axxium  tiny button" onclick="printRAMQ()">Imprimmer</div>
                      </div>
                   </div>
                </div>
@@ -3906,9 +3648,9 @@
                            <div class="four wide field">
                               <label></label>
                               <select id="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
-                                 <option value="153">Kilomètres</option>
-                                 <option value="82" >Nombre d'injections</option>
-                                 <option value="154">Durée activités administratives</option>
+                                 <option>Kilomètres</option>
+                                 <option>Nombre d'injections</option>
+                                 <option>Durée activités administratives</option>
                               </select>
                            </div>
                            <div class="field">
@@ -3933,21 +3675,10 @@
                      </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
-                           <div class="two fields">
-                             <div class="five wide field">
-                                <label>Date De Service</label>
-                                <input type="date" id="date_de_service_dentiste"  name="dat_serv_elm_fact_denti">
-                             </div>
-
-                             <div class="field">
-                              <label> Date et heure du début de l'évènement</label>
-                              <div class="two fields">
-                                <div class="nine wide field"><input type="date" name="date_debu_lev" id="date_debu_lev_denti"></div>
-                                <div class="field"><input type="time" name="time_debu_lev" id="time_debu_lev_denti"></div>
-                             </div>
+                           <div class="five wide field">
+                              <label>Date De Service</label>
+                              <input type="date" id="date_de_service_dentiste" value="2017-01-01" name="dat_serv_elm_fact_denti">
                            </div>
-                          </div>
-
                            <h4 class="ui horizontal divider header">Lieu de référence</h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
@@ -3963,29 +3694,10 @@
                                  <input type="radio" class="lieu" name="lieu_refre_phys_denti" id="lieu_codifie_non_dent" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
-                              <div class="two fields">
-                                <div class="three wide field" id="codif_selection_lieu" style="display: none">
-                                   <label>Numéro du lieu</label>
-                                   <input type="text" name="id_lieu_phys_denti">
-                                </div>
-                                 <div class="field" id="secteur_active_denti_div" style="display: none">
-                                   <label>Secteur d'activité</label>
-                                   <select  name="no_sect_activ_refr_denti" id="secteur_active_denti">
-                                      <option></option>
-                                      <option class="item" value="01"> Clinique externe </option>
-                                      <option class="item" value="35"> Clinique d’urgence  </option>
-                                      <option class="item" value="53"> Centre de douleur chronique  </option>
-                                      <option class="item" value="02"> Section gériatrique</option>
-                                      <option class="item" value="08"> Section psychiatrique </option>
-                                      <option class="item" value="15"> Unité coronarienne </option>
-                                      <option class="item" value="05"> Unité de soins de longue durée (hébergement) </option>
-                                      <option class="item" value="04"> Unité de soins de longue durée (prolongés) </option>
-                                      <option class="item" value="03"> Unité de soins généraux et spécialisés </option>
-                                      <option class="item" value="16"> Unité de soins intensifs </option>
-                                   </select>
-                                </div>
+                              <div class="three wide field" id="codif_selection_lieu" style="display: none">
+                                 <label>Numéro du lieu</label>
+                                 <input type="text" name="id_lieu_phys_denti">
                               </div>
-
                               <div class="three fields" id="codif_selection_non" style="display: none">
                                  <div class="field">
                                     <label>Code postal</label>
@@ -4032,13 +3744,6 @@
                               <option value="6">Professionnel remplacé</option>
                             </select>
                           </div>
-                          <div class="field">
-                              <label> Date heure de l'appel</label>
-                              <div class="two fields">
-                                <div class="nine wide field"><input type="date" name="date_lappel_lev" id="date_lappel_lev_denti"></div>
-                                <div class="field"><input type="time" name="time_lappel" id="time_lappel_denti"></div>
-                             </div>
-                           </div>
                         </div>
                         <button class="ui axxium button" id="" type="submit">Enregistrer</button>
             </form>
@@ -4052,8 +3757,6 @@
                   if($('#form_dentiste #lieu_codifie_dent').is(':checked')){
               
                     $('#form_dentiste #codif_selection_lieu').show();
-                    $('#form_dentiste #secteur_active_denti_div').show();
-                                       
                     $('#form_dentiste #codif_selection_non').hide();
                     $('#form_dentiste #type_lieu_cont').hide();
                   };
@@ -4136,26 +3839,25 @@
                         <div class="field">
                            <label>Éléments de contexte</label>
                            <select  id="dropD_chir" name="liste_elm_contx_bucc" multiple="multiple">
-                              <option value="1727">Acte posé plus souvent que convenu à l entente </option>
-                              <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale </option>
-                              <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie </option>
-                              <option value="37">Mise en place de la première plaque de reconstruction </option>
-                              <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation</option>
-                              <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation </option>
-                              <option value="1724">Patient sous anesthésie générale </option>
-                              <option value="41">Remplacement d une prothèse pour perte ou bris </option>
-                              <option value="1723">Remplacement de deux prothèses pour perte ou bris </option>
-                              <option value="1746">Séance différente </option>
-                              <option value="34">Service dont la complexité est inhabituelle </option>
-                              <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé </option>
-                              <option value="1749">Site différent </option>
-                              <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie </option>
-                              <option value="1725">Soins d urgence </option>
-                              <option value="35">Soins post-opératoire confiés à un autre dentiste </option>
-                              <option value="36">Soins post-opératoire confiés par un autre dentiste </option>
-                              <option value="1744">Suite à un traumatisme </option>
-                              <option value="1729">Suite à une malformation osseuse </option>
-                              <option value="1738">Soins d'urgence pendant l'horaire de garde </option>
+                              <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
+                              <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                              <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                              <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
+                              <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                              <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                              <option value="1724">Patient sous anesthésie générale (1724)</option>
+                              <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
+                              <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                              <option value="1746">Séance différente (1746)</option>
+                              <option value="34">Service dont la complexité est inhabituelle (34)</option>
+                              <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                              <option value="1749">Site différent (1749)</option>
+                              <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                              <option value="1725">Soins d urgence (1725)</option>
+                              <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
+                              <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
+                              <option value="1744">Suite à un traumatisme (1744)</option>
+                              <option value="1729">Suite à une malformation osseuse (1729)</option>
                            </select>
                         </div>
                         <div class="four fields">
@@ -4166,9 +3868,9 @@
                            <div class="four wide field">
                               <label></label>
                               <select id="medicmnt_msrbles_options_chir" style="margin-top: 20px">
-                                 <option value="153" >Kilomètres</option>
-                                 <option value="82" >Nombre d'injections</option>
-                                 <option value="154" >Durée activités administratives</option>
+                                 <option>Kilomètres</option>
+                                 <option>Nombre d'injections</option>
+                                 <option>Durée activités administratives</option>
                               </select>
                            </div>
                            <div class="field">
@@ -4181,11 +3883,9 @@
                            </div>
                         </div>
                         <script type="text/javascript">
-
                            function add_list_elem_meas_chir(){
-                            console.log($('#form_chirurgiens #medicmnt_msrbles_options_chir').val());
                              $('#form_chirurgiens #elem_meas_list').append('<option selected="selected">'+ 
-                               $('#form_chirurgiens #mesurables_chir').val()+'/'+$('#form_chirurgiens #medicmnt_msrbles_options_chir').val()+'</option>');
+                               $('#form_chirurgiens #mesurables_chir').val()+'/'+$('#medicmnt_msrbles_options_chir').val()+'</option>');
                            }
                             function del_list_elem_meas_chir(){
                              $('#form_chirurgiens #elem_meas_list option:selected').remove();
@@ -4195,19 +3895,10 @@
                      </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
-                           <div class="fields">
                            <div class="five wide field">
                               <label>Date De Service</label>
-                              <input type="date" id="date_de_service_chirur"  name="dat_serv_elm_fact_bucc">
+                              <input type="date" id="date_de_service_chirur" value="" name="dat_serv_elm_fact_bucc">
                            </div>
-                           <div class="field">
-                              <label> Date et heure du début de l'évènement</label>
-                              <div class="two fields">
-                                <div class="nine wide field"><input type="date" name="date_debu_lev" id="date_debu_lev_chir"></div>
-                                <div class="field"><input type="time" name="time_debu_lev" id="time_debu_lev_chir"></div>
-                             </div>
-                           </div>
-                         </div>
                            <h4 class="ui horizontal divider header"><label>Lieu de référence</label></h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
@@ -4223,28 +3914,10 @@
                                  <input type="radio" class="lieu" name="lieu_refre_phys_bucc" id="lieu_codifie_non_chir" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
-                              <div class="two fields">
-                                <div class="four wide field" id="codif_selection_lieu" style="display: none">
-                                   
-                                   <label>Numéro du lieu</label>
-                                   <input type="text" id="id_lieu_phys_bucc" name="id_lieu_phys_bucc">
-                                </div>
-                                 <div class="field" id="secteur_active_bucc_div" style="display: none">
-                                     <label>Secteur d'activité</label>
-                                     <select  name="no_sect_activ_refr_bucc" id="secteur_active_bucc">
-                                        <option></option>
-                                        <option class="item" value="01"> Clinique externe </option>
-                                        <option class="item" value="35"> Clinique d’urgence  </option>
-                                        <option class="item" value="53"> Centre de douleur chronique  </option>
-                                        <option class="item" value="02"> Section gériatrique</option>
-                                        <option class="item" value="08"> Section psychiatrique </option>
-                                        <option class="item" value="15"> Unité coronarienne </option>
-                                        <option class="item" value="05"> Unité de soins de longue durée (hébergement) </option>
-                                        <option class="item" value="04"> Unité de soins de longue durée (prolongés) </option>
-                                        <option class="item" value="03"> Unité de soins généraux et spécialisés </option>
-                                        <option class="item" value="16"> Unité de soins intensifs </option>
-                                     </select>
-                                  </div>
+                              <div class="three wide field" id="codif_selection_lieu" style="display: none">
+                                 
+                                 <label>Numéro du lieu</label>
+                                 <input type="text" id="id_lieu_phys_bucc" name="id_lieu_phys_bucc">
                               </div>
                               <div class="three fields" style="display: none" id="codif_selection_non">
                                  <div class="field">
@@ -4292,13 +3965,6 @@
                               <option value="6">Professionnel remplacé</option>
                             </select>
                           </div>
-                           <div class="field">
-                              <label> Date heure de l'appel</label>
-                              <div class="two fields">
-                                <div class="nine wide field"><input type="date" name="date_lappel_lev" id="date_lappel_lev_chir"></div>
-                                <div class="field"><input type="time" name="time_lappel" id="time_lappel_chir"></div>
-                             </div>
-                           </div>
                         </div>
                         <button class="ui axxium tiny button" type="submit">Enregistrer</button>
             </form>
@@ -4310,10 +3976,8 @@
             $(document).on('change','#form_chirurgiens .lieu',function(){
               
                   if($('#form_chirurgiens #lieu_codifie_chir').is(':checked')){
-                    
+              
                     $('#form_chirurgiens #codif_selection_lieu').show();
-                    $('#form_chirurgiens #secteur_active_bucc_div').show();
-                    
                     $('#form_chirurgiens #codif_selection_non').hide();
                     $('#form_chirurgiens #type_lieu_cont').hide();
                   };
@@ -4362,10 +4026,6 @@
              </div>
              <div class="eight wide column">
               <div class="ui axxium form segment">
-                <div class="five wide field">
-                    <label>Date De Service</label>
-                    <input type="date" id="date_de_service_dentu"  name="dat_serv_elm_fact_dentu">
-                 </div>
                 <h4 class="ui horizontal divider header">Référant</h4>
                 <div class="field">
                   <label>No de référant</label>
@@ -4378,13 +4038,6 @@
                     <option value="6">Professionnel remplacé</option>
                   </select>
                 </div>
-                 <div class="field">
-                        <label> Date heure de l'appel</label>
-                        <div class="two fields">
-                          <div class="nine wide field"><input type="date" name="date_lappel_lev" id="date_lappel_lev_dentu"></div>
-                          <div class="field"><input type="time" name="time_lappel" id="time_lappel_dentu"></div>
-                       </div>
-                     </div>
               </div>
              </div>
             </form>
@@ -4501,9 +4154,9 @@
                            <div class="four wide field">
                               <label></label>
                               <select id="medicmnt_msrbles_options_dentiste" style="margin-top: 20px">
-                                 <option value="153">Kilomètres</option>
-                                 <option value="82" >Nombre d'injections</option>
-                                 <option value="154">Durée activités administratives</option>
+                                 <option>Kilomètres</option>
+                                 <option>Nombre d'injections</option>
+                                 <option>Durée activités administratives</option>
                               </select>
                            </div>
                            <div class="field">
@@ -4528,19 +4181,10 @@
                      </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
-                          <div class="fields">
                            <div class="five wide field">
                               <label>Date De Service</label>
-                              <input type="date" id="date_de_service_dentisteUpd" value="" name="dat_serv_elm_fact_denti">
+                              <input type="date" id="date_de_service_dentiste" value="" name="dat_serv_elm_fact_denti">
                            </div>
-                           <div class="field">
-                              <label> Date et heure du début de l'évènement</label>
-                              <div class="two fields">
-                                <div class="nine wide field"><input type="date" name="date_debu_lev" id="date_debu_lev_dentUpd"></div>
-                                <div class="field"><input type="time" name="time_debu_lev" id="time_debu_lev_dentUpd"></div>
-                             </div>
-                           </div>
-                         </div>
                            <h4 class="ui horizontal divider header">Lieu de référence</h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
@@ -4556,27 +4200,9 @@
                                  <input type="radio" class="lieu" name="lieu_refre_phys_denti" id="lieu_codifie_non_dent" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
-                              <div class="two fields">
                               <div class="three wide field" id="codif_selection_lieu" style="display: none">
                                  <label>Numéro du lieu</label>
                                  <input type="text" name="id_lieu_phys_denti">
-                              </div>
-                                 <div class="field" id="secteur_active_denti_divUpd" style="display: none">
-                                   <label>Secteur d'activité</label>
-                                   <select  name="no_sect_activ_refr_denti" id="secteur_active_dentiUpd">
-                                      <option></option>
-                                      <option class="item" value="01"> Clinique externe </option>
-                                      <option class="item" value="35"> Clinique d’urgence  </option>
-                                      <option class="item" value="53"> Centre de douleur chronique  </option>
-                                      <option class="item" value="02"> Section gériatrique</option>
-                                      <option class="item" value="08"> Section psychiatrique </option>
-                                      <option class="item" value="15"> Unité coronarienne </option>
-                                      <option class="item" value="05"> Unité de soins de longue durée (hébergement) </option>
-                                      <option class="item" value="04"> Unité de soins de longue durée (prolongés) </option>
-                                      <option class="item" value="03"> Unité de soins généraux et spécialisés </option>
-                                      <option class="item" value="16"> Unité de soins intensifs </option>
-                                   </select>
-                                </div>
                               </div>
                               <div class="three fields" id="codif_selection_non" style="display: none">
                                  <div class="field">
@@ -4624,13 +4250,6 @@
                               <option value="6">Professionnel remplacé</option>
                             </select>
                           </div>
-                          <div class="field">
-                        <label> Date heure de l'appel</label>
-                        <div class="two fields">
-                          <div class="nine wide field"><input type="date" name="date_lappel_lev" id="date_lappel_lev_dentuUpd"></div>
-                          <div class="field"><input type="time" name="time_lappel" id="time_lappel_dentuUpd"></div>
-                       </div>
-                     </div>
                         </div>
                         <button class="ui axxium button" id="" type="submit">Enregistrer</button>
             </form>
@@ -4644,8 +4263,6 @@
                   if($('#form_dentiste_Up #lieu_codifie_dent').is(':checked')){
               
                     $('#form_dentiste_Up #codif_selection_lieu').show();
-                    $('#form_dentiste_Up #secteur_active_denti_divUpd').show();
-                                        
                     $('#form_dentiste_Up #codif_selection_non').hide();
                     $('#form_dentiste_Up #type_lieu_cont').hide();
                   };
@@ -4728,26 +4345,25 @@
                         <div class="field">
                            <label>Éléments de contexte</label>
                            <select  id="dropD_chir" name="liste_elm_contx_bucc" multiple="multiple">
-                              <option value="1727">Acte posé plus souvent que convenu à l entente </option>
-                              <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale </option>
-                              <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie </option>
-                              <option value="37">Mise en place de la première plaque de reconstruction </option>
-                              <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation </option>
-                              <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation </option>
-                              <option value="1724">Patient sous anesthésie générale </option>
-                              <option value="41">Remplacement d une prothèse pour perte ou bris </option>
-                              <option value="1723">Remplacement de deux prothèses pour perte ou bris </option>
-                              <option value="1746">Séance différente </option>
-                              <option value="34">Service dont la complexité est inhabituelle </option>
-                              <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé </option>
-                              <option value="1749">Site différent </option>
-                              <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie </option>
-                              <option value="1725">Soins d urgence </option>
-                              <option value="35">Soins post-opératoire confiés à un autre dentiste </option>
-                              <option value="36">Soins post-opératoire confiés par un autre dentiste </option>
-                              <option value="1744">Suite à un traumatisme </option>
-                              <option value="1729">Suite à une malformation osseuse </option>
-                              <option value="1738">Soins d'urgence pendant l'horaire de garde </option>
+                              <option value="1727">Acte posé plus souvent que convenu à l entente (1727)</option>
+                              <option value="38">Chirurgie secondaire pratiquée au cours d une même séance qu une chirurgie principale (38)</option>
+                              <option value="1728">Examen ou soin post-opératoire qui n est pas en lien avec la chirurgie (1728)</option>
+                              <option value="37">Mise en place de la première plaque de reconstruction (37)</option>
+                              <option value="1752">Nouvelle intervention qui est reliée à la première ou en résulte lors d une même hospitalisation (1752)</option>
+                              <option value="39">Nouvelle intervention qui n est pas reliée à la première ou n en résulte pas lors d une même hospitalisation (39)</option>
+                              <option value="1724">Patient sous anesthésie générale (1724)</option>
+                              <option value="41">Remplacement d une prothèse pour perte ou bris (41)</option>
+                              <option value="1723">Remplacement de deux prothèses pour perte ou bris (1723)</option>
+                              <option value="1746">Séance différente (1746)</option>
+                              <option value="34">Service dont la complexité est inhabituelle (34)</option>
+                              <option value="1742">Service fourni en centre hospitalier avec le concours d'un ou de dentistes résidents dans un programme visé (1742)</option>
+                              <option value="1749">Site différent (1749)</option>
+                              <option value="1726">Soin pré-opératoire qui n est pas en lien avec la chirurgie (1726)</option>
+                              <option value="1725">Soins d urgence (1725)</option>
+                              <option value="35">Soins post-opératoire confiés à un autre dentiste (35)</option>
+                              <option value="36">Soins post-opératoire confiés par un autre dentiste (36)</option>
+                              <option value="1744">Suite à un traumatisme (1744)</option>
+                              <option value="1729">Suite à une malformation osseuse (1729)</option>
                            </select>
                         </div>
                         <div class="four fields">
@@ -4758,9 +4374,9 @@
                            <div class="four wide field">
                               <label></label>
                               <select id="medicmnt_msrbles_options_chir" style="margin-top: 20px">
-                                 <option value="153">Kilomètres</option>
-                                 <option value="82" >Nombre d'injections</option>
-                                 <option value="154">Durée activités administratives</option>
+                                 <option>Kilomètres</option>
+                                 <option>Nombre d'injections</option>
+                                 <option>Durée activités administratives</option>
                               </select>
                            </div>
                            <div class="field">
@@ -4785,19 +4401,10 @@
                      </div>
                      <div class="eight wide column">
                         <div class="ui form segment">
-                          <div class="fields">
                            <div class="five wide field">
                               <label>Date De Service</label>
-                              <input type="date" id="date_de_service_chirurUpd" value="" name="dat_serv_elm_fact_bucc">
+                              <input type="date" id="date_de_service_chirur" value="" name="dat_serv_elm_fact_bucc">
                            </div>
-                           <div class="field">
-                              <label> Date et heure du début de l'évènement</label>
-                              <div class="two fields">
-                                <div class="nine wide field"><input type="date" name="date_debu_lev" id="date_debu_lev_chirUpd"></div>
-                                <div class="field"><input type="time" name="time_debu_lev" id="time_debu_lev_chirUpd"></div>
-                             </div>
-                           </div>
-                         </div>
                            <h4 class="ui horizontal divider header"><label>Lieu de référence</label></h4>
                            <div class="eight wide field">
                               <label>Situation liée au lieu de référence</label>
@@ -4813,28 +4420,10 @@
                                  <input type="radio" class="lieu" name="lieu_refre_phys_bucc" id="lieu_codifie_non_chir" value="Lieu non codifié">
                                  <label>Lieu non codifié</label>
                               </div>
-                              <div class="two fields">
-                                  <div class="four wide field" id="codif_selection_lieu" style="display: none">
-                                     <label>Numéro du lieu</label>
-                                     <input type="text" name="id_lieu_phys_bucc" id="id_lieu_phys_bucc">
-                                  </div>
-                                  <div class="field" id="secteur_active_bucc_divUpd" style="display: none">
-                                         <label>Secteur d'activité</label>
-                                         <select  name="no_sect_activ_refr_bucc" id="secteur_active_buccUpd">
-                                            <option></option>
-                                            <option class="item" value="01"> Clinique externe </option>
-                                            <option class="item" value="35"> Clinique d’urgence  </option>
-                                            <option class="item" value="53"> Centre de douleur chronique  </option>
-                                            <option class="item" value="02"> Section gériatrique</option>
-                                            <option class="item" value="08"> Section psychiatrique </option>
-                                            <option class="item" value="15"> Unité coronarienne </option>
-                                            <option class="item" value="05"> Unité de soins de longue durée (hébergement) </option>
-                                            <option class="item" value="04"> Unité de soins de longue durée (prolongés) </option>
-                                            <option class="item" value="03"> Unité de soins généraux et spécialisés </option>
-                                            <option class="item" value="16"> Unité de soins intensifs </option>
-                                         </select>
-                                      </div>
-                                </div>
+                              <div class="three wide field" id="codif_selection_lieu" style="display: none">
+                                 <label>Numéro du lieu</label>
+                                 <input type="text" name="id_lieu_phys_bucc" id="id_lieu_phys_bucc">
+                              </div>
                               <div class="three fields" style="display: none" id="codif_selection_non">
                                  <div class="field">
                                     <label>Code postal</label>
@@ -4881,13 +4470,6 @@
                               <option value="6">Professionnel remplacé</option>
                             </select>
                           </div>
-                          <div class="field">
-                            <label> Date heure de l'appel</label>
-                            <div class="two fields">
-                              <div class="nine wide field"><input type="date" name="date_lappel_lev" id="date_lappel_lev_chirrUpd"></div>
-                              <div class="field"><input type="time" name="time_lappel" id="time_lappel_chirrUpd"></div>
-                           </div>
-                          </div>
                         </div>
                         <button class="ui axxium tiny button" type="submit">Enregistrer</button>
             </form>
@@ -4898,20 +4480,17 @@
          <script type="text/javascript">
             $(document).on('change','.lieu',function(){
               
-                  if($('#form_chirurgiens_Up #lieu_codifie_chir').is(':checked')){
+                  if($('#lieu_codifie_chir').is(':checked')){
               
-                    $('#form_chirurgiens_Up #codif_selection_lieu').show();
-                    $('#form_chirurgiens_Up #secteur_active_bucc_divUpd').show();
-                    
-
-                    $('#form_chirurgiens_Up #codif_selection_non').hide();
-                    $('#form_chirurgiens_Up  #type_lieu_cont').hide();
+                    $('#codif_selection_lieu').show();
+                    $('#codif_selection_non').hide();
+                    $('#type_lieu_cont').hide();
                   };
-                  if($('#form_chirurgiens_Up #lieu_codifie_non_chir').is(':checked')){
+                  if($('#lieu_codifie_non_chir').is(':checked')){
               
-                    $('#form_chirurgiens_Up #codif_selection_non').show();
-                    $('#form_chirurgiens_Up #type_lieu_cont').show();
-                    $('#form_chirurgiens_Up #codif_selection_lieu').hide();
+                    $('#codif_selection_non').show();
+                    $('#type_lieu_cont').show();
+                    $('#codif_selection_lieu').hide();
                   };
                   // alert($('#lieu_codifie_non').checked());
                 })
@@ -4952,10 +4531,6 @@
              </div>
              <div class="eight wide column">
               <div class="ui axxium form segment">
-                  <div class="five wide field">
-                    <label>Date De Service</label>
-                    <input type="date" id="date_de_service_dentuUpd"  name="dat_serv_elm_fact_dentu">
-                 </div>
                 <h4 class="ui horizontal divider header">Référant</h4>
                 <div class="field">
                   <label>No de référant</label>
@@ -4968,13 +4543,6 @@
                     <option value="6">Professionnel remplacé</option>
                   </select>
                 </div>
-                <div class="field">
-                        <label> Date heure de l'appel</label>
-                        <div class="two fields">
-                          <div class="nine wide field"><input type="date" name="date_lappel_lev" id="date_lappel_lev_dentuUpd"></div>
-                          <div class="field"><input type="time" name="time_lappel" id="time_lappel_dentuUpd"></div>
-                       </div>
-                     </div>
               </div>
              </div>
             </form>
@@ -5799,20 +5367,6 @@
    </div>
    <script>
       $(document).ready(function(){
-
-         
-        $(document).ready(function() {
-         $('.ui.card .image').dimmer({
-          on: 'hover'
-        });
-        });
-                              
-        $("#disb,#disb1,#disb2,#disb3,#disb4,#disb5,#disb6,#disb7,#disb8 ").hide();
-        // click(function(){
-          
-        //   $(this).off(click).hide();
-        // } );
-
         var today = new Date();
         var dd = today.getDate();
         var mm = today.getMonth()+1; //January is 0!
@@ -6491,15 +6045,7 @@
       var keyNumPIN = "";
       var qParams = { };
       var dent_Type='';
-      var type_rate_glbl;
       
-      $(document).on('change','.type_rate',function(){
-        if($('.type_rate').is(':checked')){
-          type_rate_glbl=$(this).val();
-
-        }
-      })
-
       $('#context2 .menu .item').tab({
         // tabs are inside of this element
         context: $('#context2')
@@ -6725,76 +6271,13 @@
       
       $('.ui.checkbox')
       .checkbox();
-
-
       
    </script>
-
-   <script type="text/javascript">
-              $(document).on('change','#cdan_select_dd',function(){
-
-
-                var Dd_option=$('#cdan_select_dd').val();
-                console.log(Dd_option);
-
-                switch (Dd_option){
-                  case 'Transactions':
-                  console.log('trasaction');
-
-                    $('#cdan_transac').show();
-                    $('#cdan_soum').hide();
-                    $('#cdan_inter').hide();
-                  break;
-                  case 'Soumission':
-                  console.log('soumission');
-                    $('#cdan_soum').show();
-                    $('#cdan_transac').hide();
-                    $('#cdan_inter').hide();
-                  break;
-                  case 'Interrogation':
-                  console.log('Inter');
-                    $('#cdan_inter').show();
-                    $('#cdan_transac').hide();
-                    $('#cdan_soum').hide();
-                  break;
-                  default:
-                  'Error';
-                }
-              })
-          </script>
-   <script type="text/javascript">
-
-        $(document).ready(function(){
-
-       $(document).on('change','.optRegiePa_radio',function(){
-         if($("#optRegiePaimentCompteAdmin").is(":checked")){
-          $('.txtRegiPa').show();
-            }
-
-        else{
-              
-              $('.txtRegiPa').hide();
-            };
-          })
-     })
-         $(document).on('change','.optRegiePa_radio_upd',function(){
-         if($("#optRegiePaimentCompteAdmin_upd").is(":checked")){
-          $('.txtRegiPa_upd').show();
-            }
-
-        else{
-              
-              $('.txtRegiPa_upd').hide();
-            };
-          })
-     
-       </script>
-
    <script type="text/javascript">
       function changeLang(x)
         {
-          // $("label").addClass("trn");
-          // $("th").addClass("trn");
+          $("label").addClass("trn");
+          $("th").addClass("trn");
           // $("div").addClass("trn");
           translator.lang(x);
         }
@@ -6826,31 +6309,24 @@
       
       $.each(thisTag,function(idx,val){
       
-        thisData.push(''+val+ '"'+' : { en:" " },' );
+        thisData.push('"'+val+ '"'+' : { en:" " },' );
       
       });
 
-      thisData2={};
-      thisData2={'Dictionar': thisData };
-
+      // thisData2={};
+      // thisData2={ thisData };
       
-      // thisData=JSON.stringify(thisData);
-      // console.log(thisData2);
+      
+      // // thisData=JSON.stringify(thisData);
+      // console.log(thisData);
       // $.post("allScriptsv1.py",{tx: "translator", thisData: 'hyeeeeeee'},function(result){
       //     console.log(result);
       //     });
-    // console.log(thisData2)      ;
-      // $.post("allScriptsv1.py", {tx: "uploadJSONP", sub: "translator", name: 'wordDict3', json:JSON.stringify(thisData2)  }, function(result){
+      
+      // $.post("allScriptsv1.py", {tx: "uploadJSONP", sub: "patients", name: 'wordDict', json: JSON.stringify(thisData) }, function(result){
       //   console.log(result);
-      // });
-
+      // })
       });
-
-   </script>
-   <script type="text/javascript">
-     $('table th, table td,label,h4,h3,select option,a,div .item,div .button,div .header,strong ,div .divider,div i,h4 i').removeClass('trn');
-     $('table th, table td,label,h4,h3,select option,a,div .item,div .button,div .header,strong ,div .divider,div i,h4 i').addClass('trn');
-
    </script>
 </body>
 </html>
