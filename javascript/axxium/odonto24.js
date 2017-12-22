@@ -837,8 +837,6 @@
 
   function drawOdon()
   {
-  	
-  
     //alert("Draw the whole thing!");
   	var canvas = document.getElementById("odonto");
     	var ctx = canvas.getContext("2d");
@@ -922,7 +920,7 @@
   }
 
   function acceptVal1(aList)
-  { 
+  {
   	text42 = document.getElementById("text42").value;
   	note42 = document.getElementById("EnoteT").value;
   	if (trait == 1)

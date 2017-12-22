@@ -92,7 +92,7 @@
   {
 	if (keyNumPIN.length != 4)
 
-    
+    //fawad changerd from 4 to 0 
 	{
 		alert("Le code numérique doit compter 4 chiffres");
 		keyNumPIN = "";
@@ -101,7 +101,7 @@
 	}
 	else
 	{
-        
+        //changed from keyNumPIN to 1234 to make it direct and above 4 to 0 
         $.get("allScriptsv1.py?tx=getJSONsub&sub=signatures&code=S_"+keyNumPIN+"&rand="+Math.random(), function(data, status){
             	if (data["code"])
             	{
@@ -141,8 +141,7 @@
      $.getJSON("json/params/blank.json",function(data){
       dataJsonCode=data;
     });
-       
-     searchPrix(true);
+
     $('#prixEdit').modal('hide'); 
     
   }
@@ -2380,7 +2379,6 @@
   </script>
 
   <script type="text/javascript">
-
   //load all data code6.json onceioioujkuijkiuh
   var dataJsonCode;
 
@@ -2394,19 +2392,11 @@
 
   <script type="text/javascript">
    
-    function searchPrix(cond){
+    function searchPrix(){
     
      var output; 
-
-      if(cond==true){
-        alert( 'Condition went True yay ');
-
-        search1=" " 
-      }
-      else
-      {
+      
       var search1= $('.search1').val();
-      }
       var reg=new RegExp(search1,'i');
 
         $.each(dataJsonCode,function(key,val){

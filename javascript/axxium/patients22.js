@@ -819,7 +819,7 @@
 
         if(aTab=="codes")
         {
-          document.getElementById("updateAvail").innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui icon input"><input type="text" class="search1" onkeydown="searchPrix(false)" placeholder="Search by Codes" ><i class="circular search link icon"></i>';
+          document.getElementById("updateAvail").innerHTML = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div class="ui icon input"><input type="text" class="search1" onkeydown="searchPrix()" placeholder="Search by Codes" ><i class="circular search link icon"></i>';
 
 //</div><div class="ui form field"> <label>Search By Code</label><input type="text" class="search1" onkeydown="searchPrix()"></div>';
         }

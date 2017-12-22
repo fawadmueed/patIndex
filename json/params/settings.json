@@ -8,8 +8,9 @@
 	"tel"	: "Tel. (514) 374-6296",
 	"quesA"	: "AXXAv5",
 	"quesE"	: "AXXEv3",
-	"wsP"	: "http://192.168.240.10/PatientService/PatientInfo.asmx/getPatient?id=",
-	"wsS"	: "http://192.168.240.10/PatientService/PatientInfo.asmx/getPatient?id=",
-	"wsC"	: "http://192.168.240.10/PatientService/PatientInfo.asmx/getPatient?id=",
-	"wsF"	: "http://192.168.240.10/PatientService/PatientInfo.asmx/getPatient?id="
+	"wsP"	: "http://localhost:8080/PatientInfo.asmx/getPatient?id=",
+	"wsS"	: "http://localhost:8080/PatientInfo.asmx/getPatient?id=",
+	"wsC"	: "http://localhost:8080/PatientInfo.asmx/getPatient?id=",
+	"wsF"	: "http://localhost:8080/PatientInfo.asmx/getPatient?id="
+
 }

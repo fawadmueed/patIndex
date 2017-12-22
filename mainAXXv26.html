@@ -106,7 +106,7 @@ input {
 
   function checkPIN()
   {
-	if (keyNumPIN.length != 0)
+	if (keyNumPIN.length != 4)
 
     //fawad changerd from 4 to 0 
 	{
@@ -118,7 +118,7 @@ input {
 	else
 	{
         //changed from keyNumPIN to 1234 to make it direct and above 4 to 0 
-        $.get("allScriptsv1.py?tx=getJSONsub&sub=signatures&code=S_"+1234+"&rand="+Math.random(), function(data, status){
+        $.get("allScriptsv1.py?tx=getJSONsub&sub=signatures&code=S_"+keyNumPIN+"&rand="+Math.random(), function(data, status){
             	if (data["code"])
             	{
             		//alert("Bonjour "+data["name"]);
@@ -134,7 +134,6 @@ input {
             	}
         });
 	}
-
   }
 
   function updatePrix()
@@ -197,7 +196,6 @@ input {
         <div class="item" data-tab="codes" ><i class="plus icon"></i>Code Edit Prix</div>
 
     </div>
-
     <script>
     $(".ui").on("click", function() {
       $(".teal item").removeClass("active");
@@ -741,7 +739,7 @@ input {
           </div>
         </div>
       </div>
-     
+      </div>
 
      <div class="ui bottom attached tab segment" data-tab="antecedents">
     	<div class="ui one column grid">
@@ -1167,10 +1165,10 @@ input {
 	     <div class="ui grid">
 	        <div class="sixteen wide column">
 	          <div class="ui top attached tabular menu">
-  			    <div class="active item" data-tab="eb">En bouche</div>
-  			    <div class="item" data-tab="af">À faire</div>
-  			    <div class="item" data-tab="as">À surveiller</div>
-  			  </div>
+			    <div class="active item" data-tab="eb">En bouche</div>
+			    <div class="item" data-tab="af">À faire</div>
+			    <div class="item" data-tab="as">À surveiller</div>
+			  </div>
 			  <div class="ui bottom attached active tab segment" data-tab="eb">
 	          	<table class="ui compact table">
 	  				<thead>
@@ -2047,10 +2045,10 @@ input {
 
           <div class="fourteen wide field">
           <label>Entrer Alerte </label>
-            <input type="text" id="EalertM">
+            <input type="text" name="">
           </div>
           <div class="field">
-            <div class="ui axxium tiny button" onclick="modifyAlert();" style="margin-top: 20px">Ajouter</div>
+            <div class="ui axxium tiny button" onclick="" style="margin-top: 20px">Ajouter</div>
           </div>
           
         </div>
@@ -2078,7 +2076,7 @@ input {
               </tr>
             </tbody>
         </table>
-        <div class="four fields">
+        <div class="foud fields">
           <div class="inline field">
           <label>Tous</label>
             <input type="checkbox" name="" checked="">
@@ -2253,93 +2251,69 @@ input {
     <div class="ui modalAdRef small modal">
       <i class="close icon"></i>
       <div class="header">
-        <i class="user icon"></i>References 
-      </div>
+      <i class="user icon"></i>References 
 
-    <div class="content">
-      <div class="ui axxium mini form segment">
-        <!-- <div class="two column ui grid "> -->
+      <div class="content">
+        <div class="ui axxium mini form segment">
+        <div class="two column ui grid ">
         
-        <!-- <div class="eight wide column"> -->
+        <div class="eight wide column">
 
-          <div class="two fields">
-
-            <div class="five wide field">
-              <label>Titre</label>
-              <input type="text" name="" placeholder="Titre">
-            </div> 
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-            
-            <div class="six wide field">
-              <label> No Dossier</label>  
-              <input type="text" name="">
-            </div>
-
-          </div>
-            
-          
-            
-            <div class="seven wide field">
-              <label>Nom</label>  
-              <input type="text" name="">
-            </div>
-            
-            <div class="eight wide field">
-              <label> Prenom</label>
-              <input type="text" name="">
-            </div>
-         
-
+          <label>Titre</label>
           <div class="field">
-            <label>Rue</label>
+            <input type="text" name="" placeholder="Titre">
+          </div>
+            <label>Nom</label>
+            <div class="field">
             <input type="text" name="">
           </div>
-          
+          <label>Rue</label>
           <div class="field">
-            <label> Ville</label>
             <input type="text" name="">
           </div>
-
-          <div class="two fields">
-            <div class="field">
-              <label> Province </label>
-              <input type="text" name="">
-            </div>
-            <div class="field">
-              <label>Code Postal</label>
-              <input type="text" name="">
-            </div>
-           </div> 
-
+          <label> Province </label>
           <div class="field">
-            <label> Couriel </label>
             <input type="text" name="">
           </div>
-          <div class="two fields">
-            <div class="field">
-              <label> Telephone </label>
-              <input type="text" name="">
-            </div>
-            <div class="field">
-              <label>Poste</label>
-              <input type="text" name="">
-            </div>
+          <label> Couriel </label>
+          <div class="field">
+            <input type="text" name="">
           </div>
-        <!-- </div> -->
+          <label>Poste</label>
+          <div class="field">
+            <input type="text" name="">
+          </div>
+          </div>
 
-        <!-- <div class="eight wide column" >  -->
+          <div class="eight wide column" > 
 
-        <!-- </div> -->
-          <!-- </div> -->
-          <div class="three fields">
-            <div class="eight wide field"></div>
-            <div class="four wide field">
-              
+          <label> No Dossier</label>
+          <div class="inline field">
+            <input type="text" name="">
+          </div>
+          <label> Prenom</label>
+          <div class="field">
+            <input type="text" name="">
+          </div>
+          <label> Ville</label>
+          <div class="field">
+            <input type="text" name="">
+          </div>
+          <label>Code Postal</label>
+          <div class="field">
+            <input type="text" name="">
+          </div>
+          <label> Telephone </label>
+          <div class="field">
+            <input type="text" name="">
+          </div>
+          </div>
+          </div>
+          <div class="ui grid">
+            <div class="seven wide column"></div>
+            <div class="three wide columnh">
               <div class="ui axxium tiny button" onclick="">OK</div>
-              
             </div>
-            <div class="six wide field"></div>
           </div>
   
 </div>
@@ -2359,7 +2333,7 @@ input {
 
        switch(selection) {
         case "Patient":
-          var string= '<div class="ui divider"></div><div class="ui two column grid"><div class="thirteen wide column"><div class="field"> <textarea></textarea></div></div> <div class="three wide column"><div class="field"><div class="ui axxium tiny button" style="margin: 4px;" onclick="reOpenSearch();">Chercher Patient</div><div class="ui axxium tiny button" onclick=";" style="margin: 4px;">Imprimer Une etiquette</div><div class="ui axxium tiny button" onclick=";"  style="margin: 4px;">Courriel a la reference</div></div></div></div> ' ;
+          var string= '<div class="ui divider"></div><div class="ui two column grid"><div class="thirteen wide column"><div class="field"> <textarea></textarea></div></div> <div class="three wide column"><div class="field"><div class="ui axxium tiny button" onclick=";" style="margin: 4px;">Chercher Patient</div><div class="ui axxium tiny button" onclick=";" style="margin: 4px;">Imprimer Une etiquette</div><div class="ui axxium tiny button" onclick=";"  style="margin: 4px;">Courriel a la reference</div></div></div></div> ' ;
 
           $('.SelectedContent').empty();
            $('.SelectedContent').append(string);
@@ -2503,7 +2477,7 @@ input {
     	<div class="ui axxium form segment">
     	    <div class="field">
     	      <label>Entrez une alerte médicale</label>
-    	      <input id="" type="text">
+    	      <input id="EalertM" type="text">
     	    </div>
 	      <div class="ui axxium button" onclick="modifyAlert();">Valider</div>
     	</div>
@@ -3784,14 +3758,15 @@ input {
   var qParams = { };
 
   $('document').ready(function(){
-
-  	$('#context2 .menu .item').tab();
-
+  	$('.menu .item')
+  		.tab()
+	;
 	$('.sortable.table').tablesort();
-
 	$('.modalProts.modal')
-		  .modal({ allowMultiple: true});
-
+		  .modal({
+		    allowMultiple: true
+		  })
+	;
 	$('.modalNoteProt.modal')
 		  .modal({
 		    allowMultiple: true

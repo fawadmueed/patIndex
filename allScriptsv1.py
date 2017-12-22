@@ -938,15 +938,43 @@ if tx == "getRamqData":
         r = requests.post('http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/api/RamqWebApi/PostPaymentRequest', json=dataJSON, headers=headers)
 
         if r.status_code != 200:
+            json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
+            data = json.load(json_data)
+            json_data.close()  
+            
+            data["amq"] = {'req': datainputs, 'resp' : None, 'date' : None, 'status' : 0, 'nofact' : nofactext}
+            logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
+            logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+            logFile.close()  
+            
             print '{ "outcome" : "error", "message" : "Something was wrong" }'
         else:
             xmlresp = r.text
             if xmlresp is None or not xmlresp:          
+                json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
+                data = json.load(json_data)
+                json_data.close()  
+
+                data["amq"] = {'req': datainputs, 'resp' : None, 'date' : None, 'status' : 0, 'nofact' : nofactext}
+                logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
+                logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+                logFile.close()     
+
                 print '{ "outcome" : "error", "message" : "Something was wrong" }'
             else:         
                 if xmlresp.find("Error") > -1 or xmlresp.find("null") > -1:   #In case, something happen in server side code 500
                     if xmlresp.find("null") > -1:
                         xmlresp = 'Le fichier XML envoyé n\'est pas conforme'
+
+                    json_data = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'r')
+                    data = json.load(json_data)
+                    json_data.close()  
+                    
+                    data["amq"] = {'req': datainputs, 'resp' : None, 'date' : None, 'status' : 0, 'nofact' : nofactext}
+                    logFile = open('json/facturation/%s/%s/%s_%s.json'%(clinicId, patientId, nodossier, nofactext), 'w')
+                    logFile.write(json.dumps(data).decode('unicode-escape').encode('utf8'))
+                    logFile.close()   
+
                     message = {'outcome': 'error', 'message': CleanXML(xmlresp, False)}
                     print json.dumps(message)
                 else:         

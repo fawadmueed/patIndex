@@ -30,7 +30,7 @@
 "02127": {"prix": 40, "ramq" : 40, "insurance" : 40, "special" : 40 ,"fr":"SEPT PELLICULES PERIAPICALES", "unites":1},
 "02128": {"prix": 45, "ramq" : 45, "insurance" : 45, "special" : 45 ,"fr":"HUIT PELLICULES PERIAPICALES", "unites":1},
 "02129": {"prix": 50, "ramq" : 50, "insurance" : 50, "special" : 50 ,"fr":"NEUF PELLICULES PERIAPICALES", "unites":1},
-"02130": {"prix": 55, "ramq" : 55, "insurance" : 55, "special" : 55 ,"fr":"DIX PELLICULES PERIAPICALES", "unites":1 , "frais":"255"},
+"02130": {"prix": 55, "ramq" : 55, "insurance" : 55, "special" : 55 ,"fr":"DIX PELLICULES PERIAPICALES", "unites":1},
 "02131": {"prix": 31, "ramq" : 31, "insurance" : 31, "special" : 31 ,"fr":"RADIOGRAPHIE OCCLUSALE, UNE PELLICULE", "unites":1},
 "02132": {"prix": 38, "ramq" : 38, "insurance" : 38, "special" : 38 ,"fr":"RADIOGRAPHIE OCCLUSALE, DEUX PELLICULES", "unites":1},
 "02141": {"prix": 28, "ramq" : 28, "insurance" : 28, "special" : 28 ,"fr":"RADIOGRAPHIE INTERPROXIMALE, UNE PELLICULE", "unites":1},

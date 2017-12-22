@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+    <script src="ramq.js"></script>
+ 
+</head>
+<body>
+    <input type="button" onclick="CallWcfAjax()" value="Sum 2 Numbers" />
+
+
+    no_dem_ext: <input type="text" id="no_dem_ext" value="T42376-ElmCtx" /><br/>
+    no_devpr_logcl: <input type="text" id="no_devpr_logcl" value="18011"/><br/>
+    nom_devpr_logcl: <input type="text" id="nom_devpr_logcl" value="Développeur" /><br/> 
+    nom_logcl_fact: <input type="text" id="nom_logcl_fact" value="Mon logiciel" /><br/> 
+    no_versi_logcl_fact: <input type="text" id="no_versi_logcl_fact" value="1.0.0" /><br/>
+    no_versi_xml_dem: <input type="text" id="no_versi_xml_dem" value="ACTE" /><br/>
+    demdr_typ_id_intvn: <input type="text" id="demdr_typ_id_intvn" value="1" /><br/>
+    demdr_id_intvn: <input type="text" id="demdr_id_intvn" value="299801" /><br/>
+    exped_typ_id_intvn: <input type="text" id="exped_typ_id_intvn" value="3" /><br/>
+    exped_id_intvn: <input type="text" id="exped_id_intvn" value="18011" /><br/>
+    typ_moda_paimt: <input type="text" id="typ_moda_paimt" value="1" /><br/>
+    no_fact_ext: <input type="text" id="no_fact_ext" value="!" /><br/>
+    typ_id_prof: <input type="text" id="typ_id_prof" value="1" /><br/>
+    id_prof: <input type="text" id="id_prof" value="299801" /><br/>
+    typ_id_lieu_phys: <input type="text" id="typ_id_lieu_phys" value="1" /><br/>
+    id_lieu_phys: <input type="text" id="id_lieu_phys" value="99999" /><br/>
+    typ_situ_consi: <input type="text" id="typ_situ_consi" value="1" /><br/>
+    typ_id_pers: <input type="text" id="typ_id_pers" value="1" /><br/>
+    id_pers: <input type="text" id="id_pers" value="DISL14082210" /><br/>
+    no_seq_sys_cla: <input type="text" id="no_seq_sys_cla" value="12" /><br/>
+    cod_diagn_mdcal: <input type="text" id="cod_diagn_mdcal" value="V999" /><br/>
+    typ_evene_pers: <input type="text" id="typ_evene_pers" value="5" /><br/>
+    dat_evene_pers: <input type="text" id="dat_evene_pers" value="2017-08-01" /><br/>
+    dat_entre_pers_lieu: <input type="text" id="dat_entre_pers_lieu" value="2017-08-01" /><br/>
+    dat_sorti_pers_lieu: <input type="text" id="dat_sorti_pers_lieu" value="2017-08-01" /><br/>
+    ind_fact_assoc_dr: <input type="text" id="ind_fact_assoc_dr" value="true" /><br/>
+    no_ligne_fact: <input type="text" id="no_ligne_fact" value="1" /><br/>
+    typ_id_elm_fact: <input type="text" id="typ_id_elm_fact" value="1" /><br/>
+    id_elm_fact: <input type="text" id="id_elm_fact" value="21232" /><br/>
+    dat_serv_elm_fact: <input type="text" id="dat_serv_elm_fact" value="2017-08-01" /><br/>
+    cod_role:<input type="text" id="cod_role" value="1" /><br/>
+    dhd_elm_fact: <input type="text" id="dhd_elm_fact" value="2017-08-01T00:00:00" /><br/>
+    dat_autor_proth_acryl: <input type="text" id="dat_autor_proth_acryl" value="2017-08-01" /><br/>
+    no_dent: <input type="text" id="no_dent" value="1" /><br/>
+    cod_surf_dent: <input type="text" id="cod_surf_dent" value="M" /><br/>
+    typ_id_site_trait_denta: <input type="text" id="typ_id_site_trait_denta" value="1" /><br/>
+    id_site_trait_denta: <input type="text" id="id_site_trait_denta" value="9" /><br/>
+    typ_refre_autre_prof: <input type="text" id="typ_refre_autre_prof" value="1" /><br/>
+    refre_typ_id_prof: <input type="text" id="refre_typ_id_prof" value="1" /><br/>
+    refre_id_prof: <input type="text" id="refre_id_prof" value="299801" /><br/>
+    mnt_prcu_patnt: <input type="text" id="mnt_prcu_patnt" value="0" /><br/>
+
+    <br /><br /><br /><br /><input type="button" onclick="SoumissionDemandesPaiement()" value="SoumissionDemandesPaiement" />
+    <br />
+    jeton_comm: <input type="text" id="jeton_comm" /><br />
+    no_fact_ramq: <input type="text" id="no_fact_ramq" /><br />
+    id_site_trait_denta Modified: <input type="text" id="id_site_trait_denta_modified" value="8" /><br />
+    <br /><input type="button" onclick="SoumissionDemandesModification()" value="SoumissionDemandesModification" /><br />
+    <br /><input type="button" onclick="SoumissionDemandesAnnulation()" value="SoumissionDemandesAnnulation" /><br />
+</body>
+
+</html>

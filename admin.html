@@ -10,6 +10,7 @@
 
   <meta name="description" content="A menu is a collection of elements showing related user actions" />
   <meta name="keywords" content="html5, ui, library, framework, javascript" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700|Open+Sans:300italic,400,300,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" type="text/css" class="ui" href="css/dist/semantic.min.css">
@@ -65,27 +66,64 @@
 		      			<th>Ville</th>
 		      			<th>Province</th>
 		      			<th>Code Postal</th>
-		      			<th>Telephone</th>
+		      			
+		      			<th >Telephone</th>
+		      			<th class="dol" ></th>
 		      			<th>Reseau</th>
 		      		</thead>
 		      		<tbody>
-		      			<td></td>
+		      			<td contenteditable="true"></td>
+		      			<td contenteditable="true"></td>
+		      			<td contenteditable="true"></td>
+		      			<td contenteditable="true"></td>
+		      			<td contenteditable="true"></td>
+		      			<td contenteditable="true"></td>
+		      			<td contenteditable="true"></td>
+		      			<td contenteditable="true" class='mont'>24</td>
+		      			<td class="dol" >$</td>
+		      			<td contenteditable="true"></td>
+		      			
 		      		</tbody>
 		      	</table>
+		      	<style type="text/css">
+		      		 .dol{
+		      			
+		      			 border-collapse: collapse;
+		      			 text-align: left !important;
+		      			 margin:0px !important;
+		      			 padding: 0px !important;
+		      			 padding-left: 0px !important;
+		      			 padding-right: 0px !important;
+		      		}
+
+		      		 .mont{
+		      			 text-align: right !important;
+		      			 margin:0px !important;
+		      			 padding-left: 0px !important;
+		      			 padding-right: 0px !important;
+		      		}
+		      	</style>
 		      	<div class="ui grid">
 		      		<div class="row">
-		      			<div class="fourteen wide column"></div>
-		      			<div class="column">
-		      				<div class="ui tiny button teal">SUBMIT</div>	
+		      			<div class="twelve wide column"></div>
+		      			<div class="four wide column">
+		      				<div class="ui tiny button teal" onclick="modAdInsr()">Ajouter</div>	
+		      			
+		      			
+		      				<div class="ui tiny button teal">Supprimer</div>	
 		      			</div>
+		      			
 		      		</div>
 		      	</div>
 		    </div>
 
 		    <div class="ui tab teal segment" data-tab="Dashboard">
-		  		hello
+		  		Dashboard
+
 		    </div>
-		    
+		    <script type="text/javascript">
+		    	
+		    </script>
 		    <div class="ui active tab teal segment" data-tab="MachindID">
 		    	<div class="ui grid">
 		    		<div class="row">
@@ -160,6 +198,172 @@
 
 
   </div>
+
+  <div class="ui modalAdInsr modal">
+  	 <i class="close icon"></i>
+  	<div class="header">
+  		<i class="green add Circle icon"></i>Assurances et mode de paiement</div>
+  	<div class="content">
+  					
+  			<div class="ui form orange segment">
+  					
+  				<h4><label>Version CDANET</label></h4>	
+  				<div class="two fields">
+						<div class="inline field">
+							<input type="radio" name="">
+							<label>Verion 2,4</label>
+						</div>
+						<div class="inline field">
+							<input type="radio" name="">
+							<label>Verion 4,03</label>
+						</div>
+					</div>
+  	        </div>
+  				
+  			
+  				<div class="ui form  orange segment">
+  					<h3>Renseignements-Assurance</h3>
+  					<h4>Renseignements compagnie d'assurance</h4>
+  						<div class="fields">
+  								<div class="field">
+	  								<label>Code</label>
+	  								<input type="text" name="">
+  								</div>
+  								<div class="field">
+	  								<label>ID</label>
+	  								<input type="text" name="">
+  								</div>
+  								<div class="field">
+	  								<label>#Prochaine Transaction</label>
+	  								<input type="text" name="">
+  								</div>
+						</div>
+						<div class="two fields">
+						<div class="six wide field">
+							<label>Nom</label>
+							<input type="text" name="">
+  						</div>
+  						<div class="ten wide field">
+							<label>Adresse</label>
+							<input type="text" name="">
+  						</div>
+  					</div>
+  						<div class="two fields">
+  						<div class="field">
+							<label>Ville</label>
+							<input type="text" name="">
+  						</div>
+  							
+  								<div class="field">
+									<label>Province</label>
+									<input type="text" name="">
+  								</div>
+  								<div class="field">
+									<label>Code postal</label>
+									<input type="text" name="">
+  								</div>
+  							</div>		
+
+  						<div class="four wide field">
+							<label>Téléphone</label>
+							<input type="text" name="">
+  						</div>
+  						<div class="two fields">
+  						<div class="field">
+							<label>Responsable</label>
+							<input type="text" name="">
+  						</div>
+  						<div class="field">
+							<label>Remarque</label>
+							<input type="text" name="">
+  						</div>
+  					</div>
+  				</div>
+  				<div class="ui form orange segment">
+  					<h4>Opérations acceptées</h4>
+  					<div class="two fields"	>
+  						<div class="inline field"	>
+  							<input type="checkbox" name="">
+  							<label>Annulation</label>	
+  						</div>
+						<div class="inline field"	>
+  							<input type="checkbox" name="">
+  							<label>Coordination</label>	
+  						</div>
+  					</div>
+  					<div class="two fields"	>
+  						<div class="inline field"	>
+  							<input type="checkbox" name="">
+  							<label>Plan de traitement</label>	
+  						</div>
+						<div class="inline field"	>
+  							<input type="checkbox" name="">
+  							<label>Rapprochement - Paiements</label>	
+  						</div>
+  					</div>  					
+  					<div class="two fields"	>
+  						<div class="inline field"	>
+  							<input type="checkbox" name="">
+  							<label>Demandes en suspens</label>	
+  						</div>
+						<div class="inline field"	>
+  							<input type="checkbox" name="">
+  							<label>Rapprochement sommaire</label>	
+  						</div>
+  					</div>
+  					
+  					<div class="inline field"	>
+  						<input type="checkbox" name="">
+  						<label>Admissibilité</label>	  						
+  					</div>
+				</div>
+				<div class="ui form orange segment">
+					<h4>Réseau</h4>	
+					<div class="field">
+						<label>Fournisseur de réseau</label>
+						<select class="four wide field">
+							<option>AHI</option>
+							<option>NDC</option>
+							<option>Dentaide</option>
+						</select>	
+					</div>
+				
+				
+					<div class="three fields"	>
+						<div class="inline field"	>
+							<input type="radio" name="">
+							<label>Aucune</label>	
+						</div>
+						<div class="inline field"	>
+							<input type="radio" name="">	
+							<label>Standard CDANET #1</label>	
+						</div>
+						<div class="inline field"	>
+							<input type="radio" name="">	
+							<label>Standard CDANET #2</label>	
+						</div>
+					</div>
+				</div>
+				<div class="ui grid">
+				 <div class="thirteen wide column"></div>
+				 <div class="column">
+				 	<button class="ui axxium button">Enregistrer</button>
+				 </div>
+				</div>
+				
+					
+
+  					
+
+  				
+
+  			</div>
+
+  		</div>
+  	</div>
+  </div>
+
+  
 </body>
 <script type="text/javascript">
 
@@ -172,7 +376,9 @@ $('tabular.menu .item').on('ready', function() {
          
 $('.tabular.menu .item').tab();
 
-
+function modAdInsr(){
+	$('.modal.modalAdInsr').modal('show');
+}
 
 
 </script>
