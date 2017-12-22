@@ -1,46 +1,40 @@
  
     var dataJson_Code;      
-      // $.getJSON("json/params/codes6.json",function(data){
-      //   dataJson_Code=data;
-      // });
-
       $.ajax({
   type:'GET',
   url:"json/params/codes6.json",
-  // data:data,
   async:false,
   dataType: 'json',
   success: function (data) {
-    //Do stuff with the JSON data
     dataJson_Code=data;
-   
   }
+
  })
   
-
-   var dataSurfaceRules;
- // $.getJSON("json/factureValidation/rules.json",function(data){
- //          dataSurfaceRules=data;
- //          // console.log(dataSurfaceRules);
- //        });
-
+  var dataSurfaceRules;
      $.ajax({
   type:'GET',
   url:"json/factureValidation/rules.json",
-  // data:data,
   async:false,
   dataType: 'json',
   success: function (data) {
-    //Do stuff with the JSON data
     dataSurfaceRules=data;
-   
-  }
+   }
  })
 
+       var insuranceData;
+     $.ajax({
+  type:'GET',
+  url:"json/insurances/insurances.json",
+  async:false,
+  dataType: 'json',
+  success: function (data) {
+    insuranceData=data;
+   }
+ })
+     console.log(insuranceData);
 
-    
-
-      $(document).ready(function(){
+    $(document).ready(function(){
 
        
   
@@ -339,13 +333,13 @@
     if(type=="Type")
     { 
       //Condition 2: If none of AMQ BES HOP and CAS and Selected DrpDown Value - MESSAGE ERROR
-      if ((!(val=="AMQ"||val=="BES"||val=="HOP" ))&&(!(val=="CAS"))&&(!(val==$("#ramq_select").val())))
+      if ((!(val=="AMQ"||val=="BES"||val=="HOP" ))&&(!(val=="CAS"))&&(!(val==$("#ramq_select").val()))&&(!(ifExist=checkInsuranceExist(val))))
       {
         // alert('Error! No type selected');
         // warnMsg('TYPE error. Please enter correct type.')
         // return false;
-        warnMsg('Type not CAS or AMQ. Considering Insurance for Testing! ');
-        return true;
+        warnMsg('Type not CAS, AMQ or Insrance Company');
+        
       }
       
 
@@ -662,255 +656,24 @@ function get_age(){
   return age;
 }
 
-// function robValidation(type,code,tooth,age){
 
-// // /!!!ATTENTION, this section must be execute after the user fill up the code
+function checkInsuranceExist(compny){ 
+  var validation;
 
-//                    if(type == 'AMQ' || type == 'BES' || type == 'HOP') {
-//                        if(type == 'BES' && is_ablation_code(parseInt(code))) {  //We must be in QC to execute this
-//                            if(parseInt(age) < 10)
-//                                $("#message2").append(msgerror.msg044);
-//                              alert(msgerror.msg044)
-//                                return false;
-//                        }
+  $.each(insuranceData,function(key,val){
+    if(val.code==compny)
+    { 
+      validation=true;
+      
+    }
 
-//                        if(!code_amq(type, tooth, code, age))
-//                            return false;
-                       
-//                        if(!code_amq_canal(type, tooth, code, age))
-//                            return false;
-//                    }
-                   
-//                    if(code == '23105' || code == '23905' || code == '23108' || code == '23908') {
-//                        $("#message2").append(msgerror.msg06);
-//                        alert(msgerror.msg06)
-//                        return false;
-//                    }
+  })
 
-//                    if(dent_Type) {
-//                        var v_code = [33100, 33200, 33300, 33120, 33220, 33320, 33400, 33420, 33501, 33502, 33503, 33504, 33999];
-//                        if($.inArray(parseInt(code), v_code) > -1 && tooth == '79') {
-//                            $("#message2").append(msgerror.msg06);
-//                            alert(msgerror.msg06);
-//                            return false;
-//                        }
-//                    }
-
-//                    //we must be in QC to execute this section
-//                    if(code_avec_dent(parseInt(code), dent_Type)) {
-//                        if(tooth == '') {
-//                            $("#message2").append(msgerror.msg083);
-//                            alert(msgerror.msg083);
-//                            return false;
-//                        }
-//                    }
-//                    else if(code_avec_dent_et_surface(parseInt(code), dent_Type) && (tooth == '' || surface == '')) {
-//                        $("#message2").append(msgerror.msg081);
-//                        alert(msgerror.msg081);
-//                        return false;
-//                    }
-                   
-//                    return true;
-
-// }
-
-
-// // ============= FUNCTIONS ROBERTO VALIDATION=======
-
-// //  var msgerror = {}; //JSon objet for message
-// // //replace insuranceCo with globVisionRData.InsTypeList[0] 
-
-// // // var insuranceCo=globVisionRData.InsTypeList[0];
-
-// //         function code_amq_canal(insurance, tooth, code, age) {
-// //             var first_two = code.substring(0, 2);
-            
-// //             if(first_two == '33' || first_two == '39') {
-// //                 if(insurance == 'BES') {
-// //                     if(parseInt(age) > 12) {
-// //                         if(code != '39910') {
-// //                             $("#message2").append(msgerror.msg230);
-// //                             return false;
-// //                         }
-// //                     }
-// //                     else if(parseInt(age) >= 10) {
-// //                         $("#message2").append(msgerror.msg219);
-// //                         return false;                       
-// //                     }
-// //                 }
-// //                 var trois_dern = code.substring(2, 6);
-// //                 var dern_code = ['001', '002', '003', '004', '100', '200', '300', '400', '120', '220', '320', '420', '501', '502', '503', '504', '999', '910'];
-// //                 if($.inArray(trois_dern, dern_code) > -1) {
-// //                     if(primary_tooth(parseInt(tooth))) {
-// //                         $("#message2").append(msgerror.msg230);
-// //                         return false;
-// //                     }
-// //                     else if(!perment_tooth(parseInt(tooth))) {
-// //                         $("#message2").append(msgerror.msg078);
-// //                         return false;                       
-// //                     }
-// //                 }
-// //                 else {
-// //                     $("#message2").append(msgerror.msg213);
-// //                     return false;
-// //                 }
-// //             }
-        
-// //             return true;
-// //         }
-
-
-// //         function code_amq(insurance, tooth, code, age) {
-// //             if(code == '01250') {
-// //                 $("#message2").append(msgerror.msg213);
-// //                 return false;
-// //             }
-// //             if(code == '01120') {
-// //                 if(!(parseInt(age) >= 0 && parseInt(age) <= 11) && !(parseInt(tooth) >= 1 && parseInt(tooth) <= 6)) {
-// //                     $("#message2").append(msgerror.msg21);
-// //                     return false;
-// //                 }
-                
-// //                 //return Depuis() missing....
-// //             } 
-// //             if(code == '01130') {
-// //                 if(!(parseInt(age) >= 12 && parseInt(age) <= 15)) {
-// //                     if(!(insurance == 'BES' && parseInt(age) >= 16) && !(parseInt(tooth) >= 1 && parseInt(tooth) <= 6)) {
-// //                         $("#message2").append(msgerror.msg22);
-// //                         return false;
-// //                     }
-// //                 }
-                
-// //                 //return Depuis() missing...
-// //             }
-// //             if(code == '01300' || code == '93200') {
-// //                 if(!(parseInt(age) >= 0 && parseInt(age) <= 15)) {
-// //                     if(!(insurance == 'BES' && parseInt(age) >= 16) && !(parseInt(tooth) >= 1 && parseInt(tooth) <= 6)) {
-// //                         $("#message2").append(msgerror.msg23);
-// //                         return false;                   
-// //                     }
-// //                 }
-// //             }
-// //             if(code == '13200') {
-// //                 if(!(parseInt(age) >= 12 && parseInt(age) <= 15))  {
-// //                     if(!(insurance == 'BES' && parseInt(age) >= 16) && !(parseInt(tooth) >= 1 && parseInt(tooth) <= 6)) {
-// //                         $("#message2").append(msgerror.msg22);
-// //                         return false;   
-// //                     }
-// //                 }
-// //                 //return Depuis() missing...
-// //             }
-// //             //to continue...            
-// //             if(insurance == 'BES' || insurance == 'AMQ') {
-// //                 if(code) {
-// //                 }
-// //                 //Translate('Le code "') + code +
-// //                 //  Translate('" n''est pas un code RAMQ.'), mtInformation, [mbOK], 0);
-// //             }
-// //             return true;
-// //         }
-        
-
-// //         function quest_recl() {
-// //             if (confirm('Avez-vous vérifié le carnet de réclamation?')) {
-// //                 return true;
-// //             } else {
-// //                 return false;
-// //             }       
-// //         }
-
-
-// //         function perment_tooth(tooth) {
-// //             var dent_perment = [1,2,3,4,5,6,11,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28,31,32,33,34,35,36,37,38,41,42,43,44,45,46,47,48];
-// //             if($.inArray(tooth, dent_perment) > -1)
-// //                 return true
-// //             return false;                   
-// //         }
-
-
-// //         function primary_tooth(tooth)  {
-// //             var dent_primary = [51,52,53,54,55,61,62,63,64,65,71,72,73,74,75,81,82,83,84,85];
-// //             if($.inArray(tooth, dent_primary) > -1)
-// //                 return true
-// //             return false;           
-// //         }
-
-
-// //         function is_dent_anterieur(tooth) {
-// //             var dent_anterieur = [1,2,3,4,5,6,11,12,13,21,22,23,31,32,33,41,42,43,51,52,53,61,62,63,71,72,73,81,82,83];
-// //             if($.inArray(tooth, dent_anterieur) > -1)
-// //                 return true
-// //             return false;           
-// //         }
-
-
-// //         function code_avec_dent(code, dent_Type) {
-// //             var c_avec_dent = [20111, 20121, 20131, 20141, 21501, 23115, 23121, 23122, 23123, 23315,
-// //                              23701, 25521, 27721, 29600, 63031, 75350, 75360, 79301, 75100, 75101, 75200,
-// //                              75220, 79615, 79616 ,75502, 75503, 75504, 75505, 75506, 79405, 79406];
-// //             var first_two = code.toString().substring(0, 2);
-// //             if(dent_Type) { //We must be in QC to execute this
-// //                 if(is_endo_code(code) || $.inArray(code, c_avec_dent) > -1 || first_two == '71' || first_two == '72') {
-// //                     return true;
-// //                 }
-// //             }
-// //             return false;
-// //         }
-
-
-// //         function is_endo_code(code) {
-// //             var endo_code = [33100, 33101, 33102, 33120, 33200, 33201, 33202, 33220, 33201, 33202,
-// //                              33220, 33300, 33301, 33302, 33320, 33400, 33401, 33402, 33420, 33504, 33521,
-// //                              33522, 33523, 33531, 33532, 33533, 33541, 33542, 33543, 33999, 39902];
-// //             if($.inArray(code, endo_code) > -1)
-// //                 return true
-// //             return false;
-// //         }
-
-
-// //         function code_avec_dent_et_surface(code, dent_Type) {
-// //             if(code == 23210 || code == 23220)
-// //                 return false;   
-// //             if(dent_Type && code_avec_dent(code, dent_Type)) { //we must be in QC to execute this
-// //                 var c_avec_dent = [211, 212, 231, 232, 233, 234, 251, 252, 253, 255];
-// //                 var first_three = parseInt(code.toString().substring(0, 3));
-// //                 if($.inArray(first_three, c_avec_dent) > -1)
-// //                     return true 
-// //             }
-// //             return false;
-// //         }
-
-
-// //         function is_ablation_code(code) {
-// //             var ablation_code = [71101, 71111, 71401, 71411, 72210, 72230, 72250, 72260, 72300, 72311, 72351, 72361, 
-// //                                 72320, 75350, 75360, 79301];
-// //             if($.inArray(code, ablation_code) > -1)
-// //                 return true
-// //             return false;
-// //         }
-
-
-// //         function regle1_4(age, limit, insurance, insuranceCo ) {
-// //             if(age >= limit) {
-// //                 if(insurance != 'BES' && (insurance != 'HOP' && insuranceCo  != 'BES')) {
-// //                     return false;
-// //                 } else {
-// //                     if(insuranceCo  != 'BES' && insurance == 'HOP') {
-// //                         return false;   
-// //                     } else {
-// //                         switch(limit) {
-// //                             case 13:
-// //                                 if(age >= 13 && age <= 15)
-// //                                     return quest_recl();
-// //                                 break;
-// //                             case 16:
-// //                                 if(age > 16)
-// //                                     return quest_recl();
-// //                                 break;
-// //                         }
-// //                     }
-// //                 }
-// //             }           
-// //             return true;
-// //         }
-// //         // =====xx===================================xx==========
+  if (validation==true){
+      return true;
+  }
+  else{
+    return false;
+  }
+  
+}

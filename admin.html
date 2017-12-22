@@ -16,6 +16,10 @@
   <link rel="stylesheet" type="text/css" class="ui" href="css/dist/semantic.min.css">
   <link rel="stylesheet" type="text/css" class="ui" href="css/axxium.css">
 
+  <!-- <script src="javascript/tables/jquery.dataTables.min.js"></script> -->
+
+
+
   <script src="javascript/library/jquery.min.js"></script>
   <script src="javascript/library/tablesort.js"></script>
   <script src="javascript/dist/semantic.min.js"></script>
@@ -23,6 +27,17 @@
   	<script src="javascript/axxium/facture28.js"></script>
 	<script src="javascript/axxium/ramq28.js"></script>
 	<script src="javascript/axxium/ramqCredentials28.js"></script>
+
+	   <script src="https://cdn.datatables.net/1.10.11/js/dataTables.semanticui.min.js"></script>
+   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.11/css/dataTables.semanticui.min.css">
+   
+   <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+   <script src="https://cdn.datatables.net/1.10.16/js/dataTables.semanticui.min.js"></script>
+   <script src="https://cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+   <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
 
 
 </head>
@@ -57,7 +72,7 @@
 		 <div class="twelve wide stretched column">
 
 		  <div class="ui tab teal segment" data-tab="Insurances">
-		  			<table class="ui table">
+		  			<table class="ui table" id="insr_tbl" width="100%">
 		      		<thead>
 		      			<th>Code</th>
 		      			<th>No Id</th>
@@ -68,21 +83,11 @@
 		      			<th>Code Postal</th>
 		      			
 		      			<th >Telephone</th>
-		      			<th class="dol" ></th>
+		      			
 		      			<th>Reseau</th>
 		      		</thead>
-		      		<tbody>
-		      			<td contenteditable="true"></td>
-		      			<td contenteditable="true"></td>
-		      			<td contenteditable="true"></td>
-		      			<td contenteditable="true"></td>
-		      			<td contenteditable="true"></td>
-		      			<td contenteditable="true"></td>
-		      			<td contenteditable="true"></td>
-		      			<td contenteditable="true" class='mont'>24</td>
-		      			<td class="dol" >$</td>
-		      			<td contenteditable="true"></td>
-		      			
+		      		<tbody id="insr_tbl_body">
+		      		
 		      		</tbody>
 		      	</table>
 		      	<style type="text/css">
@@ -367,6 +372,59 @@
 </body>
 <script type="text/javascript">
 
+var insuranceData;
+     $.ajax({
+  type:'GET',
+  url:"json/insurances/insurances.json",
+  async:false,
+  dataType: 'json',
+  success: function (data) {
+    insuranceData=data;
+   }
+ })
+console.log(insuranceData);
+
+var insuranceData_Array=[];
+ $.each(insuranceData,function(key,val){
+
+ 	var temp_Array=[];
+ 	temp_Array.push(val.code);
+ 	temp_Array.push(val.numero_id);
+ 	temp_Array.push(val.nom);
+ 	temp_Array.push(val.adress);
+ 	temp_Array.push(val.ville);
+ 	temp_Array.push(val.prov);
+ 	temp_Array.push(val.postal);
+ 	temp_Array.push(val.tel);
+ 	temp_Array.push('x');
+
+ 	insuranceData_Array.push(temp_Array);
+ })
+
+ console.log(insuranceData_Array);
+
+$(document).ready(function() {
+
+    $('#insr_tbl').DataTable({
+    	data:insuranceData_Array
+	})
+
+} );
+
+function populateInsrTable(){
+
+	tblBody=$('#insr_tbl');
+	tr=$('<tr>');
+	td=$('<td>');
+
+     $.each(insuranceData,function(key,val){
+
+
+     })
+
+
+
+}
 
 $('tabular.menu .item').on('ready', function() {
     // programmatically activating tab

@@ -12,8 +12,7 @@ var msgerror = {}; //JSon objet for message
  	success: function (data) {
     //Do stuff with the JSON data
     msgerror=data;
-    console.log('ajax msg error here : ');
-    console.log(msgerror);
+    
   }
  })
 
