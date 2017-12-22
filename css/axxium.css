@@ -85,7 +85,10 @@ a.ui.axxium.label:hover:before {
   background-color: #008883;
 }
 .ui.axxium.segment {
-  border-top: 0.2em solid #008883;
+  border: 1px solid rgba(34, 36, 38, 0.48) !important ;
+  border-top: 0.2em solid #008883 !important;
+  box-shadow: 0 5px 2px 0 rgba(34, 36, 38, 0.12) !important ;
+  
 }
 .ui.inverted.axxium.segment {
   background-color: #008883 !important;
@@ -96,3 +99,12 @@ a.ui.axxium.label:hover:before {
       font-size: 1.24285714rem;
 
 }
+
+.ui.segment{ 
+  border: 1px solid rgba(34, 36, 38, 0.48);
+  box-shadow: 0 5px 2px 0 rgba(34, 36, 38, 0.12);
+  }
+
+
+
+                              
