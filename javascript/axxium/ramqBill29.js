@@ -11,6 +11,8 @@ var globRamqBillPaymentObjRowData;
 
 var globRamqBillArrDataForMessageTable = [];
 var globRamqBillArrDataForPaymentTable = [];
+//Global variable for printing report.
+var qFACT;
 
 $(document).ready(function () {
     //Payment table
@@ -83,6 +85,8 @@ function RamqBillGetDataFromServer()
                     alert(result.message);
                 else {
                     if (result.factures.length > 0) {
+                        // put result to global variable for further using in report.
+                        //qFACT = result.factures;
                         var arrDataForTable = RamqBillGetDataForTable(result.factures);
                         RamqBillPopulateTable(arrDataForTable);
                     }
@@ -104,7 +108,7 @@ function RamqBillGetDataForTable(pArrDataFromServer)
         objOutputData.FactureNo = objInputData.facture;
         objOutputData.Nom = (objInputData.info[0][1] && objInputData.info[0][1].NomPers)?objInputData.info[0][1].NomPers:'';
         objOutputData.Prenom = (objInputData.info[0][1] && objInputData.info[0][1].PrePers) ? objInputData.info[0][1].PrePers : '';
-        objOutputData.Montant = (objInputData.xml)?RamqBillGetMontant(objInputData.xml):0;
+        objOutputData.Montant = (objInputData.xml)?RamqBillGetMontant(objInputData.xml):'0.00';
         objOutputData.Status = pArrDataFromServer[i].status;
         objOutputData.IfUpdatePossible = RamqBillIfUpdatePossible(pArrDataFromServer[i].status, objInputData.dateregie);
 
@@ -133,7 +137,7 @@ function RamqBillPopulateTable(pArrDataForTable)
         tableContent += "<td>" + pArrDataForTable[i].Montant + "</td>"; //Montant
         tableContent += "<td>" + ((pArrDataForTable[i].Status == 1) ? 'Accepté':((pArrDataForTable[i].Status == 3) ? "Annulé":'Non transmis')) + "</td>"; //Status
         tableContent += "</tr>";
-        totalAmount += pArrDataForTable[i].Montant;
+        totalAmount += parseFloat(pArrDataForTable[i].Montant);
     }
 
     $('#rgie_fact_table tbody').append(tableContent);
@@ -183,7 +187,7 @@ function RamqBillGetMontant(pXmlResp)
     }
     catch (e)
     { }
-    return totalAmount;
+    return totalAmount.toFixed(2);
 }
 
 function RamqBillGetStatus(pstatus)
@@ -207,6 +211,8 @@ function RamqBillPopulatDetailsArrays(pBillNumber)
 
 function RamqBillPopulateBillDetails(pArrBilldata)
 {
+    RamqBillClearFormFactureDetails();
+
     globRamqBillInfo = pArrBilldata;
     arrGrilleDeFacturation_update = pArrBilldata.info[1];
     arrGrilleDeFacturation_forms_update = pArrBilldata.info[2];
@@ -236,8 +242,8 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     $('#ancienne_montant_regie_fact').val(RamqBillGetMontant(pArrBilldata.xml));
 
     //Nouvelle facture
-    $('#nouvel_no_facture').val(''); //TODO:
-    $('#novl_montant_regie_fact').val(''); //TODO:
+    //$('#nouvel_no_facture').val(''); //TODO:
+    //$('#novl_montant_regie_fact').val(''); //TODO:
 
     //renseignements complementaires regie
     if (objVisionRData && objVisionRData.IdPers)
@@ -252,13 +258,43 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     if (objAdditionalData && objAdditionalData.RembDemParPatient)
         $('#remb_dem_oui_regie_fact').prop('checked', true);
     else
-        $('#remb_dem_non_regie_fact').prop('checked', false);
+        $('#remb_dem_non_regie_fact').prop('checked', true);
+
+    if (objAdditionalData && objAdditionalData.IndFactAssosDr)
+        $('#optRegiIndFactAssosDrYes_Upd').prop('checked', true);
+    else
+        $('#optRegiIndFactAssosDrNo_Upd').prop('checked', true);
+    
 
     //professionel
     $('#pamnt_no_prof_regie_fact').val((objVisionRData && objVisionRData.IdProf) ? objVisionRData.IdProf : '');
     $('#pamnt_no_grp_regie_fact').val('');//TODO:
+    if (objAdditionalData && objAdditionalData.IsComptePersonnel) {
+        $('#optRegiePaimentComptePers_upd').prop('checked', true);
+        $('.txtRegiPa_upd').hide();
+    }
+    else if (objAdditionalData && !objAdditionalData.IsComptePersonnel) {
+        $('#optRegiePaimentCompteAdmin_upd').prop('checked', true);
+        $('#txtRegiPaimentNoCompteAdmin_upd').val(objAdditionalData.NoCpteAdmin);
+        $('.txtRegiPa_upd').show();
+    }
+        
+    
+    //code diagnostic
+    if (objAdditionalData && objAdditionalData.CodDiagnMdcal)
+    {
+        if (objAdditionalData.CodDiagnMdcal === '5210')
+            $('#code_diag_carie_dent_Upd').prop('checked', true);
+        else if (objAdditionalData.CodDiagnMdcal === 'V909')
+            $('#code_diag_etat_norm_Upd').prop('checked', true);
+        else
+        {
+            $('#code_diag_autre_radio_Upd').prop('checked', true);
+            $('#code_diag_autre_field_Upd').val(objAdditionalData.CodDiagnMdcal);
+        }
+    }
 
-    //evenement //TODO: Josee should change layout
+    //evenement 
     $('#pamnt_even_date_regie_fact').val((objAdditionalData && objAdditionalData.DatEvenePers) ? objAdditionalData.DatEvenePers : '');
     //period d'hospital.
     $('#pamnt_date_entre_regie_fact').val((objAdditionalData && objAdditionalData.DatEntrePersLieu) ? objAdditionalData.DatEntrePersLieu : '');
@@ -266,8 +302,21 @@ function RamqBillPopulateBillDetails(pArrBilldata)
 
     //Lieu de dispensation
     
-    $('#lieu_codifie_regie_fact').prop('checked', (objAdditionalData && objAdditionalData.LieuCodifieRegie)?objAdditionalData.LieuCodifieRegie:false);
-    $('#lieu_codifie_non_regie_fact').prop('checked', (objAdditionalData && objAdditionalData.LieuNonCodifieRegie) ? objAdditionalData.LieuNonCodifieRegie : false);
+    if (objAdditionalData && objAdditionalData.LieuCodifieRegie) {
+        $('#lieu_codifie_regie_fact').prop('checked', true);
+        $('#lieu_codifie_non_regie_fact').prop('checked', false);
+        $('.codif_selection_lieu').show();
+        $('.codif_selection_non').hide();
+
+    }
+    else if (objAdditionalData && objAdditionalData.LieuNonCodifieRegie) {
+        $('#lieu_codifie_regie_fact').prop('checked', false);
+        $('#lieu_codifie_non_regie_fact').prop('checked', true);
+        $('.codif_selection_lieu').hide();
+        $('.codif_selection_non').show();
+    }
+
+    
   
     $('#num_lieu_regie_fact').val((objAdditionalData && objAdditionalData.IdLieuPhys) ? objAdditionalData.IdLieuPhys : '');
     $('#secteur_active_regie_fact').val((objAdditionalData && objAdditionalData.NoSectActiv) ? objAdditionalData.NoSectActiv : '');//ddl
@@ -287,6 +336,8 @@ function RamqBillPopulateBillDetails(pArrBilldata)
     {
         $('#type_lieu_aut_regie_fact').prop('checked', true);
     }
+
+    $('#txtRamqSpecialNams').val(objAdditionalData && objAdditionalData.NoRamqSpecial);
 
     //Show/ hide buttons "Annuler fact" & Transferer a la Regie
 
@@ -318,8 +369,6 @@ function RamqBillUpdateBillInfo() {
     var objVisionRData = globRamqBillInfo.info[0][1];
     var objAdditionalData = globRamqBillInfo.info[0][2];
 
-    //globRamqJetonComm = RamqBillGetJetonComm(pArrBilldata.xml);
-    //globRamqNoFactRamq = RamqBillGetMontant(pArrBilldata.xml);
     //Identification du patient
     globRamqBillInfo.nodossier = $('#no_dosir_regie_fact').val();
 
@@ -330,31 +379,31 @@ function RamqBillUpdateBillInfo() {
     objVisionRData.NamExpDate = $('#exp_regie_fact').val();
 
     //ancienne facture
-    globRamqBillInfo.facture = $('#no_facture_regie_fact').val();
-    //$('#no_recu_regie_fact').val(globRamqNoFactRamq);
-    //$('#no_code_regie_fact').val(globRamqJetonComm);
-    //$('#ancienne_montant_regie_fact').val(RamqBillGetMontant(pArrBilldata.xml));
+    //User cannot update this section.
 
-    ////Nouvelle facture
-    //$('#nouvel_no_facture').val(''); //TODO:
-    //$('#novl_montant_regie_fact').val(''); //TODO:
+    //Nouvelle facture
+    //User cannot update this section.
 
     //renseignements complementaires regie
 
-    //if (objVisionRData.IdPers) {
-    //    $('#carte_as_malad_oui_regie_fact').prop('checked', true);
-    //}
-    //else {
-    //    $('#carte_as_malad_non_regie_fact').prop('checked', true);
-    //}
     objAdditionalData.RembDemParPatient = $('#remb_dem_oui_regie_fact').is(':checked');
-    
+    objAdditionalData.IndFactAssosDr = ($('#optRegiIndFactAssosDrYes_Upd').is(':checked')) ? 'true' : 'false';
 
     //professionel
     objVisionRData.IdProf = $('#pamnt_no_prof_regie_fact').val();
-    //$('#pamnt_no_grp_regie_fact').val('');//TODO:
+    objAdditionalData.TypModaPaimt = ($('#optRegiePaimentComptePers_upd').is(':checked')) ? '1' : '2';
+    objAdditionalData.IsComptePersonnel = ($('#optRegiePaimentComptePers_upd').is(':checked'));
+    objAdditionalData.NoCpteAdmin = $('#txtRegiPaimentNoCompteAdmin_upd').val();
 
-    //evenement //TODO: Josee should change layout
+    //code diagnostic
+    if ($('#code_diag_carie_dent_Upd').is(':checked'))
+        objAdditionalData.CodDiagnMdcal = '5210';
+    else if ($('#code_diag_etat_norm_Upd').is(':checked'))
+        objAdditionalData.CodDiagnMdcal = 'V909';
+    else if ($('#code_diag_autre_radio_Upd').is(':checked'))
+        objAdditionalData.CodDiagnMdcal = $('#code_diag_autre_field_Upd').val(); //separated by comma
+
+    //evenement 
     objAdditionalData.DatEvenePers = $('#pamnt_even_date_regie_fact').val();
     //period d'hospital.
     objAdditionalData.DatEntrePersLieu = $('#pamnt_date_entre_regie_fact').val();
@@ -376,6 +425,8 @@ function RamqBillUpdateBillInfo() {
         objAdditionalData.TypeDeLieu = "D";
     else if ($('#type_lieu_aut_regie_fact').is(':checked'))
         objAdditionalData.TypeDeLieu = "A";
+
+    objAdditionalData.NoRamqSpecial = $('#txtRamqSpecialNams_Upd').val();
 
     globRamqBillInfo.info[0][1] = objVisionRData;
     globRamqBillInfo.info[0][2] = objAdditionalData;
@@ -492,6 +543,74 @@ function RamqBillClearFormFactures() {
     $('#rgie_fact_ane_end').val('');
     $('#nombre_factures_regie').val('');
     $('#total_factures_regie').val('');
+}
+
+function RamqBillClearFormFactureDetails()
+{
+    
+    // Identification du patient
+    $('#no_dosir_regie_fact').val('');
+    $('#prenom_regie_fact').val('');
+    $('#nom_regie_fact').val('');
+    $('#amq_regie_fact').val('');
+    $('#sexe_regie_fact').val('');
+    $('#exp_regie_fact').val('');
+
+    //Ancienne facture
+    $('#no_facture_regie_fact').val('');
+    $('#no_recu_regie_fact').val('');
+    $('#no_code_regie_fact').val('');
+    $('#ancienne_montant_regie_fact').val('');
+
+    //Nouvelle facture
+    //$('#nouvel_no_facture').val('');
+    //$('#novl_montant_regie_fact').val('');
+
+    //Renseignement complementaires regie
+    $('#carte_as_malad_oui_regie_fact').prop('checked', false);
+    $('#carte_as_malad_non_regie_fact').prop('checked', false);
+    $('#remb_dem_oui_regie_fact').prop('checked', false);
+    $('#remb_dem_non_regie_fact').prop('checked', false);
+    $('#optRegiIndFactAssosDrYes_Upd').prop('checked', false);
+    $('#optRegiIndFactAssosDrNo_Upd').prop('checked', false);
+
+    //Professionel
+    $('#pamnt_no_prof_regie_fact').val('');
+    $('#pamnt_no_grp_regie_fact').val('');
+    $('#optRegiePaimentComptePers_upd').prop('checked', false);
+    $('#optRegiePaimentCompteAdmin_upd').prop('checked', false);
+    $('#txtRegiPaimentNoCompteAdmin_upd').val('');
+
+    //Code diagnostic
+    $('#code_diag_carie_dent_Upd').prop('checked', false);
+    $('#code_diag_etat_norm_Upd').prop('checked', false);
+    $('#code_diag_autre_radio_Upd').prop('checked', false);
+    $('#code_diag_autre_field_Upd').val('');
+
+    $('#pamnt_even_date_regie_fact').val('');
+
+    //Period d'hospi.
+    $('#pamnt_date_entre_regie_fact').val('');
+    $('#pamnt_date_sorti_regie_fact').val('');
+
+    //Lieu de dispensation
+    $('#lieu_codifie_regie_fact').prop('checked', false);
+    $('#lieu_codifie_non_regie_fact').prop('checked', false);
+    $('#cod_post_lieu_regie_fact').val('');
+    $('#cod_loc_regie_fact').val('');
+    $('#no_bur_regie_fact').val('');
+    $('#').val('');
+    $("#secteur_active_regie_fact").val($("#secteur_active_regie_fact option:first").val());
+    $('#type_lieu_cab_regie_fact').prop('checked', false);
+    $('#type_lieu_dom_regie_fact').prop('checked', false);
+    $('#type_lieu_aut_regie_fact').prop('checked', false);
+
+    $('#txtRamqSpecialNams_Upd').val('');
+
+    //Hide fields
+    $('.txtRegiPa_upd').hide();
+    $('.codif_selection_non').hide();
+    $('.codif_selection_lieu').hide();
 }
 
 //=========================================Message========================================
@@ -654,7 +773,7 @@ function RamqBillCreateDataArrForPaymentTable(pArrPayment)
             
             
             var payeeStatus = "Non";
-            if (ramqPayment !=null && parseFloat(billAmount.toFixed(2)) == parseFloat(ramqPayment.toFixed(2)))
+            if (ramqPayment !=null && parseFloat(billAmount).toFixed(2) == parseFloat(ramqPayment).toFixed(2))
             {
                 payeeStatus = "Oui";
             }
@@ -740,7 +859,7 @@ function RamqBillPaymentUpdateTable()
         var arrData = [];
         for(var i=0; i< globRamqBillArrDataForPaymentTable.length; i++)
         {
-            if(globRamqBillArrDataForPaymentTable[i][8]!==0)
+            if(globRamqBillArrDataForPaymentTable[i][8]!=='0.00')
             {
                 arrData.push(globRamqBillArrDataForPaymentTable[i]);
                 RamqBillPopulatePaymentTable(arrData);
@@ -752,7 +871,7 @@ function RamqBillPaymentUpdateTable()
         var arrData = [];
         for(var i=0; i< globRamqBillArrDataForPaymentTable.length; i++)
         {
-            if(globRamqBillArrDataForPaymentTable[i][8] =='')
+            if(globRamqBillArrDataForPaymentTable[i][8] =='0.00')
             {
                 arrData.push(globRamqBillArrDataForPaymentTable[i]);
                 RamqBillPopulatePaymentTable(arrData);

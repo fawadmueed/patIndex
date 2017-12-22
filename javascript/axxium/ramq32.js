@@ -22,8 +22,10 @@ function SoumissionDemandesPaiement()
             "request": inputXMl,
             "info": objSoumissionDemandesPaiementData //this data is used to store bill info on the server
         }
+
+        var strJsonXML = JSON.stringify(jsonXML)
         
-        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, json: JSON.stringify(jsonXML) },
+        $.post("allScriptsv1.py", { tx: "getRamqData", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, json: strJsonXML },
                     function (result) {
                         if (result.outcome === 'error')//Display python Error
                         {
@@ -202,7 +204,7 @@ function RamqGetSoumissionDemandesPaimentXML(_arrData) {
     '</logcl_fact>' +
     '<demdr>' +
         '<typ_id_intvn>' + _arrData[0][1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _arrData[0][1].DemdrIdIntvn + '</id_intvn>' + //?
+        '<id_intvn>' + _arrData[0][2].DemdrIdIntvn + '</id_intvn>' + //?
     '</demdr>' +
     '<exped_difrn_demdr>' +
         '<typ_id_intvn>' + _arrData[0][1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
@@ -233,7 +235,7 @@ function RamqGetSoumissionDemandesModificationXML(_arrData) {
     '</logcl_fact>' +
     '<demdr>' +
         '<typ_id_intvn>' + _arrData[0][1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
-        '<id_intvn>' + _arrData[0][1].DemdrIdIntvn + '</id_intvn>' + //?
+        '<id_intvn>' + _arrData[0][2].DemdrIdIntvn + '</id_intvn>' + //?
     '</demdr>' +
     '<exped_difrn_demdr>' +
         '<typ_id_intvn>' + _arrData[0][1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
@@ -264,11 +266,11 @@ function RamqGetSoumissionDemandesAnnulationXML(_arrData)
                     '</logcl_fact>' +
 	                '<demdr>' +
                         '<typ_id_intvn>' + _arrData[0][1].DemdrTypIdIntvn + '</typ_id_intvn>' + //const
-                        '<id_intvn>' + _arrData[0][1].DemdrIdIntvn + '</id_intvn>' + //?
+                        '<id_intvn>' + _arrData[0][2].DemdrIdIntvn + '</id_intvn>' + //?
                     '</demdr>' +
                     '<exped_difrn_demdr>' +
-                        '<typ_id_intvn>' + _arrData[0][1].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
-                        '<id_intvn>' + _arrData[0][1].ExpedIdIntvn + '</id_intvn>' + //?
+                        '<typ_id_intvn>' + _arrData[0][2].ExpedTypIdIntvn + '</typ_id_intvn>' + //const
+                        '<id_intvn>' + _arrData[0][2].ExpedIdIntvn + '</id_intvn>' + //?
                     '</exped_difrn_demdr>' +
 	                '<liste_fact_a_annu>' +
 		                '<id_fact_ramq>' +
@@ -333,12 +335,42 @@ function RamqGetListFact(_arrData)
 
 function RamqGetListePersObjetFact(pObjDataFromVisionR, pObjAdditionalData)
 {
-    var isFactAssosDr = $('#optRegiIndFactAssosDrYes').is(':checked');
+    var isFactAssosDr;
+    if (globRamqOperationType == "New")
+    {
+        isFactAssosDr = $('#optRegiIndFactAssosDrYes').is(':checked');
+    }
+    else if (globRamqOperationType == "Update")
+    {
+        isFactAssosDr = $('#optRegiIndFactAssosDrYes_Upd').is(':checked');
+    }
+    
     var xml = '';
     if (isFactAssosDr)
     {
         if (pObjDataFromVisionR.IdPers) {
-            xml +=
+            if (pObjDataFromVisionR.IdPers === '1') 
+            {
+                var arrNAM = RamqGetSpecialArrNAM();
+                if (arrNAM.length > 0)
+                {
+                    xml +=
+                        '<liste_pers_objet_fact>';
+
+                    for (var i = 0; i < arrNAM.length; i++) {
+                        xml +=
+                            '<pers_patnt_avec_idt>' +
+                                '<typ_situ_consi>1</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+                                '<typ_id_pers>1</typ_id_pers>' + //1 : NAM RAMQ
+                                '<id_pers>' + arrNAM[i] + '</id_pers>' + //NAM
+                            '</pers_patnt_avec_idt>';
+                    }
+                    //xml += '</liste_pers_objet_fact>';
+                }
+                
+            }
+            else {
+                xml +=
                 '<liste_pers_objet_fact>' +
                     '<pers_patnt_avec_idt>' +
                         '<typ_situ_consi>' + pObjDataFromVisionR.TypSituConsi + '</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
@@ -346,6 +378,8 @@ function RamqGetListePersObjetFact(pObjDataFromVisionR, pObjAdditionalData)
                         '<id_pers>' + pObjDataFromVisionR.IdPers + '</id_pers>' + //NAM
                         RamqGetInfoMdcalPers(pObjAdditionalData) +
                        '</pers_patnt_avec_idt>';
+            }
+            
         }
         else //patient without id
         {
@@ -376,8 +410,34 @@ function RamqGetListePersObjetFact(pObjDataFromVisionR, pObjAdditionalData)
         }
         xml += '</liste_pers_objet_fact>';
     }
+    else if (!isFactAssosDr && pObjDataFromVisionR.IdPers === '1')
+    {
+        var arrNAM = RamqGetSpecialArrNAM();
+        if (arrNAM.length > 0) {
+            xml +=
+                '<liste_pers_objet_fact>';
+
+            for (var i = 0; i < arrNAM.length; i++) {
+                xml +=
+                    '<pers_patnt_avec_idt>' +
+                        '<typ_situ_consi>1</typ_situ_consi>' + //Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
+                        '<typ_id_pers>1</typ_id_pers>' + //1 : NAM RAMQ
+                        '<id_pers>' + arrNAM[i] + '</id_pers>' + //NAM
+                    '</pers_patnt_avec_idt>';
+            }
+            xml += '</liste_pers_objet_fact>';
+        }
+    }
     
     return xml;
+}
+
+function RamqGetSpecialArrNAM()
+{
+    var arr = [];
+    var strNam = $('#txtRamqSpecialNams').val();
+    arr = strNam.split(',');
+    return arr;
 }
 
 function RamqGetInfoMdcalPers(pObjAdditionalData)
@@ -749,8 +809,8 @@ function RamqGetListeElmMesurXml(pObjFormMoreData)
             var arrElem = pObjFormMoreData.liste_elm_mesur[i].split('/');
             res +=
                 '<elm_mesur>'+
-                    '<cod_elm_mesur>' + arrElem[0] + '</cod_elm_mesur>' +
-                    '<val_mes>'+ arrElem[1]+'</val_mes>'+
+                    '<cod_elm_mesur>' + arrElem[1] + '</cod_elm_mesur>' +
+                    '<val_mes>'+ arrElem[0]+'</val_mes>'+
                 '</elm_mesur>';
         }
         res +=
@@ -828,7 +888,7 @@ function RamqGetListeLieuRefreXml(pObjFormMoreData)
                     '<typ_id_lieu_geo>' + typ_id_lieu_geo + '</typ_id_lieu_geo>' + //Domaine de valeurs 2 : Code postal 3 : Code localité
                     '<id_lieu_geo>' + id_lieu_geo + '</id_lieu_geo>' +
                     '<typ_lieu_geo>' + lieuType + '</typ_lieu_geo>';
-            if (p_lieu_type === "Cabinet") {
+            if (pObjFormMoreData.lieu_type === "Cabinet" && pObjFormMoreData.no_bur) {
                 res += '<no_bur>' + pObjFormMoreData.no_bur + '</no_bur>';
             }
 
@@ -866,24 +926,35 @@ function RamqGetRefreAutreProfXml(pObjFormMoreData)
 
 function RamqGetMntPrcuPatntXml(p_mnt_prcu_patnt)
 {
+    var pAmount = 0;
     var res = '';
+    var total = parseFloat(p_mnt_prcu_patnt);
+    var fTotal = total.toFixed(2);
+
+    if (!isNaN(fTotal))
+    {
+        pAmount = fTotal;
+    }
+
+    
     if (globRamqOperationType == "New")
     {
-        if ($("#remb_dem_oui").is(':checked')) {
+        if ($("#optRegiIndFactAssosDrYes").is(':checked'))
+        {
             var amount = 0;
-            amount = p_mnt_prcu_patnt;
-            if (p_mnt_prcu_patnt)
-                res = '<mnt_prcu_patnt>' + amount + '</mnt_prcu_patnt>';
+            if ($("#remb_dem_oui").is(':checked')) {
+                amount = pAmount;
+            }
+            res = '<mnt_prcu_patnt>' + amount + '</mnt_prcu_patnt>';
         }
     }
     else if (globRamqOperationType == "Update")
     {
+        var amount = 0;
         if ($("#remb_dem_oui_regie_fact").is(':checked')) {
-            var amount = 0;
-            amount = p_mnt_prcu_patnt;
-            if (p_mnt_prcu_patnt)
-                res = '<mnt_prcu_patnt>' + amount + '</mnt_prcu_patnt>';
+            amount = pAmount;
         }
+        res = '<mnt_prcu_patnt>' + amount + '</mnt_prcu_patnt>';
     }
 
     return res;
@@ -1298,56 +1369,7 @@ function RamqSoumissionDemandesPaiementGetData()
     */
     var objConstAppData = RamqGetConstAppData();
 
-    //For Test only
-    //$('#num_lieu_genr_fact').val('99999');
-    //$('#lieu_codifie').prop('checked', true);
 
-    if (dent_Type == 'Dentiste')
-    {
-        if ($('#optRegiePaimentComptePers').is(':checked')) {
-            $('#pamnt_no_prof').val('299801');
-
-        }
-        else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
-            $('#pamnt_no_prof').val('299797');
-            $('#txtRegiPaimentNoCompteAdmin').val('54337');
-        }
-
-        globVisionRData.IdProf = $('#pamnt_no_prof').val();
-        globVisionRData.DemdrIdIntvn = globVisionRData.IdProf;
-        //
-        globVisionRData.IdPers = $('#ramq_no').val();
-        globVisionRData.TypProf = dent_Type;
-    }
-    else if (dent_Type == 'Chirurgiens')
-    {
-        if ($('#optRegiePaimentComptePers').is(':checked')) {
-            $('#pamnt_no_prof').val('299741');
-        }
-        else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
-            $('#pamnt_no_prof').val('298793');
-            $('#txtRegiPaimentNoCompteAdmin').val('54348');
-        }
-
-        globVisionRData.IdProf = $('#pamnt_no_prof').val();
-        globVisionRData.DemdrIdIntvn = globVisionRData.IdProf;
-        globVisionRData.IdPers = $('#ramq_no').val();
-        globVisionRData.TypProf = dent_Type;
-    }
-    else if (dent_Type == 'Denturologiste') {
-        if ($('#optRegiePaimentComptePers').is(':checked')) {
-            $('#pamnt_no_prof').val('741788');
-        }
-        else if ($('#optRegiePaimentCompteAdmin').is(':checked')) {
-            $('#pamnt_no_prof').val('741789');
-            $('#txtRegiPaimentNoCompteAdmin').val('54355');
-        }
-        
-        globVisionRData.IdProf = $('#pamnt_no_prof').val();
-        globVisionRData.DemdrIdIntvn = globVisionRData.IdProf;
-        globVisionRData.IdPers = $('#ramq_no').val();
-        globVisionRData.TypProf = dent_Type;
-    }
 
     var objVisionRData = globVisionRData;
     //var objBillData = RamqGetBillData();
@@ -1454,26 +1476,28 @@ function RamqGetConstAppData()
 function RamqGetVisionRData()
 {
     //TODO: call service to get this parameters
-
     var res = {};
-    res.DemdrTypIdIntvn = '1';//const
-    res.DemdrIdIntvn = '299801';//? looks like Idprof
+
+    res.DemdrTypIdIntvn = '1'; //const
+
+    res.DemdrIdIntvn = $('#pamnt_no_prof').val(); //? looks like Idprof
     res.ExpedTypIdIntvn = '3';//const
     res.ExpedIdIntvn = '18011';//?
     //res.TypModaPaimt = '';//1 : Compte personnel du professionnel 2 : Compte administratif
-    //res.NoCpteAdmin = '';
-    res.TypIdProf = '1';//const 1 : Numéro dispensateur RAMQ
-    res.IdProf = '299801';// 
-    res.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
-    res.IdLieuPhys = '99999';//?
+    //res.NoCpteAdmin =$('#txtRegiPaimentNoCompteAdmin').val();
+    res.TypIdProf = '1'; //const 1 : Numéro dispensateur RAMQ
+    res.IdProf = $('#pamnt_no_prof').val(); // 
+
+    //res.TypIdLieuPhys = '1';//1 : Lieu physique, reconnu et codifié à la Régie (établissement SSS, Cabinet, etc.)
+    //res.IdLieuPhys = '99999';//?
     res.TypSituConsi = '1';//Domaine de valeurs 1 : Situation normale 10 : Délai de carence, services nécessaires aux victimes de violence conjugale ou familiale ou d'une agression 11 : Délai de carence, services liés à la grossesse, à l\'accouchement ou à l'interruption de grossesse 12 : Délai de carence, services nécessaires aux personnes aux prises avec problèmes de santé de nature infectieuse ayant une incidence sur la santé publique
     res.TypIdPers = '1';//1 : NAM RAMQ
-    res.IdPers = '';//NAM
-    res.NamExpDate = '2018-01-01';
+    res.IdPers = $('#ramq_no').val();//NAM
+    res.NamExpDate = $('#ramq_exp');
     //res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
     res.InsTypeList = ['AMQ', 'AGA'];
-    res.TypProf = 'Dentiste'; //TODO: For test only Dentiste , Chirurgiens , Denturologiste
-    //res.TypProf = dent_Type;
+    //res.TypProf = 'Dentiste'; //TODO: For test only Dentiste , Chirurgiens , Denturologiste
+    res.TypProf = dent_Type;
 
     //Patient without NAM
     res.NomPers='Smith';
@@ -1492,22 +1516,29 @@ function RamqGetVisionRData()
 
 function RamqGetAdditionalData()//Data from Payment form "Renseignements complementaires Regie"
 {
-    var res = {};
-    //if ($('#even_carie').is(':checked'))
-    //    res.TypEvenePers = 0; //TODO: add real code.
-    //else if ($('#even_etat').is(':checked'))
-    //    res.TypEvenePers = 0; //TODO: add real code.
-    //else if ($('#even_autre_rad').is(':checked'))
-    //    res.TypEvenePers = $('#even_autre_cont').val();
 
+    globVisionRData.TypProf = dent_Type; //TODO: For Test only. Remove this When GetRamqData will be implemented.
+    var res = {};
+
+    
+    res.IdPers = $('#ramq_no').val();
+
+    res.RembDemParPatient = $('#remb_dem_oui').is(':checked');
     res.IndFactAssosDr = ($('#optRegiIndFactAssosDrYes').is(':checked')) ? 'true' : 'false';
+
+    res.DemdrIdIntvn = $('#pamnt_no_prof').val();
     res.TypModaPaimt = ($('#optRegiePaimentComptePers').is(':checked')) ? '1' : '2';
     res.IsComptePersonnel = ($('#optRegiePaimentComptePers').is(':checked'));
     res.NoCpteAdmin = $('#txtRegiPaimentNoCompteAdmin').val();
 
-    res.CodDiagnMdcal = $('#code_diagn').val(); //separated by comma
-    res.RembDemParPatient = $('#remb_dem_oui').is(':checked');
-
+    //code Diagnostic
+    if ($('#code_diag_carie_dent').is(':checked'))
+        res.CodDiagnMdcal = '5210';
+    else if ($('#code_diag_etat_norm').is(':checked'))
+        res.CodDiagnMdcal = 'V909';
+    else if ($('#code_diag_autre_radio').is(':checked'))
+        res.CodDiagnMdcal = $('#code_diag_autre_field').val(); //separated by comma
+        
     res.DatEvenePers = $('#pamnt_even_date').val();
 
     res.DatEntrePersLieu = $('#pamnt_date_entre').val();
@@ -1531,6 +1562,8 @@ function RamqGetAdditionalData()//Data from Payment form "Renseignements complem
         res.TypeDeLieu = "D";
     if ($('#type_lieu_aut').is(':checked'))
         res.TypeDeLieu = "A";
+
+    res.NoRamqSpecial = $('#txtRamqSpecialNams').val();
 
     return res;
 }
@@ -1913,145 +1946,3 @@ function RamqGetCasDataFromGrille() {
 }
 
 
-//function RamqGetBillNumberFromServer()
-//{
-//    var billNumber = new Date().getTime();
-//    //$.post("allScriptsv1.py", {tx: "getNoFacture", clinicId: globClinicId}, 
-//    //function(result){
-//    //    if(result.outcome == 'error')
-//    //        return billNumber;
-//    //    else
-//    //        return result.nofact;
-//    //});
-//    return billNumber;
-//}
-
-//function getSoumissionDemandesModificationXML()
-//{
-//    var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>' +
-//   '<dem_modif xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\">' +
-//    '<no_dem_ext>' + $('#no_dem_ext').val() + '</no_dem_ext>' +
-//     '<logcl_fact>' +
-//       '<no_devpr_logcl>' + $('#no_devpr_logcl').val() + '</no_devpr_logcl>' +
-//       '<nom_devpr_logcl>' + $('#nom_devpr_logcl').val() + '</nom_devpr_logcl>' +
-//       '<nom_logcl_fact>' + $('#nom_logcl_fact').val() + '</nom_logcl_fact>' +
-//          '<no_versi_logcl_fact>' + $('#no_versi_logcl_fact').val() + '</no_versi_logcl_fact>' +
-//             '<no_versi_xml_dem>' + $('#no_versi_xml_dem').val() + '</no_versi_xml_dem>' +
-//           '</logcl_fact>' +
-//           '<demdr>' +
-//             '<typ_id_intvn>' + $('#demdr_typ_id_intvn').val() + '</typ_id_intvn>' +
-//             '<id_intvn>' + $('#demdr_id_intvn').val() + '</id_intvn>' +
-//           '</demdr>' +
-//           '<exped_difrn_demdr>' +
-//             '<typ_id_intvn>' + $('#exped_typ_id_intvn').val() + '</typ_id_intvn>' +
-//             '<id_intvn>' + $('#exped_id_intvn').val() + '</id_intvn>' +
-//           '</exped_difrn_demdr>' +
-//           '<id_fact_ramq>' +
-//             '<no_fact_ramq>' + $('#no_fact_ramq').val() + '</no_fact_ramq>' +
-//             '<jeton_comm>' + $('#jeton_comm').val() + '</jeton_comm>' +
-//           '</id_fact_ramq>' +
-//           '<fact_a_modif>' +
-//           '<fact_serv_denta_chirg_denti_1_1_0>' +
-//               '<no_fact_ext>' + $('#no_fact_ext').val() + '</no_fact_ext>' +
-//               '<prof>' +
-//                 '<typ_id_prof>' + $('#typ_id_prof').val() + '</typ_id_prof>' +
-//                 '<id_prof>' + $('#id_prof').val() + '</id_prof>' +
-//               '</prof>' +
-//               '<lieu_consi>' +
-//                 '<lieu_phys>' +
-//                   '<typ_id_lieu_phys>' + $('#typ_id_lieu_phys').val() + '</typ_id_lieu_phys>' +
-//                   '<id_lieu_phys>' + $('#id_lieu_phys').val() + '</id_lieu_phys>' +
-//                 '</lieu_phys>' +
-//               '</lieu_consi>' +
-//               '<liste_pers_objet_fact>' +
-//                 '<pers_patnt_avec_idt>' +
-//                   '<typ_situ_consi>' + $('#typ_situ_consi').val() + '</typ_situ_consi>' +
-//                   '<typ_id_pers>' + $('#typ_id_pers').val() + '</typ_id_pers>' +
-//                   '<id_pers>' + $('#id_pers').val() + '</id_pers>' +
-//                   '<info_mdcal_pers>' +
-//                     '<liste_diagn_mdcal>' +
-//                       '<diagn_mdcal>' +
-//                         '<no_seq_sys_cla>' + $('#no_seq_sys_cla').val() + '</no_seq_sys_cla>' +
-//                         '<cod_diagn_mdcal>' + $('#cod_diagn_mdcal').val() + '</cod_diagn_mdcal>' +
-//                       '</diagn_mdcal>' +
-//                     '</liste_diagn_mdcal>' +
-//                     '<evene_pers_objet_fact>' +
-//                       '<typ_evene_pers>' + $('#typ_evene_pers').val() + '</typ_evene_pers>' +
-//                       '<dat_evene_pers>' + $('#dat_evene_pers').val() + '</dat_evene_pers>' +
-//                     '</evene_pers_objet_fact>' +
-//                     '<per_sej_pers_lieu>' +
-//                       '<dat_entre_pers_lieu>' + $('#dat_entre_pers_lieu').val() + '</dat_entre_pers_lieu>' +
-//                       '<dat_sorti_pers_lieu>' + $('#dat_sorti_pers_lieu').val() + '</dat_sorti_pers_lieu>' +
-//                     '</per_sej_pers_lieu>' +
-//                   '</info_mdcal_pers>' +
-//                 '</pers_patnt_avec_idt>' +
-//               '</liste_pers_objet_fact>' +
-//               '<ind_fact_assoc_dr>true</ind_fact_assoc_dr>' +
-//               '<liste_ligne_fact_serv_denta_chirg_denti>' +
-//                 '<ligne_fact_serv_denta_chirg_denti>' +
-//                   '<no_ligne_fact>' + $('#no_ligne_fact').val() + '</no_ligne_fact>' +
-//                   '<typ_id_elm_fact>' + $('#typ_id_elm_fact').val() + '</typ_id_elm_fact>' +
-//                   '<id_elm_fact>' + $('#id_elm_fact').val() + '</id_elm_fact>' +
-//                   '<dat_serv_elm_fact>' + $('#dat_serv_elm_fact').val() + '</dat_serv_elm_fact>' +
-//                   '<cod_role>1</cod_role>' +
-//                   '<dhd_elm_fact>' + $('#dhd_elm_fact').val() + '</dhd_elm_fact>' +
-//                           '<dat_autor_proth_acryl>' + $('#dat_autor_proth_acryl').val() + '</dat_autor_proth_acryl>' +
-//                          '<info_serv_denta>' +
-//                             '<no_dent>1</no_dent>' +
-//                             '<liste_surf_dent_trait>' +
-//                               '<surf_dent>' +
-//                                 '<cod_surf_dent>' + $('#cod_surf_dent').val() + '</cod_surf_dent>' +
-//                               '</surf_dent>' +
-//                             '</liste_surf_dent_trait>' +
-//                             '<site_trait_denta>' +
-//                               '<typ_id_site_trait_denta>' + $('#typ_id_site_trait_denta').val() + '</typ_id_site_trait_denta>' +
-//                               '<id_site_trait_denta>' + $('#id_site_trait_denta_modified').val() + '</id_site_trait_denta>' + //Modified
-//                             '</site_trait_denta>' +
-//                          '</info_serv_denta>' +
-//                           '<refre_autre_prof>' +
-//                             '<typ_refre_autre_prof>' + $('#typ_refre_autre_prof').val() + '</typ_refre_autre_prof>' +
-//                             '<info_prof_refre>' +
-//                               '<prof_refre_connu>' +
-//                                 '<typ_id_prof>' + $('#typ_id_prof').val() + '</typ_id_prof>' +
-//                                 '<id_prof>' + $('#id_prof').val() + '</id_prof>' +
-//                               '</prof_refre_connu>' +
-//                             '</info_prof_refre>' +
-//                           '</refre_autre_prof>' +
-//                           '<mnt_prcu_patnt>' + $('#mnt_prcu_patnt').val() + '</mnt_prcu_patnt>' +
-//                         '</ligne_fact_serv_denta_chirg_denti>' +
-//                       '</liste_ligne_fact_serv_denta_chirg_denti>' +
-//                     '</fact_serv_denta_chirg_denti_1_1_0>' +
-//           '</fact_a_modif>' +
-//         '</dem_modif>';
-//    return xml;
-//}
-
-//function getSoumissionDemandesAnnulationXML()
-//{
-//    var xml = '<?xml version=\\"1.0\\" encoding=\\"utf-8\\"?>'+
-//                '<dem_annu xmlns=\\"urn:ramq-gouv-qc-ca:RFP\\" >'+
-//	                '<no_dem_ext>'+ $('#no_dem_ext').val() +'</no_dem_ext>'+
-//	                '<logcl_fact>'+
-//		                '<no_devpr_logcl>' + $('#no_devpr_logcl').val() + '</no_devpr_logcl>' +
-//		                '<nom_devpr_logcl>' + $('#nom_devpr_logcl').val() + '</nom_devpr_logcl>' +
-//		                '<nom_logcl_fact>' + $('#nom_logcl_fact').val() + '</nom_logcl_fact>' +
-//		                '<no_versi_logcl_fact>' + $('#no_versi_logcl_fact').val() + '</no_versi_logcl_fact>' +
-//		                '<no_versi_xml_dem>' + $('#no_versi_xml_dem').val() + '</no_versi_xml_dem>' +
-//	                '</logcl_fact>'+
-//	                '<demdr>'+
-//		                '<typ_id_intvn>' + $('#demdr_typ_id_intvn').val() + '</typ_id_intvn>' +
-//		                '<id_intvn>' + $('#demdr_id_intvn').val() + '</id_intvn>' +
-//	                '</demdr>'+
-//	                '<exped_difrn_demdr>'+
-//		                '<typ_id_intvn>' + $('#exped_typ_id_intvn').val() + '</typ_id_intvn>' +
-//		                '<id_intvn>' + $('#exped_id_intvn').val() + '</id_intvn>' +
-//	                '</exped_difrn_demdr>'+
-//	                '<liste_fact_a_annu>'+
-//		                '<id_fact_ramq>'+
-//			                '<no_fact_ramq>' + $('#no_fact_ramq').val() + '</no_fact_ramq>' +
-//			                '<jeton_comm>' + $('#jeton_comm').val() + '</jeton_comm>' +
-//		                '</id_fact_ramq>'+
-//	                '</liste_fact_a_annu>'+
-//                '</dem_annu>';
-//    return xml;
-//}
