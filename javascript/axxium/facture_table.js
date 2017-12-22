@@ -40,133 +40,49 @@ function newRecordFact(){
     tblRow=$('<tr>').attr('id',fact_tbl_row_id);
 
     var fields=['id','Type','Dent','Surface','Code','Description','Frais','Honoraires','Total','Prod','codeRole'];
-    for(i=0;i<=10;i++)
+    for(i=0;i<10;i++)
       {
+        if(i==0){
 
-        switch(fields[i]){
-
-        
-
-          case 'Type':
-       
-            if(fact_tbl_row_id==1)
+              if(fact_tbl_row_id==1)
                 {
-                 // Get First Value in TYPE from AMQ
-                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(globVisionRData.InsTypeList[0]); 
+                
+                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]).text(globVisionRData.InsTypeList[0]); 
                 // globVisionRData.InsTypeList[0]  TYPE from VisionR
                 tblData.appendTo(tblRow);
                 }
             else{
                 //typeOfLastRow
-                // For All other TYPE - Get last Row TYPE Value
                 prevRowId=fact_tbl_row_id-1;
                 prevsRowType=getPrevRowType(prevRowId);
-                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(prevsRowType);
+                tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]).text(prevsRowType);
                 tblData.appendTo(tblRow);
                 } 
+            }
+        else if(i==9)
+        {
+          tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1])
+          .bind('keypress', function (e)
+            {
+              if(e.which == 13) {
+                newRecordFact();
 
-          break;
-          
-          case 'Dent':
-           
-            tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]);
-             tblData.appendTo(tblRow);
-            
-          break;
-          
-          case 'Surface':
-          
+              };
+              return e.which!=13;
 
-            tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]);
-             tblData.appendTo(tblRow);
-            
-           
-          break;
-          
-          case 'Code':
-          
-
-            tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]);
-             tblData.appendTo(tblRow);
-            
-            
-          break;
-          
-          case 'Description':
-           
-            tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]);
-             tblData.appendTo(tblRow);
-            
-          break;
-          
-          case 'Frais':
-          
-
-            tblData=$('<td>').attr('contenteditable','true').attr('class','mont').attr('data-target',fields[i]);
-             tblData.appendTo(tblRow);
-             tblData=$('<td>').attr('class','dol').text('$');
-             tblData.appendTo(tblRow);
-            
-          break;
-          
-          case 'Honoraires':
-           
-            tblData=$('<td>').attr('contenteditable','true').attr('class','mont').attr('data-target',fields[i]);
-             tblData.appendTo(tblRow);
-              tblData=$('<td>').attr('class','dol').text('$');
-             tblData.appendTo(tblRow);  
-            
-           break;
-          
-          case 'Total':
-          
-              tblData=$('<td>').attr('contenteditable','true').attr('class','mont').attr('data-target',fields[i]);
-             tblData.appendTo(tblRow);
-              tblData=$('<td>').attr('class','dol').text('$');
-             tblData.appendTo(tblRow);
-            
-          break;
-
-          case 'Prod':
-          
-              tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(1);
-             tblData.appendTo(tblRow);
-            
-          break;
-          
-          case 'codeRole':
-
-          
-              tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(1)
-              .bind('keypress', function (e)
-              {
-                if(e.which == 13) {
-                  newRecordFact();
-                  //Rob Function : call this when change the current row
-                 var code_s=$(this).siblings("td[data-target='Code']").text();
-                 var dent_s=$(this).siblings("td[data-target='Dent']").text();
-                
-                  traiter_valeur_de_base(code_s, dent_s);
-
-                };
-                return e.which!=13;
-
-              })
-             tblData.appendTo(tblRow);
-             
-          break;
-          
+            })
+           tblData.appendTo(tblRow);
         }
+        else{
 
-          
-    }
+       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i+1]);
+       tblData.appendTo(tblRow);
+   }
+      }
            tblData=$('<td>').append('<div class="ui axxium tiny button" onclick="modFactTableMore(this);" >Plus</div><div class="ui axxium tiny button" onclick="deleteRow(this);" >Supprimer</div>');
        tblData.appendTo(tblRow);
 
         tblRow.appendTo(tblBody);
-
-        
-
 }
 
 function getPrevRowType(idPrev){
@@ -185,7 +101,6 @@ function getPrevRowType(idPrev){
 }
 
 function getAllTrData(){
-
   ramq_id=0;
   var count_ramq=0;
   var count_insur=0;
@@ -228,7 +143,6 @@ function getAllTrData(){
 
       arrGrilleDeFacturation.push(myObjects);
 });
-  
    if((count_ramq>=10)||(count_insur>=7))
    {
     alert('Limit Exceeded! Allow Limit : RamQ Bill = 10 Lines , Insurance Bill = 7 Lines. Delete few entries to proceed');
@@ -625,15 +539,15 @@ function populate_table_fact(arrToPopTabl){
                        break;
 
                        case 5:
-                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Frais+' $');
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Frais);
                       break;
 
                        case 6:
-                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Honoraires+' $');
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Honoraires);
                        break;
 
                        case 7:
-                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Total+' $');
+                       tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(val.Total);
                        break;
 
                        case 8:
