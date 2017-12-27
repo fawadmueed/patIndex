@@ -5,7 +5,7 @@ function CdaV4SendRequestToCdaNet(pTransType) {
     // TODO: call WebService and send strRequest as a parameter.
 }
 
-
+//Returns request string depends on transaction type.
 function CdaV4CreateRequestString(transactionType) {
     var strRequest = "";
     switch (transactionType) {
@@ -17,6 +17,11 @@ function CdaV4CreateRequestString(transactionType) {
         case "Claim":
             {
                 strRequest = CdaV4CreateClaimRequest();
+            }
+            break;
+        case "COBClaim":
+            {
+                strRequest = CdaV4CreateCOBClaimRequest();
             }
             break;
         case "ClaimReversal":
@@ -39,6 +44,11 @@ function CdaV4CreateRequestString(transactionType) {
                 strRequest = CdaV4CreateReconcilationRequest();
             }
             break;
+        case "SumReconcilation":
+            {
+                strRequest = CdaV4CreateSumReconcilationRequest();
+            }
+            break;
         default:
             {
                 alert("Transaction Type is not correct!");
@@ -48,65 +58,195 @@ function CdaV4CreateRequestString(transactionType) {
 }
 
 function CdaV4CreateEligibilityRequest() {
-    var req = {};
-    req = CdaV4PopulateEligibilityObj();
-
-    return req;
+    var res = '';
+    var req = CdaV4PopulateEligibilityObj();
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a09;
+    res += req.b01 + req.b02 + req.b03;
+    res += req.c01 + req.c11 + req.c02 + req.c17 + req.c03 + req.c04 + req.c05 + req.c06 + req.c07 + req.c08 + req.c09 + req.c12 + req.c18 + req.c16;
+    res += req.d01 + req.d02 + req.d03 + req.d04 + req.d10 + req.d11
+    res += req.c19;
+    return res;
 }
 
 function CdaV4CreateClaimRequest() {
     var res = "";
-    var arrParam = CdaV4PopulateClaimObj();
+    var req = CdaV4PopulateClaimObj();
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a08 + req.a09;
+    res += req.b01 + req.b02 + req.b03 + req.b04 + req.b05 + req.b06;
+    res += req.c01 + req.c11 + req.c02 + req.c17 + req.c03 + req.c04 + req.c05 + req.c06 + req.c07 + req.c08 + req.c09 + req.c10 + req.c12 + req.c18;
+    res += req.d01 + req.d02 + req.d03 + req.d04 + req.d05 + req.d06 + req.d07 + req.d08 + req.d09 + req.d10 + req.d11;
+    res += req.e18 + req.e20;
+    res += req.f06 + req.f22;
+
+    if (req.e20 == 1) 
+    {
+        res += req.e19 + req.e01 + req.e02 + req.e05 + req.e03 + req.e17 + req.e06 + req.e04 + req.e08 + req.e09 + req.e10 + req.e11 + req.e12 + req.e13 + req.e14 + req.e15 + req.e16 + req.e07
+    }
+    res += req.f01 + req.f02 + req.f03 + req.f15 + req.f04 + req.f18 + req.f19 + req.f05 + req.f20 + req.f21;
+
+    if (req.f22 > 0) //Extracted Teeth Count //TODO: check if convertion required.
+    {
+        for (var i = 0; i < req.f22; i++)
+        {
+            res += req.f23[i] + req.f24[i]; //Extracted Tooth Number, Extraction Date
+        }
+    }
+
+    for (var i = 0; i < req.f06; i++) //Number of Procedures Performed
+    {
+        res += req.f07[i] + req.f08[i] + req.f09[i] + req.f10[i] + req.f11[i] + req.f12[i] + req.f34[i] + req.f13[i] + req.f35[i] + req.f36[i] + req.f16[i] + req.f17[i];
+    }
+
+    if (req.c18 == 1)
+    {
+        res += req.c19;
+    }
+
+    return res;
+}
+
+function CdaV4CreateCOBClaimRequest() {
+    var res = "";
+    var req = CdaV4PopulateCOBClaimObj();
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a08 + req.a09;
+    res += req.b01 + req.b02 + req.b03 + req.b04 + req.b05 + req.b06;
+    res += req.c01 + req.c11 + req.c02 + req.c17 + req.c03 + req.c04 + req.c05 + req.c06 + req.c07 + req.c08 + req.c09 + req.c10 + req.c12 + req.c18;
+    res += req.d01 + req.d02 + req.d03 + req.d04 + req.d05 + req.d06 + req.d07 + req.d08 + req.d09 + req.d10 + req.d11;
+    res += req.e18 + req.e20;
+    res += req.f06 + req.f22;
+    res += req.g39;
+    if (req.e20 == 1)
+    {
+        res += req.e19 + req.e01 + req.e02 + req.e05 + req.e03 + req.e17 + req.e06 + req.e04 + req.e08 + req.e09 + req.e09 + req.e10 + req.e11 + req.e12 + req.e13 + req.e14 + req.e15 + req.e16 + req.e07;
+    }
+
+    res += req.f01 + req.f02 + req.f03 + req.f15 + req.f04 + req.f18 + req.f19 + req.f05 + req.f20 + req.f21;
+    if (req.f22 > 0) //Extracted Teeth Count //TODO: check if convertion required.
+    {
+        for (var i = 0; i < req.f22; i++)
+        {
+            res += req.f23[i] + req.f24[i]; //Extracted Tooth Number, Extraction Date
+        }
+    }
+    for (var i = 0; i < req.f06; i++)
+    {
+        res += req.f07[i] + req.f08[i] + req.f09[i] + req.f10[i] + req.f11[i] + req.f12[i] + req.f34[i] + req.f34[i] + req.f35[i] + req.f36[i] + req.f16[i] + req.f17[i];
+    }
+    
+    if (req.c18 == 1)
+    {
+        res += req.c19;
+    }
+
+    res += req.eob;
+    
     return res;
 }
 
 function CdaV4CreateClaimReversalRequest() {
     var res = "";
-    var arrParam = PopulateClaimReversalObj();
+    var req = PopulateClaimReversalObj();
+
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a09;
+    res += req.b01 + req.b02 + req.b03 + req.b04;
+    res += req.c01 + req.c11 + req.c02 + req.c03;
+    res += req.d02 + req.d03 + req.d04 + '000000';
+    res += req.g01;
     return res;
 }
 
 function CdaV4CreatePredeterminationRequest() {
     var res = "";
-    var arrParam = PopulatePredeterminationObj();
+    var req = PopulatePredeterminationObj();
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a08 + req.a09;
+    res += req.b01 + req.b02 + req.b03 + req.b04 + req.b05 + req.b06;
+    res += req.c01 + req.c11 + req.c02 + req.c17 + req.c03 + req.c04 + req.c05 + req.c06 + req.c07 + req.c08 + req.c09 + req.c10 + req.c12 + req.c18;
+    res += req.d01 + req.d02 + req.d03 + req.d04 + req.d05 + req.d06 + req.d07 + req.d08 + req.d09 + req.d10 + req.d11;
+    res += req.e18 + req.e20;
+    res += req.f06 + req.f22 + req.f25;
+    if (req.e20 == 1)
+    {
+        res += req.e19 + req.e01 + req.e02 + req.e05 + req.e03 + req.e17 + req.e06 + req.e04 + req.e08 + req.e09 + req.e10 + req.e11 + req.e12 + req.e13 + req.e13 + req.e14 + req.e15 + req.e16 + req.e07;
+    }
+    res += req.f02 + req.f15 + req.f04 + req.f18 + req.f19 + req.f05 + req.f20 + req.f21;
+
+    //Extracted Teeth Count //TODO: check if convertion required.
+    //TODO: check if have to loop through array.
+    if (req.f22 > 0)
+    {
+        res += req.f23[0] + req.f24[0];
+    }
+
+    res += req.g46 + req.g47;
+
+    if (req.f25 == 1)//Orthodontic Record Flag
+    {
+        res += req.f37 + req.f26 + req.f27 + req.f28 + req.f29 + req.f30 + req.f31 + req.f32;
+    }
+
+    for (var i = 0; i < req.f06; i++)
+    {
+        res += req.f07[i] + req.f08[i] + req.f10[i] + req.f11[i] + req.f12[i] + req.f34[i] + req.f13[i] + req.f35[i] + req.f36[i] + req.f16[i] + req.f17[i];
+    }
+
+    if(req.c18 == 1)
+    {
+        res += req.c19;
+    }
+
     return res;
 }
 
 function CdaV4CreateOutstandingRequest() {
     var res = "";
-    var arrParam = PopulateOutstandingObj();
+    var req = PopulateOutstandingObj();
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a09;
+    res += req.b01 + req.b03;
     return res;
 }
 
 function CdaV4CreateReconcilationRequest() {
     var res = "";
-    var arrParam = PopulateReconcilationObj();
+    var req = PopulateReconcilationObj();
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a09;
+    res += req.b01 + req.b02 + req.b03 + req.b04;
+    res += req.f33 + req.f38;
     return res;
 }
 
-function CdaV4PopulateClaimArrV() {
-    var myArray = { A0: '', A1: '', A2: '' };
-    myArray['A0'] = 'hello';
-    myArray['A1'] = 'bye';
-    alert(myArray['A0']);
-    return myArray;
+function CdaV4CreateSumReconcilationRequest() {
+    var res = "";
+    var req = PopulateSumReconcilationObj();
+    res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a09;
+    res += req.b01 + req.b02;
+    res += req.f33;
+    
+    return res;
 }
 
-//Converts string to char array with given length. If string is shorter than length, adds extra spaces after.
-function CdaV4FillArray(filla, size, fillstring)//filla: array of char; size: integer; fillstring:string
-{
-    var resArr = [];
-    var fillstringArr = fillstring.split('');
-    for (var i = 0; i < size - 1; i++) {
-        if (i >= fillstring.length) {
-            resArr[i] = ' ';
-        }
-        else {
-            resArr[i] = fillstringArr[i];
-        }
-    }
-    return resArr;
-}
+//function CdaV4PopulateClaimArrV() {
+//    var myArray = { A0: '', A1: '', A2: '' };
+//    myArray['A0'] = 'hello';
+//    myArray['A1'] = 'bye';
+//    alert(myArray['A0']);
+//    return myArray;
+//}
+
+////Converts string to char array with given length. If string is shorter than length, adds extra spaces after.
+//function CdaV4FillArray(filla, size, fillstring)//filla: array of char; size: integer; fillstring:string
+//{
+//    var resArr = [];
+//    var fillstringArr = fillstring.split('');
+//    for (var i = 0; i < size - 1; i++) {
+//        if (i >= fillstring.length) {
+//            resArr[i] = ' ';
+//        }
+//        else {
+//            resArr[i] = fillstringArr[i];
+//        }
+//    }
+//    return resArr;
+//}
 
 function CdaV4Topage850(pString) {
     var code;
@@ -229,14 +369,14 @@ function CdaV4Frompage850(pString) {
 function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
 {
     //convert input value to string.
-    //var v = String(pValue);
-    var v = pValue;
+    var v = String(pValue);
+    
     var res = '';
 
     switch (pFormatType) {
         /*
         Numeric. Only ASCII digits are allowed in a field of this type. If a value is not present, fill with zeros. 
-        Right-justify and fill with ASCII zeros on the left. 
+        Right-justify add fill with ASCII zeros on the left. 
         All date fields are of type numeric and formatted as YYYYMMDD.
         */
         case 'N':
@@ -251,13 +391,15 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
                     var len = v.length;
                     if (len < pRequiredLength)
                     {
+                        var asciiZero = String.fromCharCode(48);
                         //Fill with zeros.
-                        var lenDif = pRequiredLength - len;
-                        for (var i = 0; i < lenDif; i++)
+                        var i = 0;
+                        while (i < pRequiredLength)
                         {
-                            res += '0';
+                            v = asciiZero + v;
+                            i++;
                         }
-                        res += v;
+                        res = v;
                     }
                     else if (len == pRequiredLength)
                     {
@@ -276,7 +418,6 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
             Alphabetic. Only ASCII upper and lower case ALPHABETIC characters including apostrophe ('), dash (-) and comma (,) are allowed.
             Left-justify and pad with blanks on the right. If only specific values are permitted, e.g., Y, N, D, M; then the upper case must be used.
             */
-            //TODO: Check if containg extended characters, character codes 128-255.
         case 'A':
 
             //as above but allows for the inclusion of extended characters, character codes 128-255.
@@ -284,16 +425,20 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
             {
                 if (!v)
                     v = '';
+                //Convert to page850
+                v = CdaV4Topage850(v);
+
                 //Check if all characters are alphabetical
                 if (/^[a-zA-Z]+$/.test(v) || v=='') {
                     var len = v.length;
                     if (len < pRequiredLength) {
                         //Fill with spaces on the right.
-                        var lenDif = pRequiredLength - len;
-                        res = v;
-                        for (var i = 0; i < lenDif; i++) {
-                            res += ' ';
+                        var i = 0;
+                        while (i < pRequiredLength)
+                        {
+                            v += ' ';
                         }
+                        res = v;
                     }
                     else if (len == pRequiredLength) {
                         res = v;
@@ -310,40 +455,22 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
             //Alphanumeric. Any printable ASCII character is allowed. Left-justify and pad with spaces on the right.
             //TODO: check if contains extended characters, character codes 128 - 255.
         case 'AN':
-            {
-                if (!v)
-                    v = '';
-                var len = v.length;
-                if (len < pRequiredLength) {
-                    //Fill with spaces on the right.
-                    var lenDif = pRequiredLength - len;
-                    res = v;
-                    for (var i = 0; i < lenDif; i++) {
-                        res += ' ';
-                    }
-                }
-                else if (len == pRequiredLength) {
-                    res = v;
-                }
-                else if (len > pRequiredLength) {
-                    alert('adoV4FormatField Error: Value is longer than required.');
-                }
-            }
-            break;
-
             //as above but allows for the inclusion of extended characters, character codes 128 - 255.
         case 'AEN':
             {
                 if (!v)
                     v = '';
+                //Convert to page850
+                v = CdaV4Topage850(v);
+
                 var len = v.length;
                 if (len < pRequiredLength) {
                     //Fill with spaces on the right.
-                    var lenDif = pRequiredLength - len;
-                    res = v;
-                    for (var i = 0; i < lenDif; i++) {
-                        res += ' ';
+                    var i = 0;
+                    while (i < pRequiredLength) {
+                        v += ' ';
                     }
+                    res = v;
                 }
                 else if (len == pRequiredLength) {
                     res = v;
@@ -361,7 +488,7 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
         case 'D':
             {
                 if (!v)
-                    v = '0.0';
+                    v = '0.00';
                 if (isNaN(Number(v)))
                 {
                     alert('adoV4FormatField Error: value is not a number.');
@@ -370,12 +497,12 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
                     v = parseFloat(v).toFixed(2).toString();
                     var len = v.length;
                     if (len < pRequiredLength) {
+                        var asciiZero = String.fromCharCode(48);
                         //Fill with zeros.
-                        var lenDif = pRequiredLength - len;
-                        for (var i = 0; i < lenDif; i++) {
-                            res += '0';
+                        for (var i = len; i < pRequiredLength;i++) {
+                            v = asciiZero + v;
                         }
-                        res += v;
+                        res = v;
                     }
                     else if (len == pRequiredLength) {
                         res = v;
