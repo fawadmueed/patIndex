@@ -427,6 +427,7 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
                     v = '';
                 //Convert to page850
                 v = CdaV4Topage850(v);
+                v = v.trim(); //remove spaces
 
                 //Check if all characters are alphabetical
                 if (/^[a-zA-Z]+$/.test(v) || v=='') {
@@ -462,6 +463,7 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
                     v = '';
                 //Convert to page850
                 v = CdaV4Topage850(v);
+                v = v.trim(); //remove spaces.
 
                 var len = v.length;
                 if (len < pRequiredLength) {
@@ -495,6 +497,9 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
                 }
                 else {
                     v = parseFloat(v).toFixed(2).toString();
+                    v = v.replace('.', '');
+                    v = v.replace(',', '');
+
                     var len = v.length;
                     if (len < pRequiredLength) {
                         var asciiZero = String.fromCharCode(48);
@@ -522,19 +527,177 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
     return res;
 }
 
-//Returns an object with All formated fields;
-function CDAV4GetFormatedValues()
+//============================================= Populate request objects =============================================
+function CdaV4PopulateClaimObj()
 {
-    var jsonFromServer = '{"A01":"test3","A02":"25","A03":"46"}';
-    var obj = JSON.parse(jsonFromServer);
-    var objRes = {};
-    objRes.A06 = CDAV4FormatField(obj.A06, 'D', 15);
-    objRes.A02 = CDAV4FormatField(obj.A02, 'N', 12);
-    objRes.A03 = CDAV4FormatField(obj.A03, 'D', 12);
-    objRes.A04 = CDAV4FormatField(obj.A04, 'A', 12);
+    var obj = {};
+    var objDataFromDB = daV4GetDataFromDBForClaimRequest();
+    var objDataFromUI = CdaV4GetDataFromUI();
 
-    return "OK";
+    
+    //A Transaction Header
+    obj.a01 = CDAV4FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
+    obj.a02 = CDAV4FormatField(objDataFromDB.a02, 'N', 6); //Office Sequence Number
+    obj.a03 = CDAV4FormatField(objDataFromDB.a03, 'N', 2); //Format Version Number
+    obj.a04 = CDAV4FormatField(objDataFromDB.a04, 'N', 2); //Transaction Code
+    obj.a05 = CDAV4FormatField(objDataFromDB.a05, 'N', 6); //Carrier Identification Number
+    obj.a06 = CDAV4FormatField(objDataFromDB.a06, 'AN', 3); //Software System ID
+    obj.a10 = CDAV4FormatField(objDataFromDB.a10, 'N', 1); //Encryption Method
+    obj.a07 = CDAV4FormatField(objDataFromDB.a07, 'N', 5); //Message Length
+    obj.a08 = CDAV4FormatField(objDataFromDB.a08, 'AN', 1); //Materials Forwarded
+    obj.a09 = CDAV4FormatField(objDataFromDB.a09, 'N', 5); //Carrier Transaction Counter
+
+    //B Provider Identification
+    obj.b01 = CDAV4FormatField(objDataFromDB.b01, 'AN', 9); //CDA Provider Number
+    obj.b02 = CDAV4FormatField(objDataFromDB.b02, 'AN', 4); // Provider Office Number
+    obj.b03 = CDAV4FormatField(objDataFromDB.b03, 'AN', 9); //Billing Provider Number
+    obj.b04 = CDAV4FormatField(objDataFromDB.b04, 'AN', 4); //Billing Office Number
+    obj.b05 = CDAV4FormatField(objDataFromDB.b05, 'AN', 10); //Referring Provider
+    obj.b06 = CDAV4FormatField(objDataFromDB.b06, 'N', 2); //Referral Reason
+
+    //C Primary Subscriber & Patient Identification
+    obj.c01 = CDAV4FormatField(objDataFromDB.c01, 'AN', 12); //Primary Policy/Plan Number
+    obj.c11 = CDAV4FormatField(objDataFromDB.c11, 'AN', 10); //Primary Division/Section Number
+    obj.c02 = CDAV4FormatField(objDataFromDB.c02, 'AN', 12); //Subscriber Identification Number
+    obj.c17 = CDAV4FormatField(objDataFromDB.c17, 'N', 2); //Primary Dependant Code
+    obj.c03 = CDAV4FormatField(objDataFromDB.c03, 'N', 1); //Relationship Code
+    obj.c04 = CDAV4FormatField(objDataFromDB.c04, 'A', 1); //Patient's Sex
+    obj.c05 = CDAV4FormatField(objDataFromDB.c05, 'N', 8); //Patient's Birthday
+    obj.c06 = CDAV4FormatField(objDataFromDB.c06, 'AE', 25); //Patient's Last Name
+    obj.c07 = CDAV4FormatField(objDataFromDB.c07, 'AE', 15); //Patient's First Name
+    obj.c08 = CDAV4FormatField(objDataFromDB.c08, 'AE', 1); //Patient's Middle Initial
+    obj.c09 = CDAV4FormatField(objDataFromDB.c09, 'N', 1); //Eligibility Exception Code
+    obj.c10 = CDAV4FormatField(objDataFromDB.c10, 'AEN', 25); //Name of School
+    obj.c12 = CDAV4FormatField(objDataFromDB.c12, 'A', 1); //Plan Flag
+    obj.c18 = CDAV4FormatField(objDataFromDB.c18, 'N', 1); //Plan Record Count
+
+    //D Relevant Subscriber's Name & Address
+    obj.d01 = CDAV4FormatField(objDataFromDB.d01, 'N', 8); //Subscriber's Birthday
+    obj.d02 = CDAV4FormatField(objDataFromDB.d02, 'AE', 25); //Subscriber's Last Name
+    obj.d03 = CDAV4FormatField(objDataFromDB.d03, 'AE', 15); //Subscriber's First Name
+    obj.d04 = CDAV4FormatField(objDataFromDB.d04, 'AE', 1); //Subscriber's Middle Initial
+    obj.d05 = CDAV4FormatField(objDataFromDB.d05, 'AEN', 30); //Subscriber's Address Line 1
+    obj.d06 = CDAV4FormatField(objDataFromDB.d06, 'AEN', 30); //Subscriber's Address Line 2
+    obj.d07 = CDAV4FormatField(objDataFromDB.d07, 'AEN', 20); //Subscriber's City
+    obj.d08 = CDAV4FormatField(objDataFromDB.d08, 'A', 2); //Subscriber's Province/State
+    obj.d09 = CDAV4FormatField(objDataFromDB.d09, 'AN', 9); //Subscriber's Postal/Zip Code
+    obj.d10 = CDAV4FormatField(objDataFromDB.d10, 'A', 1); //Language of the Insured
+    obj.d11 = CDAV4FormatField(objDataFromDB.d11, 'N', 2); //Card Sequence/Version Number
+
+    //E Secondary Carrier Information
+    
+    obj.e18 = CDAV4FormatField(objDataFromDB.e18, 'A', 1); //Secondary Coverage Flag
+    obj.e20 = CDAV4FormatField(objDataFromDB.e20, 'N', 1); //Secondary Record Count
+
+    //F Procedure Information
+    obj.f06 = CDAV4FormatField(objDataFromDB.f06, 'N', 1); //Number of Procedures Performed //TODO: where from get this data?
+    obj.f22 = CDAV4FormatField(objDataFromDB.f22, 'N', 2); //Extracted Teeth Count //TODO: where from get this data?
+
+    //If E20 = 1 then the following Secondary Carrier fields would appear (E19 to E07)
+    obj.e19 = CDAV4FormatField(objDataFromDB.e19, 'N', 6); //Secondary Carrier Transaction Counter
+    obj.e01 = CDAV4FormatField(objDataFromDB.e01, 'N', 6); //Secondary Carrier Id Number
+    obj.e02 = CDAV4FormatField(objDataFromDB.e02, 'AN', 12); //Secondary Policy/Plan Number
+    obj.e05 = CDAV4FormatField(objDataFromDB.e05, 'AN', 10); //Secondary Division/Section Number
+    obj.e03 = CDAV4FormatField(objDataFromDB.e03, 'AN', 12); //Secondary Plan Subscriber ID
+    obj.e17 = CDAV4FormatField(objDataFromDB.e17, 'N', 2); //Secondary Dependant Code
+    obj.e06 = CDAV4FormatField(objDataFromDB.e06, 'N', 1); //Secondary Relationship Code
+    obj.e04 = CDAV4FormatField(objDataFromDB.e04, 'N', 8); //Secondary Subscriber's Birthday
+    obj.e08 = CDAV4FormatField(objDataFromDB.e08, 'AE', 25); //Secondary Subscriber's Last Name
+    obj.e09 = CDAV4FormatField(objDataFromDB.e09, 'AE', 15); //Secondary Subscriber's First Name
+    obj.e10 = CDAV4FormatField(objDataFromDB.e10, 'AE', 1); //Secondary Subscriber's Middle Initial
+    obj.e11 = CDAV4FormatField(objDataFromDB.e11, 'AEN', 30); //Secondary Subscriber's Address Line 1
+    obj.e12 = CDAV4FormatField(objDataFromDB.e12, 'AEN', 30); //Secondary Subscriber's Address Line 2
+    obj.e13 = CDAV4FormatField(objDataFromDB.e13, 'AEN', 20); //Secondary Subscriber's City
+    obj.e14 = CDAV4FormatField(objDataFromDB.e14, 'A', 2); //Secondary Subscriber's Province/State
+    obj.e15 = CDAV4FormatField(objDataFromDB.e15, 'AN', 9); //Secondary Subscriber's Postal/Zip Code
+    obj.e16 = CDAV4FormatField(objDataFromDB.e16, 'A', 1); //Secondary Language
+    obj.e07 = CDAV4FormatField(objDataFromDB.e07, 'N', 2); //Secondary Card Sequence/Version Number
+    //End of the Secondary Subscriber fields. The field positions to follow assume that E20 = 1.
+
+    //F Procedure Information (continue)
+    obj.f01 = CDAV4FormatField(objDataFromDB.f01, 'N', 1); //Payee Code
+    obj.f02 = CDAV4FormatField(objDataFromDB.f02, 'N', 8); //Accident Date
+    obj.f03 = CDAV4FormatField(objDataFromDB.f03, 'AN', 14); //Predetermination Number
+    obj.f15 = CDAV4FormatField(objDataFromDB.f15, 'A', 1); //Initial Placement Upper
+    obj.f04 = CDAV4FormatField(objDataFromDB.f04, 'N', 8); //Date of Initial Placement Upper
+    obj.f18 = CDAV4FormatField(objDataFromDB.f18, 'A', 1); //Initial Placement Lower
+    obj.f19 = CDAV4FormatField(objDataFromDB.f19, 'N', 8); //Date of Initial Placement Lower
+    obj.f05 = CDAV4FormatField(objDataFromDB.f05, 'A', 1); //Treatment Required for Orthodontic Purposes
+    obj.f20 = CDAV4FormatField(objDataFromDB.f20, 'N', 1); //Maxillary Prosthesis Material
+    obj.f21 = CDAV4FormatField(objDataFromDB.f21, 'N', 1); //Mandibular Prosthesis Material
+
+    for (var i = 0; i < obj.f22; i++)
+    {
+        obj.f23[i] = CDAV4FormatField(objDataFromDB.f23[i], 'N', 2); //Extracted Tooth Number
+        obj.f24[i] = CDAV4FormatField(objDataFromDB.f24[i], 'N', 8); //Extraction Date
+    }
+
+    for (var i = 0; i<arrGrilleDeFacturation.length; i++)
+    {
+        if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP')
+        {
+            obj.f07[i] = CDAV4FormatField(i+1, 'N', 1); //Procedure Line Number
+            obj.f08[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Code, 'AN', 5); //Procedure Code
+            obj.f09[i] = CDAV4FormatField(CDAV4GetCurrentDate(), 'N', 8); //Date of Service
+            obj.f10[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Dent, 'N', 2); //International Tooth, Sextant, Quad or Arch
+            obj.f11[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Surface, 'A', 5); //Tooth Surface
+
+            obj.f12[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
+            obj.f34[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 1  //TODO:
+            obj.f13[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Frais, 'D', 6); //Lab Procedure Fee # 1
+            obj.f35[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 2 //TODO:
+            obj.f36[i] = CDAV4FormatField('', 'D', 6); //Lab Procedure Fee # 2 //TODO:
+            obj.f16[i] = CDAV4FormatField('', 'A', 5); //Procedure Type Codes
+            obj.f17[i] = CDAV4FormatField(00, 'N', 2); //Remarks Code
+            
+        }
+    }
+
+    obj.c19 = CDAV4FormatField(objDataFromDB.c19, 'AN', 1); //Plan Record
+
+    return obj;
 }
+
+function CdaV4GetDataFromDBForClaimRequest()
+{
+    var obj = {};
+    return obj;
+}
+
+function CdaV4GetDataFromUI()
+{
+    var obj = {};
+    return obj;
+}
+
+////Returns an object with All formated fields;
+//function CDAV4GetFormatedValues()
+//{
+//    var jsonFromServer = '{"A01":"test3","A02":"25","A03":"46"}';
+//    var obj = JSON.parse(jsonFromServer);
+//    var objRes = {};
+//    objRes.A06 = CDAV4FormatField(obj.A06, 'D', 15);
+//    objRes.A02 = CDAV4FormatField(obj.A02, 'N', 12);
+//    objRes.A03 = CDAV4FormatField(obj.A03, 'D', 12);
+//    objRes.A04 = CDAV4FormatField(obj.A04, 'A', 12);
+
+//    return "OK";
+//}
+
+//returns current date in "YYYYMMDD" format.
+function CDAV4GetCurrentDate() {
+    var date = '';
+    var d = new Date();
+    var y = d.getFullYear();
+    var m = d.getMonth() + 1;
+    var day = d.getDate();
+    if (day < 10) day = '0' + day;
+    if (m < 10) m = '0' + m;
+
+    return y + m + day;
+}
+
+
 
 
 
