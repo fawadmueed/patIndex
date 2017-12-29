@@ -670,6 +670,93 @@ function CdaV4GetDataFromUI()
     return obj;
 }
 
+function CdaV4ReadResponse(pResponse)
+{
+    var res = {};
+    var transCode = '';
+    if(pResponse)
+    {
+        respType = pResponse.substring(20, 23);
+        
+        switch (transCode) {
+            case '18':
+                res = CdaV4ParseEligibilityResp(pResponse);
+                break;
+            case '11':
+                res = CdaV4ParseClaimAcknResp(pResponse);
+                break;
+            case '21':
+                res = CdaV4ParseEOBResp(pResponse);
+                break;
+            case '19':
+                res = CdaV4ParseAttachmentResp(pResponse);
+                break;
+            case '12':
+                res = CdaV4ParseClaimReversResp(pResponse);
+                break;
+            case '13':
+                res = CdaV4ParsePredetAcknResp(pResponse);
+                break;
+            case '23':
+                res = CdaV4ParsePredetEOBResp(pResponse);
+                break;
+            case '14':
+                res = CdaV4ParseOutstandAcknResp(pResponse);
+                break;
+            case '24':
+                res = CdaV4ParseOutstandEmailResp(pResponse);
+                break;
+            case '16':
+                res = CdaV4ParseReconsilResp(pResponse);
+                break;
+            case '15':
+                res = CdaV4ParseSummReconsilResp(pResponse);
+                break;
+
+        }
+    }
+    return res;
+}
+
+function CdaV4ParseEligibilityResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+
+    res.g01 = pResponse.substring(47, 61);//Transaction Reference Number
+    res.g05 = pResponse.substring(61, 62);//Response Status
+    res.g06 = parseInt(pResponse.substring(62, 64));//Number of Error Codes
+    res.g07 = pResponse.substring(64, 139);//Disposition Message
+    res.g31 = parseInt(pResponse.substring(139, 141));//Display Message Count
+    res.g42 = parseInt(pResponse.substring(141, 143));//Form ID
+
+    //Repeat for number of times specified by G06.
+    var lastPos= 143;
+    for(var i=0; i<res.g06; i++)
+    {
+        res.g08[i] = parseInt(pResponse.substring(lastPos, lastPos + 3));
+        lastPos += 3;
+    }
+
+    //Repeat for number of times specified by G31
+    for(var j = 0; j<res.g31; j++)
+    {
+        res.g32[i] = pResponse.substring(lastPos, lastPos + 75);
+        lastPos += 75;
+    }
+    return res;
+}
+
+
 ////Returns an object with All formated fields;
 //function CDAV4GetFormatedValues()
 //{
