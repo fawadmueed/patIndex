@@ -365,7 +365,6 @@ function CdaV4Frompage850(pString) {
     return arrString.join("");
 }
 
-
 function CDAV4FormatField(pValue, pFormatType, pRequiredLength)
 {
     //convert input value to string.
@@ -660,6 +659,7 @@ function CdaV4PopulateClaimObj()
 
 function CdaV4GetDataFromDBForClaimRequest()
 {
+    //TODO: implement
     var obj = {};
     return obj;
 }
@@ -707,7 +707,7 @@ function CdaV4ReadResponse(pResponse)
                 res = CdaV4ParseOutstandEmailResp(pResponse);
                 break;
             case '16':
-                res = CdaV4ParseReconsilResp(pResponse);
+                res = CdaV4ParseReconsilResp(pResponse); //TODO: continue from  here
                 break;
             case '15':
                 res = CdaV4ParseSummReconsilResp(pResponse);
@@ -750,12 +750,452 @@ function CdaV4ParseEligibilityResp(pResponse)
     //Repeat for number of times specified by G31
     for(var j = 0; j<res.g31; j++)
     {
-        res.g32[i] = pResponse.substring(lastPos, lastPos + 75);
+        res.g32[j] = pResponse.substring(lastPos, lastPos + 75);
         lastPos += 75;
     }
     return res;
 }
 
+function CdaV4ParseClaimAcknResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+
+    res.g01 = pResponse.substring(47, 61);//Transaction Reference Number
+    res.g05 = pResponse.substring(61, 62);//Response Status
+    res.g06 = parseInt(pResponse.substring(62, 64));//Number of Error Codes
+    res.g07 = pResponse.substring(64, 139);//Disposition Message
+    res.g04 = (parseFloat(pResponse.substring(139, 146))/100).toFixed(2);//Total Amount of Service
+    res.g27 = pResponse.substring(146, 147);//Language of the Insured
+    res.g31 = parseInt(pResponse.substring(147, 149));//Display Message Count
+    res.g39 = parseInt(pResponse.substring(149, 153));//Embedded Transaction Length
+
+    var lastPos = 153;
+
+
+    //Repeat for number of times specified by G31
+    for (var i = 0; i < res.g31; i++) {
+        res.g32[i] = pResponse.substring(lastPos, lastPos + 75);
+        lastPos += 75;
+    }
+
+    
+    res.g42 = parseInt(pResponse.substring(lastPos, lastPos + 2));//Form ID
+    lastPos += 2;
+
+    //Repeat for number of times specified by G06.
+
+    for (var j = 0; j < res.g06; j++) {
+        res.f07[j] = parseInt(pResponse.substring(lastPos, lastPos + 1));
+        lastPos += 1;
+
+        res.g08[j] = parseInt(pResponse.substring(lastPos, lastPos + 3));
+        lastPos += 3;
+    }
+    //The following field will only be present if G39 is not zero.
+    if (res.g40 != 0)
+    {
+        res.g40 = pResponse.substring(lastPos, lastPos + 155);
+    }
+
+    return res;
+}
+
+function CdaV4ParseEOBResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+
+    res.g01 = pResponse.substring(47, 61); //Transaction Reference Number
+    res.g03 = parseInt(pResponse.substring(61, 69));//Expected Payment Date
+    res.g04 = (parseFloat(pResponse.substring(69, 76))/100).toFixed(2);//Total Amount of Service
+    res.g27 = pResponse.substring(76, 77);//Language of the Insured
+    res.f06 = parseInt(pResponse.substring(77, 78));//Number of Procedures Performed
+    res.g10 = parseInt(pResponse.substring(78, 79));//Number of Carrier Issued Procedure Codes
+    res.g11 = parseInt(pResponse.substring(79, 81));//Number of Note Lines
+    res.g28 = (parseFloat(pResponse.substring(81, 88))/100).toFixed(2);//Total Benefit Amounts
+    res.g29 = (parseFloat(pResponse.substring(88, 94))/100).toFixed(2);//Deductible Amount - unallocated
+    res.g30 = pResponse.substring(94, 104);//Transaction Validation Code
+    res.f01 = parseInt(pResponse.substring(104, 105));//Payee Code
+    res.g33 = (parseFloat(pResponse.substring(105, 112))/100).toFixed(2);//Payment Adjustment Amount
+    res.g55 = (parseFloat(pResponse.substring(112, 119))/100).toFixed(2);//Total Payable
+    res.g39 = (parseFloat(pResponse.substring(119, 123))/100).toFixed(2); //Embedded Transaction Length
+    res.g42 = parseInt(pResponse.substring(123, 125));//Form ID
+
+    var lastPos = 125;
+    for (var i = 0; i < res.f06; i++)
+    {
+        res.f07[i] = parseInt(pResponse.substring(lastPos, lastPos + 1));
+        lastPos += 1;
+        res.g12[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Eligible Amount
+        lastPos += 6;
+        res.g13[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2); //Deductible Amount
+        lastPos += 5;
+        res.g14[i] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Eligible Percentage
+        lastPos += 3;
+        res.g15[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Benefit Amount for the Procedure
+        res.g43[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Eligible Amount for Lab Procedure # 1
+        lastPos += 6;
+        res.g56[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2); //Deductible Amount for Lab Procedure # 1
+        lastPos += 5;
+        res.g57[i] = parseInt(pResponse.substring(lastPos, lastPos + 3)); //Eligible Percentage for Lab Procedure # 1
+        lastPos += 3;
+        res.g58[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);  // Benefit Amount for Lab Procedure # 1
+        lastPos += 6;
+        res.g02[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);  // Eligible Amount for Lab Procedure # 2
+        lastPos += 6;
+        res.g59[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2);  // Deductible Amount for Lab Procedure # 2
+        lastPos += 5;
+        res.g60[i] = parseInt(lastPos, lastPos + 3);//Eligible Percentage for Lab Procedure # 2
+        lastPos += 3;
+        res.g61[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Benefit Amount for Lab Procedure # 2
+        lastPos += 6;
+        res.g16[i] = parseInt(pResponse.substring(lastPos, lastPos + 2)); // Explanation Note Number 1
+        lastPos += 2;
+        res.g17[i] = parseInt(pResponse.substring(lastPos, lastPos + 2)); // Explanation Note Number 2
+        lastPos += 2;
+    }
+
+    for (var j = 0; j < res.g10; j++)
+    {
+        res.g18[j] = parseInt(pResponse.substring(lastPos, lastPos + 7)); //References to line number of the submitted procedure.
+        lastPos += 7;
+        res.g19[j] = pResponse.substring(lastPos, lastPos + 5); //Additional procedure Code
+        lastPos += 5;
+        res.g20[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Eligible Amount for additional procedure.
+        lastPos += 6;
+        res.g44[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);// Eligible Amount for additional Lab Procedure
+        lastPos += 6;
+        res.g21[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2);//Deductible for the additional procedure.
+        lastPos += 5;
+        res.g22[j] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Eligible percentage for the additional procedure.
+        lastPos += 3;
+        res.g23[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Benefit Amount for the additional procedure.
+        lastPos += 6;
+        res.g24[j] = parseInt(pResponse.substring(lastPos, lastPos + 2)); //Explanation Note Number 1 for the additional procedure.
+        lastPos += 2;
+        res.g25[j] = parseInt(pResponse.substring(lastPos, lastPos + 2));
+        lastPos += 2;
+    }
+
+    for (var k = 0; k < res.g11; k++)
+    {
+        res.g41[k] = parseInt(pResponse.substring(lastPos, lastPos + 1));//Message Output Flag
+        lastPos += 1;
+        res.g45[k] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Note Number
+        lastPos += 3;
+        res.g26[k] = pResponse.substring(lastPos, lastPos + 75); //Note Text
+        lastPos += 75;
+    }
+
+    if (res.g39 != 0)
+    {
+        res.g40 = pResponse.substring(lastPos, lastPos + 399); //Note Text
+        lastPos += 399;
+    }
+    return res;
+}
+
+function CdaV4ParseAttachmentResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+
+    res.g01 = pResponse.substring(47, 61);//Transaction Reference Number
+    res.g05 = pResponse.substring(61, 62);//Response Status
+    res.g06 = parseInt(pResponse.substring(62, 64));//Number of Error Codes
+    res.g07 = pResponse.substring(64, 139);//Disposition Message
+    res.g31 = parseInt(pResponse.substring(139, 141));//Display Message Count
+
+    var lastPos = 141;
+    for (var i = 0; i < res.g06; i++)
+    {
+        res.g08[i] = parseInt(pResponse.substring(lastPos, lastPos + 3)); //Error Code
+        lastPos += 3;
+    }
+
+    for (var j = 0; j < res.g31; j++)
+    {
+        res.g32[j] = pResponse.substring(lastPos, lastPos + 75);//Display Message
+        lastPos += 75;
+    }
+
+    return res;
+}
+
+function CdaV4ParseClaimReversResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+
+    res.e19 = parseInt(pResponse.substring(47, 53));//Secondary Carrier Transaction Counter
+
+    res.g01 = pResponse.substring(53, 67); //Transaction Reference Number
+    res.g05 = pResponse.substring(67, 68);//Response Status
+    res.g06 = parseInt(pResponse.substring(68, 70)); //Number of Error Codes
+    res.g07 = pResponse.substring(70, 145);//Disposition Message
+    res.g04 = (parseFloat(pResponse.substring(145, 152)) / 100).toFixed(2); //Total Amount of Service
+    res.g31 = parseInt(pResponse.substring(152, 154));//Display Message Count
+
+    var lastPos = 154;
+    for (var i = 0; i < res.g31; i++)
+    {
+        res.g32[i] = pResponse.substring(lastPos, lastPos + 75);// Display Message
+        lastPos += 75;
+    }
+
+    for (var j = 0; j < res.g31; j++)
+    {
+        res.g08[j] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Error Code
+        lastPos += 3;
+    }
+
+
+    return res;
+}
+
+function CdaV4ParsePredetAcknResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+
+    res.g01 = pResponse.substring(47, 61); //Transaction Reference Number
+    res.g05 = pResponse.substring(61, 62);//Response Status
+    res.g06 = parseInt(pResponse.substring(62, 64)); //Number of Error Codes
+    res.g07 = pResponse.substring(64, 139);//Disposition Message
+    res.g04 = (parseFloat(pResponse.substring(139, 146)) / 100).toFixed(2); //Total Amount of Service
+    res.g27 = pResponse.substring(146, 147); //Language of the Insured
+    res.g31 = parseInt(pResponse.substring(147, 149)); //Display Message Count
+    res.g39 = parseInt(pResponse.substring(149, 153)); //Embedded Transaction Length
+
+
+    var lastPos = 153;
+    for (var i = 0; i < res.g31; i++)
+    {
+        res.g32[i] = pResponse.substring(lastPos, lastPos + 75);//Display Message
+        lastPos += 75;
+        res.g42[j] = parseInt(pResponse.substring(lastPos, lastPos + 2));//Form Id
+        lastPos += 2;
+        res.g46[j] = parseInt(pResponse.substring(lastPos, lastPos + 1));//Current Predetermination Page Number
+        lastPos += 1;
+        res.g47[j] = parseInt(pResponse.substring(lastPos, lastPos + 1));//Last Predetermination Page Number
+        lastPos += 1;
+    }
+
+    for (var j = 0; j < res.g06; j++)
+    {
+        res.f07[j] = parseInt(pResponse.substring(lastPos, lastPos + 1));//Procedure Line Number
+        lastPos += 1;
+        res.g08[j] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Error Code
+        lastPos += 3;
+    }
+
+    if (res.g39 != 0)
+    {
+        res.g40 = pResponse.substring(lastPos, lastPos + 232);//Embedded Transaction
+    }
+
+    return res;
+}
+
+function CdaV4ParsePredetEOBResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+
+    res.g01 = pResponse.substring(47, 61); //Transaction Reference Number
+    res.g04 = (parseFloat(pResponse.substring(61, 68)) / 100).toFixed(2);//Total Amount of Service
+    res.g27 = pResponse.substring(68, 69);//Language of the Insured
+    res.f06 = parseInt(pResponse.substring(69, 70));//Number of Procedures Performed
+    res.g10 = parseInt(pResponse.substring(70, 71));//Number of Carrier Issued Procedure Codes
+    res.g11 = parseInt(pResponse.substring(71, 73));//Number of Note Lines;
+    res.g28 = (parseFloat(pResponse.substring(73, 80)) / 100).toFixed(2);//Total Benefit Amounts
+    res.g29 = (parseFloat(pResponse.substring(80, 86)) / 100).toFixed(2); //Deductible Amount - unallocated
+    res.g30 = pResponse.substring(86, 96);//Transaction Validation Code
+    res.g39 = parseInt(pResponse.substring(96, 100));//Embedded Transaction Length
+    res.g42 = parseInt(pResponse.substring(100, 102));// Form ID
+    res.g46 = parseInt(pResponse.substring(102, 103));// Current Predetermination Page Number
+    res.g47 = parseInt(pResponse.substring(103, 104));//Last Predetermination Page Number
+
+    var lastPos = 104;
+    for (var i = 0; i < res.f06; i++)
+    {
+        res.f07[i] = parseInt(pResponse.substring(lastPos, lastPos + 1));//Procedure Line Number
+        lastPos += 1;
+        res.g12[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);// Eligible Amount
+        lastPos += 6;
+        res.g13[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2);//Deductible Amount
+        lastPos += 5;
+        res.g14[i] = parseInt(pResponse.substring(lastPos, lastPos + 3));// Eligible Percentage
+        lastPos += 3;
+        res.g15[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Benefit Amount for the Procedure
+        lastPos += 6;
+        res.g43[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Eligible Amount for Lab Procedure # 1
+        lastPos += 6;
+        res.g56[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2);//Deductible Amount for Lab Procedure # 1
+        lastPos += 5;
+        res.g57[i] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Eligible Percentage for Lab Procedure # 1
+        lastPos += 3;
+        res.g58[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Benefit Amount for Lab Procedure # 1
+        lastPos += 6;
+        res.g02[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Eligible Amount for Lab Procedure # 2
+        lastPos += 6;
+        res.g59[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2); //Deductible Amount for Lab Procedure # 2
+        lastPos += 5;
+        res.g60[i] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Eligible Percentage for Lab Procedure # 2
+        lastPos += 3;
+        res.g61[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Benefit Amount for Lab Procedure # 2
+        lastPos += 6
+        res.g16[i] = parseInt(pResponse.substring(lastPos, lastPos + 2));//Explanation Note Number 1
+        lastPos += 2;
+        res.g17[i] = parseInt(pResponse.substring(lastPos, lastPos + 2));//Explanation Note Number 2
+        lastPos += 2;
+    }
+
+    for (var j = 0; j < res.g10; j++) {
+        res.g18[j] = parseInt(pResponse.substring(lastPos, lastPos + 7));//References to line number of the submitted procedure.
+        lastPos += 7;
+        res.g19[j] = pResponse.substring(lastPos + lastPos + 5);//Additional Procedure Code
+        lastPos += 5;
+        res.g20[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Eligible Amount for Additional Procedure.
+        lastPos += 6;
+        res.g44[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Eligible Amount for Additional Lab Procedure
+        lastPos += 6;
+        res.g21[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2);//Deductible for the Additional Procedure.
+        lastPos += 5;
+        res.g22[j] = parseInt(pResponse.substring(lastPos, lastPos + 3));//EEligible Percentage for the Additional Procedure.
+        lastPos += 3;
+        res.g23[j] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Benefit Amount for the Additional Procedure.
+        lastPos += 6;
+        res.g24[j] = parseInt(pResponse.substring(lastPos, lastPos + 2));//Explanation Note Number 1 for the Additional Procedure;
+        lastPos += 2;
+        res.g25[j] = parseInt(pResponse.substring(lastPos, lastPos + 2));//Explanation Note Number 2 for the Additional Procedure.
+        lastPos += 2;
+    }
+
+    for (var k = 0; k < res.g11; k++)
+    {
+        res.g41 = parseInt(pResponse.substring(lastPos, lastPos + 1));//Message Output Flag
+        lastPos += 1;
+        res.g45 = parseInt(pResponse.substring(lastPos, lastPos + 1));//Note Number
+        lastPos += 1;
+        res.g26 = pResponse.substring(lastPos, lastPos + 1); //Note Text
+        lastPos += 1;
+    }
+
+    if (res.g39 != 0)
+    {
+        res.g40 = pResponse.substring(lastPos, lastPos + 299); //Embedded Transaction
+    }
+        return res;
+}
+
+function CdaV4ParseOutstandAcknResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a05 = parseInt(pResponse.substring(22, 28));//Carrier Identification Number
+    res.a07 = parseInt(pResponse.substring(28, 33));//Message Length
+    res.a11 = pResponse.substring(33, 34);//Mailbox Indicator
+
+    res.b01 = pResponse.substring(34, 43);//CDA Provider Number
+    res.b02 = pResponse.substring(43, 47);//Provider Office Number
+    res.b03 = pResponse.substring(47, 56);// Billing Provider Number
+    res.g05 = pResponse.substring(56, 57);//Response Status
+    res.g06 = parseInt(pResponse.substring(57, 59));//Number of Error Codes
+    res.g07 = pResponse.substring(59, 134);//Disposition Message
+    
+    var lastPos = 134;
+    for (var i = 0; i < res.g06; i++)
+    {
+        res.g08[i] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Error Code
+        lastPos += 3;
+    }
+    return res;
+}
+
+function CdaV4ParseOutstandEmailResp(pResponse)
+{
+    var res = {};
+    res.a01 = pResponse.substring(0, 12); //Transaction Prefix
+    res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
+    res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
+    res.a04 = parseInt(pResponse.substring(20, 22));//Transaction Code
+    res.a07 = parseInt(pResponse.substring(22, 27));// Message Length
+    res.a11 = pResponse.substring(27, 28);//Mailbox Indicator
+
+    res.g48 = parseInt(pResponse.substring(28, 32));//E-Mail Office Number
+    res.g54 = pResponse.substring(32, 42);//E-Mail Reference Number
+    res.g49 = pResponse.substring(42, 102);//E-Mail To
+    res.g50 = pResponse.substring(102, 162);//E-Mail From
+    res.g51 = pResponse.substring(162, 222);//E-Mail Subject
+    res.g52 = pResponse.substring(223, 224);//Number of E-Mail Note Lines
+
+    var lastPos = 224;
+    for (var i = 0; i < res.g52; i++)
+    {
+        res.g53[i] = pResponse.substring(lastPos, lastPos + 75); //E-Mail Note Line
+        lastPos += 75;
+    }
+    return res;
+}
 
 ////Returns an object with All formated fields;
 //function CDAV4GetFormatedValues()
