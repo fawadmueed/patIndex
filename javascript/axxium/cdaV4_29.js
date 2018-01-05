@@ -1,7 +1,10 @@
 var globCdaReq4Obj = {};
 
-function CdaV4SendRequestToCdaNet(pTransType, pG01) {
-    var strRequest = CdaV4CreateRequestString(pTransType, pG01);
+var globCdaV4TransType = 'Claim';
+var globCdaV4g01 = '';
+
+function CdaV4SendRequestToCdaNet() {
+    var strRequest = CdaV4CreateRequestString(globCdaV4TransType, globCdaV4g01);
     // TODO: call WebService and send strRequest as a parameter.
 }
 
@@ -377,14 +380,14 @@ function CdaV4PopulateClaimObj()
     
 
     //F Procedure Information (continue)
-    obj.f01 = CDAV4FormatField(objDataFromDB.f01, 'N', 1); //Payee Code
-    obj.f02 = CDAV4FormatField(objDataFromDB.f02, 'N', 8); //Accident Date
-    obj.f03 = CDAV4FormatField(objDataFromDB.f03, 'AN', 14); //Predetermination Number
-    obj.f15 = CDAV4FormatField(objDataFromDB.f15, 'A', 1); //Initial Placement Upper
-    obj.f04 = CDAV4FormatField(objDataFromDB.f04, 'N', 8); //Date of Initial Placement Upper
+    obj.f01 = CDAV4FormatField($("#cdan2_payabl").val(), 'N', 1); //Payee Code
+    obj.f02 = CDAV4FormatField($("#cdan2_date_accident").val(), 'N', 8); //Accident Date
+    obj.f03 = CDAV4FormatField($("#cdan2_no_confrmtn_plan").val(), 'AN', 14); //Predetermination Number
+    obj.f15 = CDAV4FormatField($("#cdan_placmnt_maxl").val(), 'A', 1); //Initial Placement Upper
+    obj.f04 = CDAV4FormatField($("#cdan_date_plcmnt_maxl").val(), 'N', 8); //Date of Initial Placement Upper
     obj.f18 = CDAV4FormatField(objDataFromDB.f18, 'A', 1); //Initial Placement Lower
     obj.f19 = CDAV4FormatField(objDataFromDB.f19, 'N', 8); //Date of Initial Placement Lower
-    obj.f05 = CDAV4FormatField(objDataFromDB.f05, 'A', 1); //Treatment Required for Orthodontic Purposes
+    obj.f05 = CDAV4FormatField($('#q2_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes 
     obj.f20 = CDAV4FormatField(objDataFromDB.f20, 'N', 1); //Maxillary Prosthesis Material
     obj.f21 = CDAV4FormatField(objDataFromDB.f21, 'N', 1); //Mandibular Prosthesis Material
 
@@ -515,14 +518,14 @@ function CdaV4PopulateCOBClaimObj(pEob)
     
 
     //F Procedure Information (continue)
-    obj.f01 = CDAV4FormatField(objDataFromDB.f01, 'N', 1); //Payee Code
-    obj.f02 = CDAV4FormatField(objDataFromDB.f02, 'N', 8); //Accident Date
-    obj.f03 = CDAV4FormatField(objDataFromDB.f03, 'AN', 14); //Predetermination Number
-    obj.f15 = CDAV4FormatField(objDataFromDB.f15, 'A', 1); //Initial Placement Upper
-    obj.f04 = CDAV4FormatField(objDataFromDB.f04, 'N', 8); //Date of Initial Placement Upper
+    obj.f01 = CDAV4FormatField($("#cdan2_payabl").val(), 'N', 1); //Payee Code
+    obj.f02 = CDAV4FormatField($("#cdan2_date_accident").val(), 'N', 8); //Accident Date
+    obj.f03 = CDAV4FormatField($("#cdan2_no_confrmtn_plan").val(), 'AN', 14); //Predetermination Number 
+    obj.f15 = CDAV4FormatField($("#cdan_placmnt_maxl").val(), 'A', 1); //Initial Placement Upper
+    obj.f04 = CDAV4FormatField($("#cdan_date_plcmnt_maxl").val(), 'N', 8); //Date of Initial Placement Upper
     obj.f18 = CDAV4FormatField(objDataFromDB.f18, 'A', 1); //Initial Placement Lower
     obj.f19 = CDAV4FormatField(objDataFromDB.f19, 'N', 8); //Date of Initial Placement Lower
-    obj.f05 = CDAV4FormatField(objDataFromDB.f05, 'A', 1); //Treatment Required for Orthodontic Purposes
+    obj.f05 = CDAV4FormatField($('#q2_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes 
     obj.f20 = CDAV4FormatField(objDataFromDB.f20, 'N', 1); //Maxillary Prosthesis Material
     obj.f21 = CDAV4FormatField(objDataFromDB.f21, 'N', 1); //Mandibular Prosthesis Material
 
@@ -688,14 +691,14 @@ function PopulatePredeterminationObj() {
 
 
     //F Procedure Information (continue)
-    //obj.f01 = CDAV4FormatField(objDataFromDB.f01, 'N', 1); //Payee Code
-    obj.f02 = CDAV4FormatField(objDataFromDB.f02, 'N', 8); //Accident Date
+    //obj.f01 = CDAV4FormatField($("#cdan2_payabl").val(), 'N', 1); //Payee Code
+    obj.f02 = CDAV4FormatField($("#cdan2_date_accident").val(), 'N', 8); //Accident Date
     //obj.f03 = CDAV4FormatField(objDataFromDB.f03, 'AN', 14); //Predetermination Number
-    obj.f15 = CDAV4FormatField(objDataFromDB.f15, 'A', 1); //Initial Placement Upper
-    obj.f04 = CDAV4FormatField(objDataFromDB.f04, 'N', 8); //Date of Initial Placement Upper
+    obj.f15 = CDAV4FormatField($("#cdan_placmnt_maxl").val(), 'A', 1); //Initial Placement Upper
+    obj.f04 = CDAV4FormatField($("#cdan_date_plcmnt_maxl").val(), 'N', 8); //Date of Initial Placement Upper
     obj.f18 = CDAV4FormatField(objDataFromDB.f18, 'A', 1); //Initial Placement Lower
     obj.f19 = CDAV4FormatField(objDataFromDB.f19, 'N', 8); //Date of Initial Placement Lower
-    obj.f05 = CDAV4FormatField(objDataFromDB.f05, 'A', 1); //Treatment Required for Orthodontic Purposes
+    obj.f05 = CDAV4FormatField($('#q2_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes
     obj.f20 = CDAV4FormatField(objDataFromDB.f20, 'N', 1); //Maxillary Prosthesis Material
     obj.f21 = CDAV4FormatField(objDataFromDB.f21, 'N', 1); //Mandibular Prosthesis Material
 
@@ -1624,6 +1627,7 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength) {
             {
                 if (!v)
                     v = '0';
+                v = v.replace(/-/g, '');// Replase '-' from date.
 
                 if (!Number.isInteger(Number(v))) {
                     alert('adoV4FormatField Error: value is not an integer.');
@@ -1765,6 +1769,21 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength) {
 function CdaV4GetDataFromDB(pRrequestType) {
     //TODO: implement
     var obj = {};
+    var version = '2';
+    var transaction = '1';
+    var nodossier = '006596';
+    var dentiste = 'MM';
+    var uri = 'ec2-52-38-58-195.us-west-2.compute.amazonaws.com/api/InsuranceWebApi/';
+    $.ajax(
+        {
+            url: uri + "PostGenerTransaction",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ Version: version, TransactionType: transaction, NoDossier: nodossier, Dentiste: dentiste }),
+            success: function (result) {
+                alert(result.Result);
+            }
+        });
     return obj;
 }
 

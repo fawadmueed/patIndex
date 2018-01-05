@@ -1,7 +1,9 @@
 var globCdaReq2Obj = {};
+var globCdaV2TransType = 'Claim';
+var globCdaV2g01 = '';
 
-function CdaV2SendRequestToCdaNet(pTransType, pG01) {
-    var strRequest = CdaV2CreateRequestString(pTransType, pG01);
+function CdaV2SendRequestToCdaNet() {
+    var strRequest = CdaV2CreateRequestString(globCdaV2TransType, globCdaV2g01);
     // TODO: call WebService and send strRequest as a parameter.
 }
 
@@ -202,12 +204,12 @@ function CdaV2PopulateClaimObj() {
     obj.e04 = CdaV2FormatField(objDataFromDB.e04, 'N', 8); //Secondary Subscriber's Birthday
 
     //F Procedure Information
-    obj.f01 = CdaV2FormatField(objDataFromDB.f01, 'N', 1); //Payee Code
-    obj.f02 = CdaV2FormatField(objDataFromDB.f02, 'N', 8); //Accident Date
-    obj.f03 = CdaV2FormatField(objDataFromDB.f03, 'AN', 14); //Predetermination Number
-    obj.f15 = CdaV2FormatField(objDataFromDB.f15, 'A', 1); //Initial Placement Upper
-    obj.f04 = CdaV2FormatField(objDataFromDB.f04, 'N', 8); //Date of Initial Placement Upper
-    obj.f05 = CdaV2FormatField(objDataFromDB.f05, 'A', 1); //Treatment Required for Orthodontic Purposes
+    obj.f01 = CdaV2FormatField($("#cdan1_payabl").val(), 'N', 1); //Payee Code
+    obj.f02 = CdaV2FormatField($('#cdan1_date_accident').val(), 'N', 8); //Accident Date
+    obj.f03 = CdaV2FormatField($('#cdan1_no_confrmtn_plan').val(), 'AN', 14); //Predetermination Number
+    obj.f15 = CdaV2FormatField($('#cdan1_placmnt').val(), 'A', 1); //Initial Placement Upper
+    obj.f04 = CdaV2FormatField($('#cdan1_placmnt_date').val(), 'N', 8); //Date of Initial Placement Upper
+    obj.f05 = CdaV2FormatField($('#q1_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes 
     obj.f06 = CdaV2FormatField(CdaV2GGetNumProcedures(), 'N', 1); //Number of Procedures Performed 
 
     for (var i = 0; i < arrGrilleDeFacturation.length; i++) {
@@ -316,12 +318,10 @@ function CdaV2PopulatePredeterminationObj() {
     obj.e04 = CdaV2FormatField(objDataFromDB.e04, 'N', 8); //Secondary Subscriber's Birthday
 
     //F Procedure Information
-    //obj.f01 = CdaV2FormatField(objDataFromDB.f01, 'N', 1); //Payee Code
-    obj.f02 = CdaV2FormatField(objDataFromDB.f02, 'N', 8); //Accident Date
-    //obj.f03 = CdaV2FormatField(objDataFromDB.f03, 'AN', 14); //Predetermination Number
-    obj.f15 = CdaV2FormatField(objDataFromDB.f15, 'A', 1); //Initial Placement Upper
-    obj.f04 = CdaV2FormatField(objDataFromDB.f04, 'N', 8); //Date of Initial Placement Upper
-    obj.f05 = CdaV2FormatField(objDataFromDB.f05, 'A', 1); //Treatment Required for Orthodontic Purposes
+    obj.f02 = CdaV2FormatField($('#cdan1_date_accident').val(), 'N', 8); //Accident Date
+    obj.f15 = CdaV2FormatField($('#cdan1_placmnt').val(), 'A', 1); //Initial Placement Upper
+    obj.f04 = CdaV2FormatField($('#cdan1_placmnt_date').val(), 'N', 8); //Date of Initial Placement Upper
+    obj.f05 = CdaV2FormatField($('#q1_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes
     obj.f06 = CdaV2FormatField(CdaV2GGetNumProcedures(), 'N', 1); //Number of Procedures Performed 
 
     for (var i = 0; i < arrGrilleDeFacturation.length; i++) {
@@ -741,6 +741,7 @@ function CdaV2FormatField(pValue, pFormatType, pRequiredLength) {
             {
                 if (!v)
                     v = '0';
+                v = v.replace(/-/g, '');// Replase '-' from date.
 
                 if (!Number.isInteger(Number(v))) {
                     alert('adoV2FormatField Error: value is not an integer.');
@@ -847,6 +848,7 @@ function CdaV2FormatField(pValue, pFormatType, pRequiredLength) {
 function CdaV2GetDataFromDB(pRrequestType) {
     //TODO: implement
     var obj = {};
+
     return obj;
 }
 
