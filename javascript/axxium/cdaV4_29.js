@@ -1502,30 +1502,30 @@ function CdaV4Topage850(pString) {
         for (var i = 0; i < arrString.length; i++) {
             code = arrString[i].charCodeAt(0);
             switch (arrString[i]) {
-                case 'É': code = 144; break;
-                case 'È': code = 212; break;
-                case 'Ê': code = 210; break;
-                case 'À': code = 183; break;
-                case 'Â': code = 182; break;
-                case 'Ï': code = 216; break;
-                case 'Î': code = 215; break;
-                case 'Ô': code = 226; break;
-                case 'Ö': code = 153; break;
-                case 'Û': code = 234; break;
-                case 'Ü': code = 154; break;
-                case 'Ç': code = 128; break;
-                case 'é': code = 130; break;
-                case 'è': code = 138; break;
-                case 'ê': code = 136; break;
-                case 'à': code = 133; break;
-                case 'â': code = 131; break;
-                case 'ï': code = 139; break;
-                case 'î': code = 140; break;
-                case 'ô': code = 147; break;
-                case 'ö': code = 148; break;
-                case 'û': code = 150; break;
-                case 'ü': code = 129; break;
-                case 'ç': code = 135; break;
+                case 'Ã‰': code = 144; break;
+                case 'Ãˆ': code = 212; break;
+                case 'ÃŠ': code = 210; break;
+                case 'Ã€': code = 183; break;
+                case 'Ã‚': code = 182; break;
+                case 'Ã': code = 216; break;
+                case 'ÃŽ': code = 215; break;
+                case 'Ã”': code = 226; break;
+                case 'Ã–': code = 153; break;
+                case 'Ã›': code = 234; break;
+                case 'Ãœ': code = 154; break;
+                case 'Ã‡': code = 128; break;
+                case 'Ã©': code = 130; break;
+                case 'Ã¨': code = 138; break;
+                case 'Ãª': code = 136; break;
+                case 'Ã ': code = 133; break;
+                case 'Ã¢': code = 131; break;
+                case 'Ã¯': code = 139; break;
+                case 'Ã®': code = 140; break;
+                case 'Ã´': code = 147; break;
+                case 'Ã¶': code = 148; break;
+                case 'Ã»': code = 150; break;
+                case 'Ã¼': code = 129; break;
+                case 'Ã§': code = 135; break;
             }
             arrString[i] = String.fromCharCode(code);
         }
@@ -1541,70 +1541,70 @@ function CdaV4Frompage850(pString) {
         for (var i = 0; i < arrString.length; i++) {
             code = arrString[i].charCodeAt(0);
             switch (code) {
-                case 144: arrString[i] = 'É'; break;
-                case 212: arrString[i] = 'È'; break;
-                case 210: arrString[i] = 'Ê'; break;
-                case 211: arrString[i] = 'Ë'; break;
-                case 183: arrString[i] = 'À'; break;
-                case 182: arrString[i] = 'Â'; break;
-                case 181: arrString[i] = 'Á'; break;
-                case 142: arrString[i] = 'Ä'; break;
-                case 143: arrString[i] = 'Å'; break;
-                case 146: arrString[i] = 'Æ'; break;
-                case 216: arrString[i] = 'Ï'; break;
-                case 215: arrString[i] = 'Î'; break;
-                case 222: arrString[i] = 'Ì'; break;
-                case 214: arrString[i] = 'Í'; break;
+                case 144: arrString[i] = 'Ã‰'; break;
+                case 212: arrString[i] = 'Ãˆ'; break;
+                case 210: arrString[i] = 'ÃŠ'; break;
+                case 211: arrString[i] = 'Ã‹'; break;
+                case 183: arrString[i] = 'Ã€'; break;
+                case 182: arrString[i] = 'Ã‚'; break;
+                case 181: arrString[i] = 'Ã'; break;
+                case 142: arrString[i] = 'Ã„'; break;
+                case 143: arrString[i] = 'Ã…'; break;
+                case 146: arrString[i] = 'Ã†'; break;
+                case 216: arrString[i] = 'Ã'; break;
+                case 215: arrString[i] = 'ÃŽ'; break;
+                case 222: arrString[i] = 'ÃŒ'; break;
+                case 214: arrString[i] = 'Ã'; break;
 
-                case 226: arrString[i] = 'Ô'; break;
-                case 153: arrString[i] = 'Ö'; break;
-                case 224: arrString[i] = 'Ó'; break;
-                case 227: arrString[i] = 'Ò'; break;
-                case 229: arrString[i] = 'Õ'; break;
+                case 226: arrString[i] = 'Ã”'; break;
+                case 153: arrString[i] = 'Ã–'; break;
+                case 224: arrString[i] = 'Ã“'; break;
+                case 227: arrString[i] = 'Ã’'; break;
+                case 229: arrString[i] = 'Ã•'; break;
 
-                case 235: arrString[i] = 'Ù'; break;
-                case 233: arrString[i] = 'Ú'; break;
-                case 234: arrString[i] = 'Û'; break;
-                case 154: arrString[i] = 'Ü'; break;
+                case 235: arrString[i] = 'Ã™'; break;
+                case 233: arrString[i] = 'Ãš'; break;
+                case 234: arrString[i] = 'Ã›'; break;
+                case 154: arrString[i] = 'Ãœ'; break;
 
-                case 128: arrString[i] = 'Ç'; break;
-                case 237: arrString[i] = 'Ý'; break;
+                case 128: arrString[i] = 'Ã‡'; break;
+                case 237: arrString[i] = 'Ã'; break;
 
-                case 130: arrString[i] = 'é'; break;
-                case 138: arrString[i] = 'è'; break;
-                case 136: arrString[i] = 'ê'; break;
-                case 137: arrString[i] = 'ë'; break;
+                case 130: arrString[i] = 'Ã©'; break;
+                case 138: arrString[i] = 'Ã¨'; break;
+                case 136: arrString[i] = 'Ãª'; break;
+                case 137: arrString[i] = 'Ã«'; break;
 
-                case 133: arrString[i] = 'à'; break;
-                case 131: arrString[i] = 'â'; break;
-                case 160: arrString[i] = 'á'; break;
-                case 198: arrString[i] = 'ã'; break;
-                case 132: arrString[i] = 'ä'; break;
-                case 134: arrString[i] = 'å'; break;
-                case 145: arrString[i] = 'æ'; break;
+                case 133: arrString[i] = 'Ã '; break;
+                case 131: arrString[i] = 'Ã¢'; break;
+                case 160: arrString[i] = 'Ã¡'; break;
+                case 198: arrString[i] = 'Ã£'; break;
+                case 132: arrString[i] = 'Ã¤'; break;
+                case 134: arrString[i] = 'Ã¥'; break;
+                case 145: arrString[i] = 'Ã¦'; break;
 
-                case 139: arrString[i] = 'ï'; break;
-                case 140: arrString[i] = 'î'; break;
-                case 141: arrString[i] = 'ì'; break;
-                case 161: arrString[i] = 'í'; break;
+                case 139: arrString[i] = 'Ã¯'; break;
+                case 140: arrString[i] = 'Ã®'; break;
+                case 141: arrString[i] = 'Ã¬'; break;
+                case 161: arrString[i] = 'Ã­'; break;
 
-                case 147: arrString[i] = 'ô'; break;
-                case 148: arrString[i] = 'ö'; break;
-                case 149: arrString[i] = 'ò'; break;
-                case 228: arrString[i] = 'õ'; break;
-                case 162: arrString[i] = 'ó'; break;
+                case 147: arrString[i] = 'Ã´'; break;
+                case 148: arrString[i] = 'Ã¶'; break;
+                case 149: arrString[i] = 'Ã²'; break;
+                case 228: arrString[i] = 'Ãµ'; break;
+                case 162: arrString[i] = 'Ã³'; break;
 
-                case 208: arrString[i] = 'ð'; break;
+                case 208: arrString[i] = 'Ã°'; break;
 
-                case 150: arrString[i] = 'û'; break;
-                case 129: arrString[i] = 'ü'; break;
-                case 151: arrString[i] = 'ù'; break;
-                case 163: arrString[i] = 'ú'; break;
+                case 150: arrString[i] = 'Ã»'; break;
+                case 129: arrString[i] = 'Ã¼'; break;
+                case 151: arrString[i] = 'Ã¹'; break;
+                case 163: arrString[i] = 'Ãº'; break;
 
-                case 152: arrString[i] = 'ÿ'; break;
-                case 236: arrString[i] = 'ý'; break;
+                case 152: arrString[i] = 'Ã¿'; break;
+                case 236: arrString[i] = 'Ã½'; break;
 
-                case 135: arrString[i] = 'ç'; break;
+                case 135: arrString[i] = 'Ã§'; break;
             }
         }
     }
