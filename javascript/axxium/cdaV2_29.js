@@ -2,21 +2,27 @@ var globCdaReq2Obj = {};
 var globCdaV2TransType = '1';//'Claim';
 var globCdaV2g01 = '';
 var globCdaNetAPIuri = 'http://ec2-52-38-58-195.us-west-2.compute.amazonaws.com/axxium/api/InsuranceWebApi/';
+var globCdaDataFromDB;
 
 function CdaV2SendRequestToCdaNet() {
     CdaV2GetDataFromDB();//Claim
 }
 
-function CdaV2CallCDAService(pDataFromDB)
+function CdaV2CallCDAService()
 {
-    var strRequest = CdaV2CreateRequestString(pDataFromDB);
+    var strRequest = CdaV2CreateRequestString();
     // TODO: call WebService and send strRequest as a parameter.
+
+    var resp = 'xxxxxxxxxxxxxxxxxxx21xxxxxx';
+    var objResp = CdaV2ReadResponse(resp);
+    CdaCommShowResp(objResp);
+
 }
 
 //============================================= Create request string =============================================
 
 //Returns request string depends on transaction type.
-function CdaV2CreateRequestString(pDataFromDB) {
+function CdaV2CreateRequestString() {
     var strRequest = "";
     switch (globCdaV2TransType) {
         case "Eligibility":
@@ -26,7 +32,7 @@ function CdaV2CreateRequestString(pDataFromDB) {
             break;
         case '1'://"Claim":
             {
-                strRequest = CdaV2CreateClaimRequest(pDataFromDB);
+                strRequest = CdaV2CreateClaimRequest();
             }
             break;
         case "ClaimReversal":
@@ -62,9 +68,9 @@ function CdaV2CreateEligibilityRequest() {
     return res;
 }
 
-function CdaV2CreateClaimRequest(pDataFromDB) {
+function CdaV2CreateClaimRequest() {
     var res = "";
-    var req = CdaV2PopulateClaimObj(pDataFromDB);
+    var req = CdaV2PopulateClaimObj();
     res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a07 + req.a08;
     res += req.b01 + req.b02;
     res += req.c01 + req.c11 + req.c02 + req.c03 + req.c04 + req.c05 + req.c06 + req.c07 + req.c08 + req.c09 + req.c10;
@@ -157,10 +163,10 @@ function CdaV2PopulateEligibilityObj() {
     return obj;
 }
 
-function CdaV2PopulateClaimObj(pObjFromDB) {
+function CdaV2PopulateClaimObj() {
     var obj = {};
 
-    var objDataFromDB = pObjFromDB;
+    var objDataFromDB = globCdaDataFromDB;
 
     //A Transaction Header
     obj.a01 = CdaV2FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
@@ -381,7 +387,7 @@ function CdaV2ReadResponse(pResponse) {
     var res = {};
     var transCode = '';
     if (pResponse) {
-        transCode = pResponse.substring(20, 23);
+        transCode = pResponse.substring(20, 22);
 
         switch (transCode) {
             case '10':
@@ -391,7 +397,7 @@ function CdaV2ReadResponse(pResponse) {
                 res = CdaV2ParseClaimAcknResp(pResponse);
                 break;
             case '21':
-                res = CdaV2ParseEOBResp(pResponse);
+                    res = CdaV2ParseEOBResp(pResponse);
                 break;
             case '12':
                 res = CdaV2ParseClaimReversResp(pResponse);
@@ -870,12 +876,13 @@ function CdaV2GetDataFromDB() {
                 switch (globCdaV2TransType) {
                     case '1'://Claim
                         {
-                            CdaV2CallCDAService(result);
+                            globCdaDataFromDB = result;
+                            CdaV2CallCDAService();
                         }
                     break;
                 }
 
-                console.log(result);
+                //console.log(result);
             },
             error: function (xhr, ajaxOptions, thrownError) {
                 debugger;
