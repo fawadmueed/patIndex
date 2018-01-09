@@ -1540,7 +1540,7 @@ function RamqGetVisionRData()
     res.IdPers = '';//NAM
     res.NamExpDate = '2018-01-01';
     //res.IndFactAssosDr = 'true';//? Indique si la facture est associée à une demande de remboursement d'un bénéficiare.
-    res.InsTypeList = ['AMQ', 'AGA'];
+    res.InsTypeList = ['DES', 'AGA'];
     res.TypProf = 'Dentiste'; //TODO: For test only Dentiste , Chirurgiens , Denturologiste
     //res.TypProf = dent_Type;
 

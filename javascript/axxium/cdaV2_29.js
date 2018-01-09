@@ -1,5 +1,4 @@
 var globCdaReq2Obj = {};
-var globCdaV2TransType = '1';//'Claim';
 var globCdaV2g01 = '';
 var globCdaNetAPIuri = 'http://ec2-52-38-58-195.us-west-2.compute.amazonaws.com/axxium/api/InsuranceWebApi/';
 var globCdaDataFromDB;
@@ -15,7 +14,8 @@ function CdaV2CallCDAService()
 
     var resp = 'xxxxxxxxxxxxxxxxxxx21xxxxxx';
     var objResp = CdaV2ReadResponse(resp);
-    CdaCommShowResp(objResp);
+    CdaV2CreateRespMessage(objResp);
+    //CdaCommShowResp(objResp);
 
 }
 
@@ -24,7 +24,7 @@ function CdaV2CallCDAService()
 //Returns request string depends on transaction type.
 function CdaV2CreateRequestString() {
     var strRequest = "";
-    switch (globCdaV2TransType) {
+    switch (globCdanetTranscode) {
         case "Eligibility":
             {
                 strRequest = CdaV2CreateEligibilityRequest();
@@ -627,122 +627,6 @@ function CdaV2GetCurrentDate() {
     return y + m + day;
 }
 
-function CdaV2Topage850(pString) {
-    var code;
-    var arrString;
-    if (pString) {
-        arrString = pString.split('');
-        for (var i = 0; i < arrString.length; i++) {
-            code = arrString[i].charCodeAt(0);
-            switch (arrString[i]) {
-                case 'É': code = 144; break;
-                case 'È': code = 212; break;
-                case 'Ê': code = 210; break;
-                case 'À': code = 183; break;
-                case 'Â': code = 182; break;
-                case 'Ï': code = 216; break;
-                case 'Î': code = 215; break;
-                case 'Ô': code = 226; break;
-                case 'Ö': code = 153; break;
-                case 'Û': code = 234; break;
-                case 'Ü': code = 154; break;
-                case 'Ç': code = 128; break;
-                case 'é': code = 130; break;
-                case 'è': code = 138; break;
-                case 'ê': code = 136; break;
-                case 'à': code = 133; break;
-                case 'â': code = 131; break;
-                case 'ï': code = 139; break;
-                case 'î': code = 140; break;
-                case 'ô': code = 147; break;
-                case 'ö': code = 148; break;
-                case 'û': code = 150; break;
-                case 'ü': code = 129; break;
-                case 'ç': code = 135; break;
-            }
-            arrString[i] = String.fromCharCode(code);
-        }
-    }
-    return arrString.join("");
-}
-
-function CdaV2Frompage850(pString) {
-    var code;
-    var arrString;
-    if (pString) {
-        arrString = pString.split('');
-        for (var i = 0; i < arrString.length; i++) {
-            code = arrString[i].charCodeAt(0);
-            switch (code) {
-                case 144: arrString[i] = 'É'; break;
-                case 212: arrString[i] = 'È'; break;
-                case 210: arrString[i] = 'Ê'; break;
-                case 211: arrString[i] = 'Ë'; break;
-                case 183: arrString[i] = 'À'; break;
-                case 182: arrString[i] = 'Â'; break;
-                case 181: arrString[i] = 'Á'; break;
-                case 142: arrString[i] = 'Ä'; break;
-                case 143: arrString[i] = 'Å'; break;
-                case 146: arrString[i] = 'Æ'; break;
-                case 216: arrString[i] = 'Ï'; break;
-                case 215: arrString[i] = 'Î'; break;
-                case 222: arrString[i] = 'Ì'; break;
-                case 214: arrString[i] = 'Í'; break;
-
-                case 226: arrString[i] = 'Ô'; break;
-                case 153: arrString[i] = 'Ö'; break;
-                case 224: arrString[i] = 'Ó'; break;
-                case 227: arrString[i] = 'Ò'; break;
-                case 229: arrString[i] = 'Õ'; break;
-
-                case 235: arrString[i] = 'Ù'; break;
-                case 233: arrString[i] = 'Ú'; break;
-                case 234: arrString[i] = 'Û'; break;
-                case 154: arrString[i] = 'Ü'; break;
-
-                case 128: arrString[i] = 'Ç'; break;
-                case 237: arrString[i] = 'Ý'; break;
-
-                case 130: arrString[i] = 'é'; break;
-                case 138: arrString[i] = 'è'; break;
-                case 136: arrString[i] = 'ê'; break;
-                case 137: arrString[i] = 'ë'; break;
-
-                case 133: arrString[i] = 'à'; break;
-                case 131: arrString[i] = 'â'; break;
-                case 160: arrString[i] = 'á'; break;
-                case 198: arrString[i] = 'ã'; break;
-                case 132: arrString[i] = 'ä'; break;
-                case 134: arrString[i] = 'å'; break;
-                case 145: arrString[i] = 'æ'; break;
-
-                case 139: arrString[i] = 'ï'; break;
-                case 140: arrString[i] = 'î'; break;
-                case 141: arrString[i] = 'ì'; break;
-                case 161: arrString[i] = 'í'; break;
-
-                case 147: arrString[i] = 'ô'; break;
-                case 148: arrString[i] = 'ö'; break;
-                case 149: arrString[i] = 'ò'; break;
-                case 228: arrString[i] = 'õ'; break;
-                case 162: arrString[i] = 'ó'; break;
-
-                case 208: arrString[i] = 'ð'; break;
-
-                case 150: arrString[i] = 'û'; break;
-                case 129: arrString[i] = 'ü'; break;
-                case 151: arrString[i] = 'ù'; break;
-                case 163: arrString[i] = 'ú'; break;
-
-                case 152: arrString[i] = 'ÿ'; break;
-                case 236: arrString[i] = 'ý'; break;
-
-                case 135: arrString[i] = 'ç'; break;
-            }
-        }
-    }
-    return arrString.join("");
-}
 
 function CdaV2FormatField(pValue, pFormatType, pRequiredLength) {
     //convert input value to string.
@@ -871,9 +755,9 @@ function CdaV2GetDataFromDB() {
             url: globCdaNetAPIuri + "PostGenerTransaction",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({ Version: '2', TransactionType: globCdaV2TransType, NoDossier: globNoDossier, Dentiste: globDentist}),
+            data: JSON.stringify({ Version: '2', TransactionType: globCdanetTranscode, NoDossier: globNoDossier, Dentiste: globDentist}),
             success: function (result) {
-                switch (globCdaV2TransType) {
+                switch (globCdanetTranscode) {
                     case '1'://Claim
                         {
                             globCdaDataFromDB = result;
@@ -899,6 +783,154 @@ function CdaV2GGetNumProcedures() {
             count++;
     }
     return count;
+}
+
+function CdaV2CreateRespMessage(pResp)
+{
+    var ResponseList = '';
+
+    if (![2, 4, 5, 6, 99].includes(parseInt(globCdanetTranscode)))
+    {
+        var lastName = (globVisionRData && globVisionRData.NomPers) ? globVisionRData.NomPers : '';
+        var firstName = (globVisionRData && globVisionRData.PrePers) ? globVisionRData.PrePers : '';
+        ResponseList += 'Patient: ' + lastName + ' ' + firstName + '\n';
+
+        var assurance = (globVisionRData && globVisionRData.InsTypeList && globVisionRData.InsTypeList.length > 0) ? globVisionRData.InsTypeList[0] : '';
+        ResponseList += 'Assurance: ' + assurance + '\n';
+    }
+
+    var noSequence = (pResp.a02) ? pResp.a02 : '';
+    ResponseList += 'No de Séquence: ' + noSequence +'\n';
+
+    var respCode = (pResp.a04) ? pResp.a04 : '';
+    ResponseList += 'Code de réponse: ' + respCode + '\n';
+
+    if (respCode == '21')//adjudicated ,explanation of benefits
+    {
+        ResponseList += CdaV2GetResponseListForEOB(pResp);
+    }
+    else if (respCode == '11')//Claim acknowledge
+    {
+        ResponseList += CdaV2GetResponseListForClaimAck(pResp);
+    }
+    else if (respCode == '13')// Predetermination(paln de trait) acknowledge
+    {
+        ResponseList += CdaV2GetResponseListForPredeterm(pResp);
+    }
+    else if (respCode == '12')// Claim Reversal Response
+    {
+        ResponseList += CdaV2GetResponseListForClaimRevers(pResp);
+    }
+    else if (respCode == '10')// eligibility  Response
+    {
+        ResponseList += CdaV2GetResponseListForEligibil(pResp);
+    }
+    //TODO: display ResponseList;
+    modResponseCDANET();
+    CdaCommShowResp(objResp);
+}
+
+function CdaV2GetResponseListForEOB(pResp)
+{
+    var ResponseList = '';
+    ResponseList += 'Réponse à la demande de réglement: Réclamation acceptée\n';
+    var gTransref = (pResp.g01) ? pResp.g01 : '';
+    ResponseList += 'No de Référence: ' + gTransref + '\n';
+
+    var gNoConfirm = (pResp.g30) ? pResp.g30 : '';
+    objResponseList = 'No de confirmation: ' + gNoConfirm + '\n';
+
+    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04) / 100;
+    ResponseList += 'Montant réclamé: ' + montantReclame.toFixed(2) + '\n';
+
+    var montantDuDeductibleNonAlloue = (isNaN(parseFloat(pResp.g29))) ? 0 : parseFloat(pResp.g29) / 100;
+    ResponseList += 'Montant du déductible non alloué: ' + montantDuDeductibleNonAlloue.toFixed(2) + '\n';
+
+    var montantTotalRembourse = (isNaN(parseFloat(pResp.g28))) ? 0 : parseFloat(pResp.g28) / 100;
+    ResponseList += 'Montant total remboursé: ' + montantTotalRembourse.toFixed(2) + '\n';
+
+    var dateDePaiement = CdaCommConvertDate(pResp.g03);
+    ResponseList += 'Date de paiement : ' + dateDePaiement;
+
+    var g11 = parseInt(pResp.g11);
+    g11 = (isNaN(g11)) ? 0 : g11;
+
+    var nNotes = g11;
+    if (g11 > 0) //nNotes
+    {
+        ResponseList += 'Notes (' + nNotes + '):\n';
+        for (var i = 0; i < nNotes; i++) {
+            ResponseList += CdaCommFrompage850(pResp.g26[i]) + '\n';
+        }
+    }
+    return ResponseList;
+}
+
+function CdaV2GetResponseListForClaimAck(pResp)
+{
+    var ResponseList = '';
+    var responsemess = '';
+    if (globCdanetTranscode = '00')
+        responsemess = 'Réponse à l\'interrogation sur l\'admissibilité: ';
+    else
+        responsemess = 'Réponse la demande de réglement: ';
+
+    ResponseList += Responsemess;
+    var responsestatus = pResp.g05;
+
+    switch (responsestatus) {
+        case 'R':
+            responsemess = 'Réclamation rejetée à cause d\'erreurs.Veuillez corriger les erreurs avant de re-soumettre\n';
+            break;
+        case 'H':
+            responsemess = 'Réclamation reçue par l\'assureur.\nSera traitée à une date ultérieure...\nVous ne recevrez pas de réponse electronique\n';
+            break;
+        case 'B':
+            responsemess = 'Réclamation reçue par le réseau.\nSera envoyée à l\'assureur pour traitement ultérieur \nVous ne recevrez pas de réponse electronique\n';
+            break;
+        case 'C':
+            responsemess = 'Réclamation reçue par la compagnie d\'assurance.\nSera traitée à une date ultérieure...\nVous pourriez recevoir une réponse electronique\n';
+            break;
+        case 'N':
+            responsemess = 'Réclamation reçue par le réseau.\nSera envoyée à l\'assureur pour traitement ultérieur\nVous pourriez recevoir une réponse electronique\n';
+            break;
+        case 'M':
+            responsemess = 'La réclamation doit être soumise manuellement.';
+            break;
+    }
+
+    ResponseList += responsemess;
+
+    var disposition = (pResp.g07) ? pResp.g07 : '';
+    ResponseList += CdaCommFrompage850(disposition) + '\n';
+
+    var gTransref = (pResp.g01) ? pResp.g01 : '';
+    ResponseList += 'No de Référence: ' + gTransref +'\n';
+
+
+
+
+
+
+    return ResponseList;
+}
+
+function CdaV2GetResponseListForPredeterm(pResp) {
+    var ResponseList = '';
+
+    return ResponseList;
+}
+
+function CdaV2GetResponseListForClaimRevers(pResp) {
+    var ResponseList = '';
+
+    return ResponseList;
+}
+
+function CdaV2GetResponseListForEligibil(pResp) {
+    var ResponseList = '';
+
+    return ResponseList;
 }
 
 
