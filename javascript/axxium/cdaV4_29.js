@@ -1,17 +1,28 @@
-var globCdaReq4Obj = {};
+//var globCdaReq4Obj = {};
 
 var globCdaV4TransType = 'Claim';
 var globCdaV4g01 = '';
 
 function CdaV4SendRequestToCdaNet() {
-    var strRequest = CdaV4CreateRequestString(globCdaV4TransType, globCdaV4g01);
+    CdaV4GetDataFromDB();
+}
+
+function CdaV4CallCDAService() {
+    var strRequest = CdaV4CreateRequestString();
     // TODO: call WebService and send strRequest as a parameter.
+
+    var responseLine = 'xxxxxxxxxxxxxxxxxxxx21xxxxxx';
+    var objResp = CdaV4ReadResponse(responseLine);
+    var respMessage = CdaV4CreateRespMessage(objResp, responseLine);
+    CdaCommShowResp(respMessage);
+    //CdaCommShowResp(objResp);
+
 }
 
 //============================================= Create request string =============================================
 
 //Returns request string depends on transaction type.
-function CdaV4CreateRequestString(transactionType, pG01) {
+function CdaV4CreateRequestString() {
     var strRequest = "";
     switch (transactionType) {
         case "Eligibility":
@@ -31,7 +42,7 @@ function CdaV4CreateRequestString(transactionType, pG01) {
             break;
         case "ClaimReversal":
             {
-                strRequest = CdaV4CreateClaimReversalRequest(pG01);
+                strRequest = CdaV4CreateClaimReversalRequest();
             }
             break;
         case "Predetermination":
@@ -235,7 +246,7 @@ function CdaV4PopulateEligibilityObj()
 {
     var obj = {};
     var transactionType = "Eligibility";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
 
     //A Transaction Header
@@ -292,7 +303,7 @@ function CdaV4PopulateClaimObj()
 {
     var obj = {};
     var transactionType = "Claim";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
     
     //A Transaction Header
@@ -429,7 +440,7 @@ function CdaV4PopulateCOBClaimObj(pEob)
 {
     var obj = {};
     var transactionType = "COBClaim";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
 
     //A Transaction Header
@@ -565,7 +576,7 @@ function CdaV4PopulateCOBClaimObj(pEob)
 function PopulateClaimReversalObj() {
     var obj = {};
     var transactionType = "ClaimReversal";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
 
     //A Transaction Header
@@ -604,7 +615,7 @@ function PopulateClaimReversalObj() {
 function PopulatePredeterminationObj() {
     var obj = {};
     var transactionType = "Predetermination";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
 
     //A Transaction Header
@@ -749,7 +760,7 @@ function PopulatePredeterminationObj() {
 function PopulateOutstandingObj() {
     var obj = {};
     var transactionType = "Outstanding";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
 
     //A Transaction Header
@@ -773,7 +784,7 @@ function PopulateOutstandingObj() {
 function PopulateReconcilationObj() {
     var obj = {};
     var transactionType = "Reconcilation";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
 
     //A Transaction Header
@@ -802,7 +813,7 @@ function PopulateReconcilationObj() {
 function PopulateSumReconcilationObj() {
     var obj = {};
     var transactionType = "SumReconcilation";
-    var objDataFromDB = CdaV4GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
 
     //A Transaction Header
@@ -1465,6 +1476,50 @@ function CdaV4ParseSummReconsilResp(pResponse)
     return res;
 }
 
+function CdaV4CreateRespMessage(pResp, pResponseLine) {
+    var ResponseList = '';
+    ResponseList += 'cdanetTranscode : ' + globCdanetTranscode;
+
+    if (![2, 4, 5, 6, 99].includes(parseInt(globCdanetTranscode))) {
+        var lastName = (globVisionRData && globVisionRData.NomPers) ? globVisionRData.NomPers : '';
+        var firstName = (globVisionRData && globVisionRData.PrePers) ? globVisionRData.PrePers : '';
+        ResponseList += 'Patient: ' + lastName + ' ' + firstName + '\n';
+
+        var assurance = (globVisionRData && globVisionRData.InsTypeList && globVisionRData.InsTypeList.length > 0) ? globVisionRData.InsTypeList[0] : '';
+        ResponseList += 'Assurance: ' + assurance + '\n';
+    }
+
+    var noSequence = (pResp.a02) ? pResp.a02 : '';
+    ResponseList += 'No de Séquence: ' + noSequence + '\n';
+
+    var respCode = (pResp.a04) ? pResp.a04 : '';
+    ResponseList += 'Code de réponse: ' + respCode + '\n';
+
+    if (respCode == '21')//adjudicated ,explanation of benefits
+    {
+        ResponseList += CdaV2GetResponseListForEOB(pResp);
+    }
+    else if (respCode == '11')//Claim acknowledge
+    {
+        ResponseList += CdaV2GetResponseListForClaimAck(pResp);
+    }
+    else if (respCode == '13')// Predetermination(paln de trait) acknowledge
+    {
+        ResponseList += CdaV2GetResponseListForPredeterm(pResp);
+    }
+    else if (respCode == '12')// Claim Reversal Response
+    {
+        ResponseList += CdaV2GetResponseListForClaimRevers(pResp);
+    }
+    else if (respCode == '10')// eligibility  Response
+    {
+        ResponseList += CdaV2GetResponseListForEligibil(pResp);
+    }
+    else
+        ResponseList += 'La réponse n\'a pas pu être interprétée. Veuillez vérifier la réponse reçue ci-dessous.\n-----------------------\n' + pResponseLine;
+
+    return ResponseList;
+}
 
 ////Returns an object with All formated fields;
 //function CDAV4GetFormatedValues()
@@ -1767,24 +1822,29 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength) {
 }
 
 function CdaV4GetDataFromDB(pRrequestType) {
-    //TODO: implement
-    var obj = {};
-    var version = '2';
-    var transaction = '1';
-    var nodossier = '006596';
-    var dentiste = 'MM';
-    var uri = 'ec2-52-38-58-195.us-west-2.compute.amazonaws.com/api/InsuranceWebApi/';
     $.ajax(
         {
-            url: uri + "PostGenerTransaction",
+            url: globCdaNetAPIuri + "PostGenerTransaction",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({ Version: version, TransactionType: transaction, NoDossier: nodossier, Dentiste: dentiste }),
+            data: JSON.stringify({ Version: '2', TransactionType: globCdanetTranscode, NoDossier: globNoDossier, Dentiste: globDentist }),
             success: function (result) {
-                alert(result.Result);
+                switch (globCdanetTranscode) {
+                    case '1'://Claim
+                        {
+                            globCdaDataFromDB = result;
+                            CdaV4CallCDAService();
+                        }
+                        break;
+                }
+
+                //console.log(result);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                debugger;
+                alert(xhr.statusText);
             }
         });
-    return obj;
 }
 
 function CdaV4GetDataFromUI() {

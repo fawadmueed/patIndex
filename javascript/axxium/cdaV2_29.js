@@ -1,10 +1,9 @@
-var globCdaReq2Obj = {};
-var globCdaV2g01 = '';
-var globCdaNetAPIuri = 'http://ec2-52-38-58-195.us-west-2.compute.amazonaws.com/axxium/api/InsuranceWebApi/';
-var globCdaDataFromDB;
+//var globCdaReq2Obj = {};
+//var globCdaV2g01 = '';
+
 
 function CdaV2SendRequestToCdaNet() {
-    CdaV2GetDataFromDB();//Claim
+    CdaV2GetDataFromDB();
 }
 
 function CdaV2CallCDAService()
@@ -12,9 +11,10 @@ function CdaV2CallCDAService()
     var strRequest = CdaV2CreateRequestString();
     // TODO: call WebService and send strRequest as a parameter.
 
-    var resp = 'xxxxxxxxxxxxxxxxxxx21xxxxxx';
-    var objResp = CdaV2ReadResponse(resp);
-    CdaV2CreateRespMessage(objResp);
+    var responseLine = 'xxxxxxxxxxxxxxxxxxxx21xxxxxx';
+    var objResp = CdaV2ReadResponse(responseLine);
+    var respMessage = CdaV2CreateRespMessage(objResp, responseLine);
+    CdaCommShowResp(respMessage);
     //CdaCommShowResp(objResp);
 
 }
@@ -127,7 +127,7 @@ function CdaV2CreatePendedClaimsRequest() {
 function CdaV2PopulateEligibilityObj() {
     var obj = {};
     var transactionType = "Eligibility";
-    var objDataFromDB = CdaV2GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
 
     //A Transaction Header
     obj.a01 = CdaV2FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
@@ -253,7 +253,7 @@ function CdaV2PopulateClaimObj() {
 function CdaV2PopulateClaimReversalObj() {
     var obj = {};
     var transactionType = "ClaimReversal";
-    var objDataFromDB = CdaV2GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
 
     //A Transaction Header
     obj.a01 = CdaV2FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
@@ -287,7 +287,7 @@ function CdaV2PopulateClaimReversalObj() {
 function CdaV2PopulatePredeterminationObj() {
     var obj = {};
     var transactionType = "Predetermination";
-    var objDataFromDB = CdaV2GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV2GetDataFromUI();
 
     //A Transaction Header
@@ -364,7 +364,7 @@ function CdaV2PopulatePredeterminationObj() {
 function CdaV2PopulatePendedClaimsObj() {
     var obj = {};
     var transactionType = "PendedClaims";
-    var objDataFromDB = CdaV2GetDataFromDB(transactionType);
+    var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV2GetDataFromUI();
 
     //A Transaction Header
@@ -465,7 +465,7 @@ function CdaV2ParseClaimAcknResp(pResponse) {
         res.f07[j] = parseInt(pResponse.substring(lastPos, lastPos + 1));
         lastPos += 1;
 
-        res.g08[j] = parseInt(pResponse.substring(lastPos, lastPos + 3));
+        res.g08[j] = pResponse.substring(lastPos, lastPos + 3);
         lastPos += 3;
     }
     return res;
@@ -599,21 +599,8 @@ function CdaV2ParsePredetAcknResp(pResponse) {
     return res;
 }
 
-////Returns an object with All formated fields;
-//function CdaV2GetFormatedValues()
-//{
-//    var jsonFromServer = '{"A01":"test3","A02":"25","A03":"46"}';
-//    var obj = JSON.parse(jsonFromServer);
-//    var objRes = {};
-//    objRes.A06 = CdaV2FormatField(obj.A06, 'D', 15);
-//    objRes.A02 = CdaV2FormatField(obj.A02, 'N', 12);
-//    objRes.A03 = CdaV2FormatField(obj.A03, 'D', 12);
-//    objRes.A04 = CdaV2FormatField(obj.A04, 'A', 12);
 
-//    return "OK";
-//}
-
-//============================================= Comon functions =============================================
+//============================================= Common functions =============================================
 //returns current date in "YYYYMMDD" format.
 function CdaV2GetCurrentDate() {
     var date = '';
@@ -775,7 +762,7 @@ function CdaV2GetDataFromDB() {
         });
 }
 
-
+//Returns number of procedures 
 function CdaV2GGetNumProcedures() {
     var count = 0;
     for (var i = 0; i < arrGrilleDeFacturation.length; i++) {
@@ -785,7 +772,7 @@ function CdaV2GGetNumProcedures() {
     return count;
 }
 
-function CdaV2CreateRespMessage(pResp)
+function CdaV2CreateRespMessage(pResp, pResponseLine)
 {
     var ResponseList = '';
 
@@ -825,9 +812,10 @@ function CdaV2CreateRespMessage(pResp)
     {
         ResponseList += CdaV2GetResponseListForEligibil(pResp);
     }
-    //TODO: display ResponseList;
-    modResponseCDANET();
-    CdaCommShowResp(objResp);
+    else
+        ResponseList += 'La réponse n\'a pas pu être interprétée. Veuillez vérifier la réponse reçue ci-dessous.\n-----------------------\n' + pResponseLine;
+    
+    return ResponseList;
 }
 
 function CdaV2GetResponseListForEOB(pResp)
@@ -905,30 +893,148 @@ function CdaV2GetResponseListForClaimAck(pResp)
     ResponseList += CdaCommFrompage850(disposition) + '\n';
 
     var gTransref = (pResp.g01) ? pResp.g01 : '';
-    ResponseList += 'No de Référence: ' + gTransref +'\n';
+    ResponseList += 'No de Référence: ' + gTransref + '\n';
+
+    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04) / 100;
+    ResponseList += 'Montant réclamé : ' + montantReclame.toFixed(2) + '\n';
 
 
+    var g06 = parseInt(pResp.g06);
+    g06 = (isNaN(g06)) ? 0 : g06;//g06 Number of Error Codes
 
-
-
-
+    ResponseList += 'Nombre d\'erreurs  :' + g06 + '\n';
+    for (var i = 0; i < g06; i++)
+    {
+        if (pResp.f07[i] != 0)// f07 Procedure Line Number
+        {
+            ResponseList +='Erreur dans le traitement # ' + pResp.f07[i] + ' ; Erreur No ' + CdaCommGetCDANETMessage(pResp.g08);
+        }
+        else {
+            ResponseList += 'Erreur #  ' + CdaCommGetCDANETMessage(pResp.g08);
+        }
+    }
     return ResponseList;
 }
 
 function CdaV2GetResponseListForPredeterm(pResp) {
     var ResponseList = '';
+    ResponseList += 'Réponse à la soumission d\'un plan de traitement';
+    var responsemess = '';
+    var responsestatus = pResp.g05;
+    switch (responsestatus) {
+        case 'R':
+            responsemess = 'Plan de traitement rejeté à cause d\'erreurs.Veuillez corriger les erreurs avant de re-soumettre\n';
+            break;
+        case 'A':
+            responsemess = 'Plan de traitement reçu par l\'assureur.\nSera traité à une date ultérieure.\n';
+            break;
+        case 'C':
+            responsemess = 'Plan de traitement reçu par l\'assureur.\nSera traité à une date ultérieure.\nVous pourriez recevoir les détails par voie électronique.\n';
+            break;
+    }
+    ResponseList += responsemess;
+    ResponseList += CdaCommFrompage850(pResp.g07) + '\n'; //g07 disposition;
 
+    ResponseList.add('No de Référence: ' + pResp.g01) + '\n';
+
+    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04) / 100;
+    ResponseList += 'Montant réclamé : ' + montantReclame.toFixed(2) + '\n';
+
+    var g06 = parseInt(pResp.g06);
+    g06 = (isNaN(g06)) ? 0 : g06;//g06 Number of Error Codes
+
+    ResponseList += 'Nombre d\'erreurs  :' + g06 + '\n';
+    for (var i = 0; i < g06; i++) {
+        if (pResp.f07[i] != 0)// f07 Procedure Line Number
+        {
+            ResponseList += 'Erreur dans le traitement # ' + pResp.f07[i] + ' ; Erreur No ' + CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+        }
+        else {
+            ResponseList += 'Erreur #  ' + CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+        }
+    }
     return ResponseList;
 }
 
 function CdaV2GetResponseListForClaimRevers(pResp) {
     var ResponseList = '';
+    ResponseList += 'Réponse à la demande d\'annulation de la réclamation No :' + pResp.a02 + '\n';
+    ResponseList += 'No de Référence: ' + pResp.g01 + '\n';
+    var Nnotes = pResp.g06; //g06 error codes
 
+    var responsestatus = pResp.g05;
+    switch (responsestatus) {
+        case 'A':
+            responsemess = 'Demande  d\'annulation acceptée...\n';
+            break;
+        case 'R':
+            {
+                if (Nnotes != 0) {
+                    responsemess = 'Demande  d\'annulation rejetée à cause d\'erreurs...\nVeuillez la re-soumettre après avoir corrigé les erreurs...\n';
+                }
+                else {
+                    responsemess = 'Demande  d\'annulation refusée ...\nVeuillez la soumettre manuellement...\n';
+                }
+            }
+            
+            break;
+        
+        case 'B':
+            responsemess = 'Le réseau a reçu la demande d\'annulation et la transmettra à la compagnie d\'assurance...\nPas de réponse électronique retournée.\n';
+            break;
+        case 'N':
+            responsemess = 'Le réseau a reçu la demande d\'annulation et la transmettra à la compagnie d\'assurance...\nPas de réponse électronique retournée.\n';
+    }
+    ResponseList += responsemess;
+    ResponseList += pResp.g07 + '\n'; //g07
+    ResponseList += 'Nombre d\'erreurs : ' + Nnotes + '\n';
+
+    for (var i = 0; i < Nnotes; i++)
+    {
+        ResponseList += 'Erreur No: ' + CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+    }
     return ResponseList;
 }
 
 function CdaV2GetResponseListForEligibil(pResp) {
     var ResponseList = '';
+    ResponseList += 'Réponse à l\'interrogation sur l\'admissibilité';
+
+    var gTransref = (pResp.g01) ? pResp.g01 : '';
+    ResponseList += 'No de Référence: ' + gTransref + '\n';
+
+    var responsemess = '';
+    var responsestatus = pResp.g05;
+
+    switch (responsestatus) {
+        case 'E':
+        case 'M':
+            responsemess = 'Patient admissible...';
+        case 'R':
+            {
+                if (pRes.g06 == 0)
+                    responsemess = 'Patient inadmissible...' + '\n';
+                else
+                    responsemess = 'Il y a des erreurs dans la demande.Veuillez corriger les erreurs avant de la re-soumettre' + '\n';
+            }
+            break;
+        
+    }
+    ResponseList += responsemess + '\n';
+    ResponseList += CdaCommFrompage850(pResp.g07) + '\n'; //g07 disposition;
+
+    var Nnotes = parseInt(pResp.g06);
+    Nnotes = (isNaN(Nnotes)) ? 0 : Nnotes;//g06 Number of Error Codes
+
+    if (Nnotes > 0)
+    {
+        ResponseList += 'Nombre d\'erreurs : ' + Nnotes + '\n';
+        for (var i = 0; i < Nnotes; i++)
+        {
+            ResponseList += 'Erreur No: ' + CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+        }
+
+    }
 
     return ResponseList;
 }
