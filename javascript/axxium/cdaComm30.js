@@ -50,6 +50,22 @@ function CdaCommConvertDate(pStr)
     return formatedDate;
 }
 
+//Convert DateFrom YYYYMMDD to yyyy-mm-dd. Return '-1' if conversion impossible.
+function CdaCommConvertDate(pStr) {
+    var formatedDate;
+    if (pStr == '00000000' || isNaN(pStr)) {
+        formatedDate =-1;
+    }
+    else {
+        var year = pStr.substring(0, 4);
+        var month = pStr.substring(4, 6);
+        var day = pStr.substring(6, 8);
+        formatedDate = year + '-' + month + '-' + day;
+    }
+
+    return formatedDate;
+}
+
 function CdaCommTopage850(pString) {
     var code;
     var arrString;

@@ -1480,253 +1480,623 @@ function CdaV4CreateRespMessage(pResp, pResponseLine) {
     var ResponseList = '';
     ResponseList += 'cdanetTranscode : ' + globCdanetTranscode;
 
-    if (![2, 4, 5, 6, 99].includes(parseInt(globCdanetTranscode))) {
+    if (![2, 4, 5, 6, 99].includes(parseInt(globCdanetTranscode)))
+    {
         var lastName = (globVisionRData && globVisionRData.NomPers) ? globVisionRData.NomPers : '';
         var firstName = (globVisionRData && globVisionRData.PrePers) ? globVisionRData.PrePers : '';
         ResponseList += 'Patient: ' + lastName + ' ' + firstName + '\n';
 
-        var assurance = (globVisionRData && globVisionRData.InsTypeList && globVisionRData.InsTypeList.length > 0) ? globVisionRData.InsTypeList[0] : '';
+        //if (strToint(CDANETTranscode) = 8) and not (primaryeligibility) then
+        //ResponseList.add('Assurance secondaire : ' + policer.ass2)
+        //else
+        //    begin
+        //if coverage = 'S' then
+        //ResponseList.add('Assurance : ' + policer.ass2)
+        //else
+        //          ResponseList.add('Assurance : ' + patientr.ass);
+        //end;
+
+        var isFirstCoverage = true;//TODO implement functionality to know if it is first coverage.
+        var assurance;
+        if (isFirstCoverage)
+            assurance = (globVisionRData && globVisionRData.InsTypeList && globVisionRData.InsTypeList.length > 0) ? globVisionRData.InsTypeList[0] : '';
+        else
+            assurance = (globVisionRData && globVisionRData.InsTypeList && globVisionRData.InsTypeList.length > 0) ? globVisionRData.InsTypeList[1] : '';
+
         ResponseList += 'Assurance: ' + assurance + '\n';
     }
 
-    var noSequence = (pResp.a02) ? pResp.a02 : '';
+    var noSequence = pResp.a02;
     ResponseList += 'No de Séquence: ' + noSequence + '\n';
 
-    var respCode = (pResp.a04) ? pResp.a04 : '';
-    ResponseList += 'Code de réponse: ' + respCode + '\n';
+    var respCode = pResp.a04.toString();
+    ResponseList += 'responseCode: ' + respCode + '\n';
 
-    if (respCode == '21')//adjudicated ,explanation of benefits
+    var MailBox = pResp.a11;
+    ResponseList += 'MailBox : ' + MailBox + '\n';
+
+    if (respCode == '16') //Reconciliation des paiements
     {
-        ResponseList += CdaV2GetResponseListForEOB(pResp);
+        ResponseList += CdaV4GetResponseListForReconcilPaiments(pResp);
+    }
+    else if (respCode == '15')//conciliation sommaire
+    {
+        ResponseList += CdaV4GetResponseListForConcilationSommaire(pResp);
+    }
+    else if (respCode == '21')//adjudicated ,explanation of benefits
+    {
+        ResponseList += CdaV4GetResponseListForEOB(pResp);
+    }
+    else if (respCode == '23')//explanation of benefits,Predetermination
+    {
+        ResponseList += CdaV4GetResponseListForEOBPredet(pResp);
     }
     else if (respCode == '11')//Claim acknowledge
     {
-        ResponseList += CdaV2GetResponseListForClaimAck(pResp);
+        ResponseList += CdaV4GetResponseListForClaimAck(pResp);
     }
     else if (respCode == '13')// Predetermination(paln de trait) acknowledge
     {
-        ResponseList += CdaV2GetResponseListForPredeterm(pResp);
+        ResponseList += CdaV4GetResponseListForPredeterm(pResp);
     }
-    else if (respCode == '12')// Claim Reversal Response
+    else if (respCode == '14')// Outstanding acknowledge
     {
-        ResponseList += CdaV2GetResponseListForClaimRevers(pResp);
+        ResponseList += CdaV4GetResponseListForOutstAckn(pResp);
     }
-    else if (respCode == '10')// eligibility  Response
+    else if (respCode == '12') // Claim Reversal Response
     {
-        ResponseList += CdaV2GetResponseListForEligibil(pResp);
+        ResponseList += CdaV4GetResponseListForClaimRevers(pResp);
+    }
+    else if (respCode == '24') // E_mail response
+    {
+        ResponseList += CdaV4GetResponseListForEmail(pResp);
+    }
+    else if (respCode == '18')// eligibility  Response
+    {
+        ResponseList += CdaV4GetResponseListForEligibility(pResp);
     }
     else
-        ResponseList += 'La réponse n\'a pas pu être interprétée. Veuillez vérifier la réponse reçue ci-dessous.\n-----------------------\n' + pResponseLine;
+        ResponseList += 'La réponse n\'a pas pu être interprétée. Veuillez vérifier la réponse reçue ci-dessous.\n-----------------------\n' + pResponseLine + '\n';
+
+    if (MailBox == 'Y' || MailBox == 'O')
+    {
+        ResponseList += 'Vous avez des réclamations en attente\n';
+        MailBox = 'Y';
+    }
+        
+    return ResponseList;
+}
+
+//16
+function CdaV4GetResponseListForReconcilPaiments(pResp)
+{
+    var ResponseList = '';
+    ResponseList += 'Réponse à la demande de conciliation des paiements\n';
+
+    var gTransref = pResp.g01;
+    ResponseList += 'No de Référence : ' + gTransref + '\n';
+
+    var responsestatus = pResp.g05;
+    var responsemess = '';
+    switch (responsestatus)
+    {
+        case 'A': responsemess = 'Demande acceptée'; break;
+        case 'R': responsemess = 'Demande rejetée à cause d\'erreurs.Corriger les erreurs avant de re-soumettre'; break;
+    }
+    ResponseList += responsemess;
+
+    var Nnotes = pResp.g06; //number error codes
+    if (Nnotes == 0) {
+        var paymentReference = pResp.g34;
+        if (paymentReference.trim() !== '') {
+            ResponseList += 'No de référence du paiement : ' + paymentReference + '\n';
+        }
+
+        var paymentDate = pResp.g35.toString();
+        paymentDate = CdaCommConvertDate(paymentDate);
+        ResponseList += 'Date du paiement :' + paymentDate + '\n';
+
+        var paymentAmount = pResp.g36;
+
+        if (isNaN(paymentAmount / 100)) {
+            ResponseList += 'Montant du paiement : Erreur\n';
+        }
+        else {
+            ResponseList += 'Montant du paiement : ' + (paymentAmount / 100).toFixed(2) + '\n';
+        }
+
+        var paymentAdjustmentAmount = pResp.g33;
+
+        if (isNaN(paymentAdjustmentAmount / 100)) {
+            ResponseList += 'Montant Ajustement : Erreur\n';
+        }
+        else {
+            ResponseList += 'Montant Ajustement : ' + (paymentAdjustmentAmount / 100).toFixed(2) + '\n';
+        }
+    }
+
+    ResponseList +='Nombre d\'erreurs  :' + Nnotes;
+    
+    for (var i = 0; i < Nnotes; i++)
+    {
+        ResponseList += CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+    }
+
+    var g11 = parseInt(pResp.g11);//Number of notes
+    g11 = (isNaN(g11)) ? 0 : g11;
+
+    if (g11 != 0)
+    {
+        ResponseList += 'Messages  (' + g11 + ')' + '\n';
+
+        for (var j = 0; j < g11; j++) {
+            ResponseList += CdaCommFrompage850(pResp.g26[j]) + '\n';
+        }
+    }
+
+    return ResponseList;
+}
+//15
+function CdaV4GetResponseListForConcilationSommaire(pResp)
+{
+    var ResponseList = '';
+    ResponseList += 'Réponse à la demande de conciliation sommaire de la journée';
+
+    var gTransref =pResp.g01;
+    ResponseList += 'No de Référence : ' + gTransref;
+
+    var responsestatus = pResp.g05;
+    var responsemess;
+    switch (responsestatus)
+    {
+        case 'A': responsemess = 'Demande acceptée'; break;
+        case 'R': responsemess = 'Demande rejetée à cause d\'erreurs.Corriger les erreurs avant de re-soumettre'; break;
+    }
+    ResponseList += responsemess;
+
+
+
+    var Nnotes = pResp.g06; //number error codes
+    if (Nnotes == 0) {
+        var paymentReference = pResp.g34;
+        if (paymentReference.trim() !== '') {
+            ResponseList += 'No de référence du paiement : ' + paymentReference + '\n';
+        }
+
+        var paymentDate = pResp.g35.toString();
+        paymentDate = CdaCommConvertDate(paymentDate);
+        ResponseList += 'Date du paiement :' + paymentDate + '\n';
+
+        var paymentAmount = pResp.g36;
+
+        if (isNaN(paymentAmount / 100)) {
+            ResponseList += 'Montant du paiement : Erreur\n';
+        }
+        else {
+            ResponseList += 'Montant du paiement : ' + (paymentAmount / 100).toFixed(2) + '\n';
+        }
+
+        var paymentAdjustmentAmount = pResp.g33;
+
+        if (isNaN(paymentAdjustmentAmount / 100)) {
+            ResponseList += 'Montant Ajustement : Erreur\n';
+        }
+        else {
+            ResponseList += 'Montant Ajustement : ' + (paymentAdjustmentAmount / 100).toFixed(2) + '\n';
+        }
+    }
+
+    ResponseList += 'Nombre d\'erreurs  :' + Nnotes;
+
+    for (var i = 0; i < Nnotes; i++) {
+        ResponseList += CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+    }
+
+    var g11 = parseInt(pResp.g11);//Number of notes
+    g11 = (isNaN(g11)) ? 0 : g11;
+
+    if (g11 != 0) {
+        ResponseList += 'Messages  (' + g11 + ')' + '\n';
+
+        for (var j = 0; j < g11; j++) {
+            ResponseList += CdaCommFrompage850(pResp.g26[j]) + '\n';
+        }
+    }
+
+    return ResponseList;
+}
+//21
+function CdaV4GetResponseListForEOB(pResp) {
+    var ResponseList = '';
+
+    ResponseList +='Réponse à la demande de réglement\n';
+    ResponseList +='Réclamation acceptée\n';
+    
+    var gTransref = pResp.g01; //g01
+    ResponseList += 'No de Référence : ' + gTransref;
+
+    var gNoConfirm  = pResp.g30;
+    ResponseList.add('No de confirmation : ' + gNoConfirm);
+
+    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
+    ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
+
+    var deductibleAmount = (isNaN(pResp.g29 / 100)) ? '0' : (pResp.g29 / 100).toFixed(2);
+    ResponseList += 'Montant du déductible non alloué : ' + deductibleAmount + '\n';
+
+    var totalBenefitAmounts = (isNaN(pResp.g28 / 100)) ? '0' : (pResp.g28 / 100).toFixed(2);
+    ResponseList += 'Montant des prestations : ' + totalBenefitAmounts + '\n';
+
+    var adjustmentAmount = (isNaN(pResp.g33 / 100)) ? '0' : (pResp.g33 / 100).toFixed(2);
+    ResponseList += 'Montant pour ajustement : ' + adjustmentAmount + '\n';
+
+    var totalPayable = (isNaN(pResp.g55 / 100)) ? '0' : (pResp.g55 / 100).toFixed(2);
+    ResponseList += 'Montant total remboursé : ' + totalPayable + '\n';
+
+    var paymentDate = pResp.g03.toString();
+    paymentDate = CdaCommConvertDate(paymentDate);
+    if (paymentDate != '-1')
+        ResponseList += 'Date de paiement : ' + paymentDate + '\n';
+    else
+        ResponseList += 'Date de paiement not set ' + '\n';
+
+    var payeeCode = pResp.f01;
+    var message = '';
+    switch (payeeCode)
+    {
+        case 1: message = 'à l\'assuré'; break;
+        case 2: message = 'à une tierce personne'; break;
+        case 4: message = 'au dentiste'; break;
+
+    }
+    ResponseList += 'Payable ' + message + '\n';
+
+    var nNotes = pResp.g11;
+    var noteTxt;
+    for (var i = 0; i < Nnotes; i++)
+    {
+        noteTxt = g45[i] + ' ' + g26[i];
+        noteTxt = CdaCommFrompage850(noteTxt);
+        ResponseList += noteTxt + '\n';
+    }
+    return ResponseList;
+}
+//23
+function CdaV4GetResponseListForEOBPredet(pResp)
+{
+    var ResponseList = '';
+    ResponseList +='Réponse à la soumssion d\'un plan de traitement';
+
+    ResponseList +='Plan de traitement accepté' +'\n';
+    var gTransref = pResp.g01;
+    ResponseList +='No de Référence : ' + gTransref +'\n';
+    var gNoConfirm = pResp.g30;
+    ResponseList +='No de confirmation : ' + gNoConfirm +'\n';
+
+    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
+    ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
+
+    var totalBenefitAmounts = (isNaN(pResp.g28 / 100)) ? '0' : (pResp.g28 / 100).toFixed(2);
+    ResponseList += 'Montant qui sera remboursé : ' + totalBenefitAmounts + '\n';
+
+    var deductibleAmount = (isNaN(pResp.g29 / 100)) ? '0' : (pResp.g29 / 100).toFixed(2);
+    ResponseList += 'Montant déductible : ' + deductibleAmount + '\n';
+
+    var nNotes = pResp.g11;
+    var noteTxt;
+    for (var i = 0; i < Nnotes; i++) {
+        noteTxt = g45[i] + ' ' + g26[i];
+        noteTxt = CdaCommFrompage850(noteTxt);
+        ResponseList += noteTxt + '\n';
+    }
+
+    return ResponseList;
+}
+//11
+function CdaV4GetResponseListForClaimAck(pResp)
+{
+    var responsemess = '';
+    var ResponseList = '';
+    if(globCdanetTranscode == 8)
+    {
+        responsemess = 'Réponse à l\'interrogation sur l\'admissibilité';
+    }
+    else
+        responsemess = 'Réponse la demande de réglement';
+
+    ResponseList += responsemess + '\n';
+
+    var responsestatus =pResp.g05;
+    switch(responsestatus)
+    {
+        case 'R': responsemess = 'Réclamation rejetée à cause d\'erreurs.Veuillez corriger les erreurs avant de re-soumettre' + '\n'; break;
+        case 'H': responsemess = 'Réclamation reçue par l\'assureur.' + '\n' + 'Sera traitée à une date ultérieure...' + '\n' + 'Vous ne recevrez pas de réponse electronique' + '\n'; break;
+        case 'B': responsemess = 'Réclamation reçue par le réseau.' + '\n' + 'Sera envoyée à l\'assureur pour traitement ultérieur ' + '\n' + 'Vous ne recevrez pas de réponse electronique ' + '\n'; break;
+        case 'C': responsemess = 'Réclamation reçue par la compagnie d\'assurance.' +  '\n' + 'Sera traitée à une date ultérieure...' + '\n' + 'Vous pourriez recevoir une réponse electronique ' + '\n'; break;
+        case 'N': responsemess = 'Réclamation reçue par le réseau.' + '\n' + 'Sera envoyée à l\'assureur pour traitement ultérieur' + '\n' + 'Vous pourriez recevoir une réponse electronique ' + '\n'; break;
+        case 'M': responsemess = 'La réclamation doit être soumise manuellement.'+ '\n'; break;
+    }
+
+    ResponseList += responsemess;
+    var disposition = pResp.g07; disposition;
+    ResponseList += CdaCommFrompage850(disposition);
+    var gTransref = pResp.g01; //g01
+    ResponseList +='No de Référence: ' + gTransref;
+
+    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
+    ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
+
+    var nError = pResp.g06;
+    ResponseList += 'Nombre d\'erreurs  :' + nError + '\n';
+
+    for (var i = 0; i < nError; i++)
+    {
+        //TODO:Start here
+    }
+
+
+    return ResponseList;
+}
+//13
+function CdaV4GetResponseListForPredeterm(pResp)
+{
+    var ResponseList = '';
+
+    return ResponseList;
+}
+//14
+function CdaV4GetResponseListForOutstAckn(pResp) {
+    var ResponseList = '';
+
+    return ResponseList;
+}
+//12
+function CdaV4GetResponseListForClaimRevers(pResp)
+{
+    var ResponseList = '';
+
+    return ResponseList;
+}
+//24
+function CdaV4GetResponseListForEmail(pResp)
+{
+    var ResponseList = '';
+
+    return ResponseList;
+}
+//18
+function CdaV4GetResponseListForEligibility(pResp) {
+    var ResponseList = '';
 
     return ResponseList;
 }
 
-////Returns an object with All formated fields;
-//function CDAV4GetFormatedValues()
-//{
-//    var jsonFromServer = '{"A01":"test3","A02":"25","A03":"46"}';
-//    var obj = JSON.parse(jsonFromServer);
-//    var objRes = {};
-//    objRes.A06 = CDAV4FormatField(obj.A06, 'D', 15);
-//    objRes.A02 = CDAV4FormatField(obj.A02, 'N', 12);
-//    objRes.A03 = CDAV4FormatField(obj.A03, 'D', 12);
-//    objRes.A04 = CDAV4FormatField(obj.A04, 'A', 12);
 
-//    return "OK";
-//}
+    //============================================= Comon functions =============================================
+    //returns current date in "YYYYMMDD" format.
+    function CDAV4GetCurrentDate() {
+        var date = '';
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = d.getMonth() + 1;
+        var day = d.getDate();
+        if (day < 10) day = '0' + day;
+        if (m < 10) m = '0' + m;
 
-//============================================= Comon functions =============================================
-//returns current date in "YYYYMMDD" format.
-function CDAV4GetCurrentDate() {
-    var date = '';
-    var d = new Date();
-    var y = d.getFullYear();
-    var m = d.getMonth() + 1;
-    var day = d.getDate();
-    if (day < 10) day = '0' + day;
-    if (m < 10) m = '0' + m;
-
-    return y + m + day;
-}
-
-function CdaV4Topage850(pString) {
-    var code;
-    var arrString;
-    if (pString) {
-        arrString = pString.split('');
-        for (var i = 0; i < arrString.length; i++) {
-            code = arrString[i].charCodeAt(0);
-            switch (arrString[i]) {
-                case 'É': code = 144; break;
-                case 'È': code = 212; break;
-                case 'Ê': code = 210; break;
-                case 'À': code = 183; break;
-                case 'Â': code = 182; break;
-                case 'Ï': code = 216; break;
-                case 'Î': code = 215; break;
-                case 'Ô': code = 226; break;
-                case 'Ö': code = 153; break;
-                case 'Û': code = 234; break;
-                case 'Ü': code = 154; break;
-                case 'Ç': code = 128; break;
-                case 'é': code = 130; break;
-                case 'è': code = 138; break;
-                case 'ê': code = 136; break;
-                case 'à': code = 133; break;
-                case 'â': code = 131; break;
-                case 'ï': code = 139; break;
-                case 'î': code = 140; break;
-                case 'ô': code = 147; break;
-                case 'ö': code = 148; break;
-                case 'û': code = 150; break;
-                case 'ü': code = 129; break;
-                case 'ç': code = 135; break;
-            }
-            arrString[i] = String.fromCharCode(code);
-        }
+        return y + m + day;
     }
-    return arrString.join("");
-}
 
-function CdaV4Frompage850(pString) {
-    var code;
-    var arrString;
-    if (pString) {
-        arrString = pString.split('');
-        for (var i = 0; i < arrString.length; i++) {
-            code = arrString[i].charCodeAt(0);
-            switch (code) {
-                case 144: arrString[i] = 'É'; break;
-                case 212: arrString[i] = 'È'; break;
-                case 210: arrString[i] = 'Ê'; break;
-                case 211: arrString[i] = 'Ë'; break;
-                case 183: arrString[i] = 'À'; break;
-                case 182: arrString[i] = 'Â'; break;
-                case 181: arrString[i] = 'Á'; break;
-                case 142: arrString[i] = 'Ä'; break;
-                case 143: arrString[i] = 'Å'; break;
-                case 146: arrString[i] = 'Æ'; break;
-                case 216: arrString[i] = 'Ï'; break;
-                case 215: arrString[i] = 'Î'; break;
-                case 222: arrString[i] = 'Ì'; break;
-                case 214: arrString[i] = 'Í'; break;
-
-                case 226: arrString[i] = 'Ô'; break;
-                case 153: arrString[i] = 'Ö'; break;
-                case 224: arrString[i] = 'Ó'; break;
-                case 227: arrString[i] = 'Ò'; break;
-                case 229: arrString[i] = 'Õ'; break;
-
-                case 235: arrString[i] = 'Ù'; break;
-                case 233: arrString[i] = 'Ú'; break;
-                case 234: arrString[i] = 'Û'; break;
-                case 154: arrString[i] = 'Ü'; break;
-
-                case 128: arrString[i] = 'Ç'; break;
-                case 237: arrString[i] = 'Ý'; break;
-
-                case 130: arrString[i] = 'é'; break;
-                case 138: arrString[i] = 'è'; break;
-                case 136: arrString[i] = 'ê'; break;
-                case 137: arrString[i] = 'ë'; break;
-
-                case 133: arrString[i] = 'à'; break;
-                case 131: arrString[i] = 'â'; break;
-                case 160: arrString[i] = 'á'; break;
-                case 198: arrString[i] = 'ã'; break;
-                case 132: arrString[i] = 'ä'; break;
-                case 134: arrString[i] = 'å'; break;
-                case 145: arrString[i] = 'æ'; break;
-
-                case 139: arrString[i] = 'ï'; break;
-                case 140: arrString[i] = 'î'; break;
-                case 141: arrString[i] = 'ì'; break;
-                case 161: arrString[i] = 'í'; break;
-
-                case 147: arrString[i] = 'ô'; break;
-                case 148: arrString[i] = 'ö'; break;
-                case 149: arrString[i] = 'ò'; break;
-                case 228: arrString[i] = 'õ'; break;
-                case 162: arrString[i] = 'ó'; break;
-
-                case 208: arrString[i] = 'ð'; break;
-
-                case 150: arrString[i] = 'û'; break;
-                case 129: arrString[i] = 'ü'; break;
-                case 151: arrString[i] = 'ù'; break;
-                case 163: arrString[i] = 'ú'; break;
-
-                case 152: arrString[i] = 'ÿ'; break;
-                case 236: arrString[i] = 'ý'; break;
-
-                case 135: arrString[i] = 'ç'; break;
+    function CdaV4Topage850(pString) {
+        var code;
+        var arrString;
+        if (pString) {
+            arrString = pString.split('');
+            for (var i = 0; i < arrString.length; i++) {
+                code = arrString[i].charCodeAt(0);
+                switch (arrString[i]) {
+                    case 'É': code = 144; break;
+                    case 'È': code = 212; break;
+                    case 'Ê': code = 210; break;
+                    case 'À': code = 183; break;
+                    case 'Â': code = 182; break;
+                    case 'Ï': code = 216; break;
+                    case 'Î': code = 215; break;
+                    case 'Ô': code = 226; break;
+                    case 'Ö': code = 153; break;
+                    case 'Û': code = 234; break;
+                    case 'Ü': code = 154; break;
+                    case 'Ç': code = 128; break;
+                    case 'é': code = 130; break;
+                    case 'è': code = 138; break;
+                    case 'ê': code = 136; break;
+                    case 'à': code = 133; break;
+                    case 'â': code = 131; break;
+                    case 'ï': code = 139; break;
+                    case 'î': code = 140; break;
+                    case 'ô': code = 147; break;
+                    case 'ö': code = 148; break;
+                    case 'û': code = 150; break;
+                    case 'ü': code = 129; break;
+                    case 'ç': code = 135; break;
+                }
+                arrString[i] = String.fromCharCode(code);
             }
         }
+        return arrString.join("");
     }
-    return arrString.join("");
-}
 
-function CDAV4FormatField(pValue, pFormatType, pRequiredLength) {
-    //convert input value to string.
-    var v = String(pValue);
+    function CdaV4Frompage850(pString) {
+        var code;
+        var arrString;
+        if (pString) {
+            arrString = pString.split('');
+            for (var i = 0; i < arrString.length; i++) {
+                code = arrString[i].charCodeAt(0);
+                switch (code) {
+                    case 144: arrString[i] = 'É'; break;
+                    case 212: arrString[i] = 'È'; break;
+                    case 210: arrString[i] = 'Ê'; break;
+                    case 211: arrString[i] = 'Ë'; break;
+                    case 183: arrString[i] = 'À'; break;
+                    case 182: arrString[i] = 'Â'; break;
+                    case 181: arrString[i] = 'Á'; break;
+                    case 142: arrString[i] = 'Ä'; break;
+                    case 143: arrString[i] = 'Å'; break;
+                    case 146: arrString[i] = 'Æ'; break;
+                    case 216: arrString[i] = 'Ï'; break;
+                    case 215: arrString[i] = 'Î'; break;
+                    case 222: arrString[i] = 'Ì'; break;
+                    case 214: arrString[i] = 'Í'; break;
 
-    var res = '';
+                    case 226: arrString[i] = 'Ô'; break;
+                    case 153: arrString[i] = 'Ö'; break;
+                    case 224: arrString[i] = 'Ó'; break;
+                    case 227: arrString[i] = 'Ò'; break;
+                    case 229: arrString[i] = 'Õ'; break;
 
-    switch (pFormatType) {
-        /*
-        Numeric. Only ASCII digits are allowed in a field of this type. If a value is not present, fill with zeros. 
-        Right-justify add fill with ASCII zeros on the left. 
-        All date fields are of type numeric and formatted as YYYYMMDD.
-        */
-        case 'N':
-            {
-                if (!v)
-                    v = '0';
-                v = v.replace(/-/g, '');// Replase '-' from date.
+                    case 235: arrString[i] = 'Ù'; break;
+                    case 233: arrString[i] = 'Ú'; break;
+                    case 234: arrString[i] = 'Û'; break;
+                    case 154: arrString[i] = 'Ü'; break;
 
-                if (!Number.isInteger(Number(v))) {
-                    alert('adoV4FormatField Error: value is not an integer.');
+                    case 128: arrString[i] = 'Ç'; break;
+                    case 237: arrString[i] = 'Ý'; break;
+
+                    case 130: arrString[i] = 'é'; break;
+                    case 138: arrString[i] = 'è'; break;
+                    case 136: arrString[i] = 'ê'; break;
+                    case 137: arrString[i] = 'ë'; break;
+
+                    case 133: arrString[i] = 'à'; break;
+                    case 131: arrString[i] = 'â'; break;
+                    case 160: arrString[i] = 'á'; break;
+                    case 198: arrString[i] = 'ã'; break;
+                    case 132: arrString[i] = 'ä'; break;
+                    case 134: arrString[i] = 'å'; break;
+                    case 145: arrString[i] = 'æ'; break;
+
+                    case 139: arrString[i] = 'ï'; break;
+                    case 140: arrString[i] = 'î'; break;
+                    case 141: arrString[i] = 'ì'; break;
+                    case 161: arrString[i] = 'í'; break;
+
+                    case 147: arrString[i] = 'ô'; break;
+                    case 148: arrString[i] = 'ö'; break;
+                    case 149: arrString[i] = 'ò'; break;
+                    case 228: arrString[i] = 'õ'; break;
+                    case 162: arrString[i] = 'ó'; break;
+
+                    case 208: arrString[i] = 'ð'; break;
+
+                    case 150: arrString[i] = 'û'; break;
+                    case 129: arrString[i] = 'ü'; break;
+                    case 151: arrString[i] = 'ù'; break;
+                    case 163: arrString[i] = 'ú'; break;
+
+                    case 152: arrString[i] = 'ÿ'; break;
+                    case 236: arrString[i] = 'ý'; break;
+
+                    case 135: arrString[i] = 'ç'; break;
                 }
-                else {
-                    var len = v.length;
-                    if (len < pRequiredLength) {
-                        var asciiZero = String.fromCharCode(48);
-                        //Fill with zeros.
-                        var i = 0;
-                        while (i < pRequiredLength) {
-                            v = asciiZero + v;
-                            i++;
-                        }
-                        res = v;
-                    }
-                    else if (len == pRequiredLength) {
-                        res = v;
-                    }
-                    else if (len > pRequiredLength) {
-                        alert('adoV4FormatField Error: Value is longer than required.');
-                    }
-                }
-
             }
-            break;
+        }
+        return arrString.join("");
+    }
 
+    function CDAV4FormatField(pValue, pFormatType, pRequiredLength) {
+        //convert input value to string.
+        var v = String(pValue);
+
+        var res = '';
+
+        switch (pFormatType) {
             /*
-            Alphabetic. Only ASCII upper and lower case ALPHABETIC characters including apostrophe ('), dash (-) and comma (,) are allowed.
-            Left-justify and pad with blanks on the right. If only specific values are permitted, e.g., Y, N, D, M; then the upper case must be used.
+            Numeric. Only ASCII digits are allowed in a field of this type. If a value is not present, fill with zeros. 
+            Right-justify add fill with ASCII zeros on the left. 
+            All date fields are of type numeric and formatted as YYYYMMDD.
             */
-        case 'A':
+            case 'N':
+                {
+                    if (!v)
+                        v = '0';
+                    v = v.replace(/-/g, '');// Replase '-' from date.
 
-            //as above but allows for the inclusion of extended characters, character codes 128-255.
-        case 'AE':
-            {
-                if (!v)
-                    v = '';
-                //Convert to page850
-                v = CdaV4Topage850(v);
-                v = v.trim(); //remove spaces
+                    if (!Number.isInteger(Number(v))) {
+                        alert('adoV4FormatField Error: value is not an integer.');
+                    }
+                    else {
+                        var len = v.length;
+                        if (len < pRequiredLength) {
+                            var asciiZero = String.fromCharCode(48);
+                            //Fill with zeros.
+                            var i = 0;
+                            while (i < pRequiredLength) {
+                                v = asciiZero + v;
+                                i++;
+                            }
+                            res = v;
+                        }
+                        else if (len == pRequiredLength) {
+                            res = v;
+                        }
+                        else if (len > pRequiredLength) {
+                            alert('adoV4FormatField Error: Value is longer than required.');
+                        }
+                    }
 
-                //Check if all characters are alphabetical
-                if (/^[a-zA-Z]+$/.test(v) || v == '') {
+                }
+                break;
+
+                /*
+                Alphabetic. Only ASCII upper and lower case ALPHABETIC characters including apostrophe ('), dash (-) and comma (,) are allowed.
+                Left-justify and pad with blanks on the right. If only specific values are permitted, e.g., Y, N, D, M; then the upper case must be used.
+                */
+            case 'A':
+
+                //as above but allows for the inclusion of extended characters, character codes 128-255.
+            case 'AE':
+                {
+                    if (!v)
+                        v = '';
+                    //Convert to page850
+                    v = CdaV4Topage850(v);
+                    v = v.trim(); //remove spaces
+
+                    //Check if all characters are alphabetical
+                    if (/^[a-zA-Z]+$/.test(v) || v == '') {
+                        var len = v.length;
+                        if (len < pRequiredLength) {
+                            //Fill with spaces on the right.
+                            var i = 0;
+                            while (i < pRequiredLength) {
+                                v += ' ';
+                            }
+                            res = v;
+                        }
+                        else if (len == pRequiredLength) {
+                            res = v;
+                        }
+                        else if (len > pRequiredLength) {
+                            alert('adoV4FormatField Error: Value is longer than required.');
+                        }
+                    }
+                    else
+                        alert('adoV4FormatField Error: Value contains not alphabetical caracters.');
+                }
+                break;
+
+                //Alphanumeric. Any printable ASCII character is allowed. Left-justify and pad with spaces on the right.
+                //TODO: check if contains extended characters, character codes 128 - 255.
+            case 'AN':
+                //as above but allows for the inclusion of extended characters, character codes 128 - 255.
+            case 'AEN':
+                {
+                    if (!v)
+                        v = '';
+                    //Convert to page850
+                    v = CdaV4Topage850(v);
+                    v = v.trim(); //remove spaces.
+
                     var len = v.length;
                     if (len < pRequiredLength) {
                         //Fill with spaces on the right.
@@ -1743,125 +2113,92 @@ function CDAV4FormatField(pValue, pFormatType, pRequiredLength) {
                         alert('adoV4FormatField Error: Value is longer than required.');
                     }
                 }
-                else
-                    alert('adoV4FormatField Error: Value contains not alphabetical caracters.');
-            }
-            break;
+                break;
 
-            //Alphanumeric. Any printable ASCII character is allowed. Left-justify and pad with spaces on the right.
-            //TODO: check if contains extended characters, character codes 128 - 255.
-        case 'AN':
-            //as above but allows for the inclusion of extended characters, character codes 128 - 255.
-        case 'AEN':
-            {
-                if (!v)
-                    v = '';
-                //Convert to page850
-                v = CdaV4Topage850(v);
-                v = v.trim(); //remove spaces.
-
-                var len = v.length;
-                if (len < pRequiredLength) {
-                    //Fill with spaces on the right.
-                    var i = 0;
-                    while (i < pRequiredLength) {
-                        v += ' ';
+                /*
+                Decimal amount. All decimal amount fields have implied decimal points two digits from the right.
+                This field format is generally used for storing dollar amounts. Right-justify and zero fill on the left.
+                */
+            case 'D':
+                {
+                    if (!v)
+                        v = '0.00';
+                    if (isNaN(Number(v))) {
+                        alert('adoV4FormatField Error: value is not a number.');
                     }
-                    res = v;
-                }
-                else if (len == pRequiredLength) {
-                    res = v;
-                }
-                else if (len > pRequiredLength) {
-                    alert('adoV4FormatField Error: Value is longer than required.');
-                }
-            }
-            break;
+                    else {
+                        v = parseFloat(v).toFixed(2).toString();
+                        v = v.replace('.', '');
+                        v = v.replace(',', '');
 
-            /*
-            Decimal amount. All decimal amount fields have implied decimal points two digits from the right.
-            This field format is generally used for storing dollar amounts. Right-justify and zero fill on the left.
-            */
-        case 'D':
-            {
-                if (!v)
-                    v = '0.00';
-                if (isNaN(Number(v))) {
-                    alert('adoV4FormatField Error: value is not a number.');
-                }
-                else {
-                    v = parseFloat(v).toFixed(2).toString();
-                    v = v.replace('.', '');
-                    v = v.replace(',', '');
-
-                    var len = v.length;
-                    if (len < pRequiredLength) {
-                        var asciiZero = String.fromCharCode(48);
-                        //Fill with zeros.
-                        for (var i = len; i < pRequiredLength; i++) {
-                            v = asciiZero + v;
+                        var len = v.length;
+                        if (len < pRequiredLength) {
+                            var asciiZero = String.fromCharCode(48);
+                            //Fill with zeros.
+                            for (var i = len; i < pRequiredLength; i++) {
+                                v = asciiZero + v;
+                            }
+                            res = v;
                         }
-                        res = v;
+                        else if (len == pRequiredLength) {
+                            res = v;
+                        }
+                        else if (len > pRequiredLength) {
+                            alert('adoV4FormatField Error: Value is longer than required.');
+                        }
                     }
-                    else if (len == pRequiredLength) {
-                        res = v;
-                    }
-                    else if (len > pRequiredLength) {
-                        alert('adoV4FormatField Error: Value is longer than required.');
-                    }
-                }
 
-            }
-            break;
-        default:
-            {
-                alert("adoV4FormatField Error: Format Type is not correct.");
-            }
+                }
+                break;
+            default:
+                {
+                    alert("adoV4FormatField Error: Format Type is not correct.");
+                }
+        }
+        return res;
     }
-    return res;
-}
 
-function CdaV4GetDataFromDB(pRrequestType) {
-    $.ajax(
-        {
-            url: globCdaNetAPIuri + "PostGenerTransaction",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ Version: '2', TransactionType: globCdanetTranscode, NoDossier: globNoDossier, Dentiste: globDentist }),
-            success: function (result) {
-                switch (globCdanetTranscode) {
-                    case '1'://Claim
-                        {
-                            globCdaDataFromDB = result;
-                            CdaV4CallCDAService();
-                        }
-                        break;
+    function CdaV4GetDataFromDB(pRrequestType) {
+        $.ajax(
+            {
+                url: globCdaNetAPIuri + "PostGenerTransaction",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ Version: '2', TransactionType: globCdanetTranscode, NoDossier: globNoDossier, Dentiste: globDentist }),
+                success: function (result) {
+                    switch (globCdanetTranscode) {
+                        case '1'://Claim
+                            {
+                                globCdaDataFromDB = result;
+                                CdaV4CallCDAService();
+                            }
+                            break;
+                    }
+
+                    //console.log(result);
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    debugger;
+                    alert(xhr.statusText);
                 }
+            });
+    }
 
-                //console.log(result);
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-                debugger;
-                alert(xhr.statusText);
-            }
-        });
-}
+    function CdaV4GetDataFromUI() {
+        //TODO: implement
+        var obj = {};
+        return obj;
+    }
 
-function CdaV4GetDataFromUI() {
-    //TODO: implement
-    var obj = {};
-    return obj;
-}
-
-function CdaV4GGetNumProcedures()
-{
-    var count = 0;
-    for (var i = 0; i < arrGrilleDeFacturation.length; i++)
+    function CdaV4GGetNumProcedures()
     {
-        if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP')
-            count++;
+        var count = 0;
+        for (var i = 0; i < arrGrilleDeFacturation.length; i++)
+        {
+            if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP')
+                count++;
+        }
+        return count;
     }
-    return count;
-}
 
 
