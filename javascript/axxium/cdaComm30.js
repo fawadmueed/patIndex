@@ -1,6 +1,7 @@
 var globCdaNetAPIuri = 'http://ec2-52-38-58-195.us-west-2.compute.amazonaws.com/axxium/api/InsuranceWebApi/';
 var globCdanetTranscode = '1'; //'Claim';
 var globCdaDataFromDB;
+var globCdaProviderSequence; //populate this variable when transaction is selected in the transaction grid.
 
 function CdaCommSendToSecondIns()
 { }
@@ -331,3 +332,23 @@ function CdaCommGetCDANETMessage(p)
     return temp;
 
 }
+
+//Returns Print form name
+function CdaCommGetFormToPrint(pFormId)
+{
+    var res = '';
+    switch (pFormId)
+    {
+        case '01': res = 'EXPLICATION DES PRESTATIONS-RÉCLAMATION'; break;
+        case '02': res = 'DENTAIDE'; break;
+        case '03': res = 'ACCUSÉ DE RÉCEPTION-RÉCLAMATION'; break;
+        case '04': res = 'FORMULAIRE DE VALIDATION PAR L\'EMPLOYEUR'; break;
+        case '05': res = 'FORMULAIRE NORMAL'; break;
+        case '06': res = 'ACCUSÉ DE RÉCEPTION-PLAN DE TRAITEMENT'; break;
+        case '07': res = 'EXPLICATION DES PRESTATIONS-PLAN DE TRAITEMENT'; break;
+        case '08': res = 'FORMULAIRE D\'ADMISSIBILITÉ'; break;
+    }
+    return res;
+}
+
+

@@ -1583,10 +1583,10 @@ function CdaV4GetResponseListForReconcilPaiments(pResp)
         case 'A': responsemess = 'Demande acceptée'; break;
         case 'R': responsemess = 'Demande rejetée à cause d\'erreurs.Corriger les erreurs avant de re-soumettre'; break;
     }
-    ResponseList += responsemess;
+    ResponseList += responsemess + '\n';
 
-    var Nnotes = pResp.g06; //number error codes
-    if (Nnotes == 0) {
+    var nNotes = pResp.g06; //number error codes
+    if (nNotes == 0) {
         var paymentReference = pResp.g34;
         if (paymentReference.trim() !== '') {
             ResponseList += 'No de référence du paiement : ' + paymentReference + '\n';
@@ -1615,9 +1615,9 @@ function CdaV4GetResponseListForReconcilPaiments(pResp)
         }
     }
 
-    ResponseList +='Nombre d\'erreurs  :' + Nnotes;
+    ResponseList += 'Nombre d\'erreurs  :' + nNotes + '\n';
     
-    for (var i = 0; i < Nnotes; i++)
+    for (var i = 0; i < nNotes; i++)
     {
         ResponseList += CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
     }
@@ -1640,10 +1640,10 @@ function CdaV4GetResponseListForReconcilPaiments(pResp)
 function CdaV4GetResponseListForConcilationSommaire(pResp)
 {
     var ResponseList = '';
-    ResponseList += 'Réponse à la demande de conciliation sommaire de la journée';
+    ResponseList += 'Réponse à la demande de conciliation sommaire de la journée' + '\n';
 
     var gTransref =pResp.g01;
-    ResponseList += 'No de Référence : ' + gTransref;
+    ResponseList += 'No de Référence : ' + gTransref + '\n';
 
     var responsestatus = pResp.g05;
     var responsemess;
@@ -1656,8 +1656,8 @@ function CdaV4GetResponseListForConcilationSommaire(pResp)
 
 
 
-    var Nnotes = pResp.g06; //number error codes
-    if (Nnotes == 0) {
+    var nNotes = pResp.g06; //number error codes
+    if (nNotes == 0) {
         var paymentReference = pResp.g34;
         if (paymentReference.trim() !== '') {
             ResponseList += 'No de référence du paiement : ' + paymentReference + '\n';
@@ -1686,9 +1686,9 @@ function CdaV4GetResponseListForConcilationSommaire(pResp)
         }
     }
 
-    ResponseList += 'Nombre d\'erreurs  :' + Nnotes;
+    ResponseList += 'Nombre d\'erreurs  :' + nNotes + '\n';
 
-    for (var i = 0; i < Nnotes; i++) {
+    for (var i = 0; i < nNotes; i++) {
         ResponseList += CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
     }
 
@@ -1713,10 +1713,10 @@ function CdaV4GetResponseListForEOB(pResp) {
     ResponseList +='Réclamation acceptée\n';
     
     var gTransref = pResp.g01; //g01
-    ResponseList += 'No de Référence : ' + gTransref;
+    ResponseList += 'No de Référence : ' + gTransref + '\n';
 
     var gNoConfirm  = pResp.g30;
-    ResponseList.add('No de confirmation : ' + gNoConfirm);
+    ResponseList +='No de confirmation : ' + gNoConfirm + '\n';
 
     var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
     ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
@@ -1753,7 +1753,7 @@ function CdaV4GetResponseListForEOB(pResp) {
 
     var nNotes = pResp.g11;
     var noteTxt;
-    for (var i = 0; i < Nnotes; i++)
+    for (var i = 0; i < nNotes; i++)
     {
         noteTxt = g45[i] + ' ' + g26[i];
         noteTxt = CdaCommFrompage850(noteTxt);
@@ -1765,7 +1765,7 @@ function CdaV4GetResponseListForEOB(pResp) {
 function CdaV4GetResponseListForEOBPredet(pResp)
 {
     var ResponseList = '';
-    ResponseList +='Réponse à la soumssion d\'un plan de traitement';
+    ResponseList += 'Réponse à la soumssion d\'un plan de traitement' + '\n';
 
     ResponseList +='Plan de traitement accepté' +'\n';
     var gTransref = pResp.g01;
@@ -1784,7 +1784,7 @@ function CdaV4GetResponseListForEOBPredet(pResp)
 
     var nNotes = pResp.g11;
     var noteTxt;
-    for (var i = 0; i < Nnotes; i++) {
+    for (var i = 0; i < nNotes; i++) {
         noteTxt = g45[i] + ' ' + g26[i];
         noteTxt = CdaCommFrompage850(noteTxt);
         ResponseList += noteTxt + '\n';
@@ -1817,11 +1817,11 @@ function CdaV4GetResponseListForClaimAck(pResp)
         case 'M': responsemess = 'La réclamation doit être soumise manuellement.'+ '\n'; break;
     }
 
-    ResponseList += responsemess;
+    ResponseList += responsemess + '\n';
     var disposition = pResp.g07; disposition;
-    ResponseList += CdaCommFrompage850(disposition);
+    ResponseList += CdaCommFrompage850(disposition) + '\n';
     var gTransref = pResp.g01; //g01
-    ResponseList +='No de Référence: ' + gTransref;
+    ResponseList += 'No de Référence: ' + gTransref + '\n';
 
     var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
     ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
@@ -1831,29 +1831,163 @@ function CdaV4GetResponseListForClaimAck(pResp)
 
     for (var i = 0; i < nError; i++)
     {
-        //TODO:Start here
+        var prLineNumber = pResp.f07[i];
+        if (prLineNumber > 0) {
+            ResponseList += 'Erreur dans le traitement # ' + prLineNumber + ' ; ' + 'Erreur No ' + CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+        }
+        else {
+            ResponseList += 'Erreur No ' + CdaCommGetCDANETMessage(pResp.g08[i]) + '\n';
+        }
+    }
+    
+    var messageCount = pResp.g31;
+    if (messageCount > 0)
+    {
+        ResponseList += 'Messages  (' + messageCount + ')' + '\n';
+
+        for (var j = 0; j < messageCount; j++) {
+            var displayMessage = CdaCommFrompage850(pRes.g32[i]);
+            ResponseList += displayMessage + '\n';
+        }
     }
 
-
+    // stupid logic from VisionR
+    var mFormId = pResp.g08[g08.length - 1]; //last formid
+    if (responsestatus == 'R')
+    {
+        ResponseList += 'Type de Formulaire  à imprimer : ' + CdaCommGetFormToPrint(mFormId) + '\n';
+    }
     return ResponseList;
 }
 //13
 function CdaV4GetResponseListForPredeterm(pResp)
 {
     var ResponseList = '';
+    ResponseList += 'Réponse à la soumission d\'un plan de traitement' + '\n';
+    var responsestatus = pResp.g05;
+    var responsemess = '';
+    switch (responsestatus) {
+        case 'R': responsemess = 'Plan de traitement rejeté à cause d\'erreurs.Veuillez corriger les erreurs avant de re-soumettre'; break;
+        case 'A': responsemess = 'Plan de traitement reçu par l\'assureur.' + '\n' + 'Sera traité à une date ultérieure.'; break;
+        case 'C': responsemess = 'Plan de traitement reçu par l\'assureur.' + '\n' + 'Sera traité à une date ultérieure.' + '\n' + 'Vous pourriez recevoir les détails par voie electronique.'; break;
+    }
 
+    ResponseList += responsemess + '\n';
+    var disposition = pResp.g07;
+
+    ResponseList += CdaCommFrompage850(disposition) + '\n';
+
+    var gTransfer = pResp.g01;
+    ResponseList += 'No de Référence: ' + gTransref + '\n';
+
+    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
+    ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
+
+    var errorCodeNum = pResp.g06;
+    ResponseList +='Nombre d\'erreurs : ' + errorCodes + '\n';
+    
+    for (var i = 0; i < errorCodes; i++) {
+        var procLineNum = pResp.f07[i];
+        var errorCode = pResp.g08[i];
+        if (procLineNum > 0)
+        {
+            ResponseList += 'Erreur dans le traitement # ' + procLineNum + ' ; ' + 'Erreur No ' + CdaCommGetCDANETMessage(errorCode) + '\n';
+        }
+        ResponseList += 'Erreur No ' + CdaCommGetCDANETMessage(errorCode) + '\n';
+    }
+
+    var messageCount = pResp.g31;
+    if (messageCount > 0)
+    {
+        ResponseList += 'Messages  (' + messageCount + ')' + '\n';
+        for (var j = 0; j< messageCount; j++)
+        {
+            var displayMessage = pResp.g32;
+            ResponseList += CdaCommFrompage850(displayMessage) + '\n';
+        }
+    }
+
+    var mFormId = pResp.g42;
+    ResponseList += 'Type de Formulaire  à imprimer :' + CdaCommGetFormToPrint(mFormId) + '\n';
     return ResponseList;
 }
 //14
 function CdaV4GetResponseListForOutstAckn(pResp) {
     var ResponseList = '';
+    ResponseList += 'Réponse à l\'interrogation pour des demandes en attente' + '\n';
+    var responstatus = pResp.g05;
+    var responseMess;
+    switch (responstatus)
+    {
+        case 'R': responseMess = 'Transaction rejetée à cause d\'erreurs.Veuillez corriger les erreurs avant de re-soumettre'; break;
+        case 'X': responseMess = 'Vous n\'avez aucune réclamation en attente de traitement...'; break;
+    }
 
+    ResponseList += responseMess + '\n';
+    
+    var disposMessage = pResp.g07;
+    ResponseList += disposMessage + '\n';
+
+    var ErrorCodesNum = pResp.g06;
+    ResponseList += 'Nombre d\'erreurs  (' + ErrorCodesNum + ')' + '\n';
+
+    for (var i = 0; i < ErrorCodesNum; i++)
+    {
+        var errorCode = pResp.g08[i];
+        ResponseList += 'Erreur No ' + CdaCommGetCDANETMessage(errorCode) + '\n';
+    }
     return ResponseList;
 }
 //12
 function CdaV4GetResponseListForClaimRevers(pResp)
 {
     var ResponseList = '';
+    ResponseList += 'Réponse à la demande d\'annulation de la réclamation No :' + globCdaProviderSequence + '\n';
+
+    var gTransref = pResp.g01;
+    ResponseList += 'No de Référence: ' + gTransref + '\n';
+    
+    var nNotes = pResp.g06;
+    var responsestatus = pResp.g05; 
+    var responsemess;
+    switch(responsestatus)
+    {
+        case 'A': responsemess = 'Demande  d\'annulation acceptée...'; break;
+        case 'R': 
+            {
+                if(nNotes>0)
+                    responsemess = 'Demande  d\'annulation rejetée à cause d\'erreurs...' + '\n' + 'Veuillez la re-soumettre après avoir corrigé les erreurs...'; 
+                else
+                    responsemess = 'Demande  d\'annulation refusée ...' + '\n' + 'Veuillez la soumettre manuellement..';
+            }
+            break;
+        case 'B': responsemess = 'Le réseau a reçu la demande d\'annulation et la transmettra à la compagnie d\'assurance...' + '\n' + 'Pas de réponse électronique retournée.'; break;
+        case 'N': responsemess = 'Le réseau a reçu la demande d\'annulation et la transmettra à la compagnie d\'assurance...' + '\n' + 'Pas de réponse électronique retournée.'; break;
+    }
+
+    ResponseList += responsemess + '\n';
+    ResponseList += pResp.g07 + '\n'; //Disposition Message
+
+    var errorCodesNum = pResp.g06;
+    ResponseList += 'Nombre d\'erreurs : ' + errorCodesNum + '\n';
+    for (var i = 0; i < errorCodesNum; i++)
+    {
+        var errorCode = pResp.g08[i];
+        ResponseList += 'Erreur No: ' + CdaCommGetCDANETMessage(errorCode) + '\n';
+    }
+
+    var messageCount = pResp.g31;
+    if (messageCount > 0)
+    {
+        ResponseList += 'Messages  (' + messageCount + ')' + '\n';
+        for (var j = 0; j < messageCount; j++)
+        {
+            var displayMessage = pResp.g32[j];
+            ResponseList += displayMessage + '\n';
+        }
+
+    }
+
 
     return ResponseList;
 }
@@ -1862,6 +1996,20 @@ function CdaV4GetResponseListForEmail(pResp)
 {
     var ResponseList = '';
 
+    ResponseList +='Réponse par courriel CDANET' + '/n';
+    ResponseList +='Date : ' + CdaCommConvertDate('00000000'); //Current date?
+    var gTransref = pResp.g54;
+    ResponseList +='No de référence : ' + gTransref;
+
+    var emailOfficeNumber = pResp.g48;
+    ResponseList +='No de groupe : ' + emailOfficeNumber;
+
+    // Continue here
+    //ResponseList.add('Destinataire :' + copy(responseline, 43, 60));
+    //ConsultPatient.CdaInfoTbemailTo.asstring := copy(responseline, 43,60);
+    //ResponseList.add('Expéditeur   :' + copy(responseline, 103, 60));
+    //ConsultPatient.CdaInfoTbemailFrom.asstring := copy(responseline, 103,60);
+    //ResponseList.add('Objet        :' + copy(responseline, 163, 60));
     return ResponseList;
 }
 //18
@@ -1872,7 +2020,7 @@ function CdaV4GetResponseListForEligibility(pResp) {
 }
 
 
-    //============================================= Comon functions =============================================
+    //============================================= Common functions =============================================
     //returns current date in "YYYYMMDD" format.
     function CDAV4GetCurrentDate() {
         var date = '';
