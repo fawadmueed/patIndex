@@ -32,13 +32,15 @@ var globRamqObjCredentials;
 var globClinicId = "";
 var globPatientId = "";
 var globNoDossier = "";
+var globDentist = "";
 
-
+//Page load
 $(function () {
     //Get parameters from url and put it in global variable
     globClinicId = GetParamFromUrl("clinicId");
     globPatientId = GetParamFromUrl("patientId");
     globNoDossier = GetParamFromUrl("dossierNo");
+    globDentist = GetParamFromUrl("dentist");
 });
 
 function RamqCheckCredentials()
@@ -139,7 +141,7 @@ function GetParamFromUrl(name) {
     //TODO: uncomment for production.
     // var url = location.href;
     //var url = window.location.href;
-    var url = "http://myserver/action?clinicId=AGP18011&patientId=234577&dossierNo=39";// For test only.
+    var url = "http://myserver/action?clinicId=AGP18011&patientId=234577&dossierNo=000192&dentist=MM";// For test only.
 
     if (!url) url = location.href;
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
