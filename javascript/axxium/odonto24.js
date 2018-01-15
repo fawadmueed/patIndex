@@ -567,7 +567,7 @@
   {
 	ctx.strokeStyle = "#"+aColor;
 	ctx.fillStyle = "#"+aColor;
-	console.log(aList);
+	// console.log(aList);
 	
       	for (cd in aList)
       	{

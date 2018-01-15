@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title><meta charset="utf-8" />
+	<meta charset="utf-8" />
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
 
   <title>Axxium | Sans-papier</title>
 
@@ -40,6 +41,8 @@
    <script src="https://cdn.datatables.net/buttons/1.4.2/js/buttons.html5.min.js"></script>
 
 
+
+
 </head>
 <body>
 	<div class="example">
@@ -64,17 +67,17 @@
   	    <div class="three wide column">
 		    <div class="ui vertical fluid tabular menu">
 		      <a class=" item" data-tab="Dashboard">Dashboard</a>
-		      <a class="item" data-tab="Insurances">Insurances</a>
-		      <a class="active item" data-tab="MachindID">RamQ Credentials</a>
+		      <a class="active item" data-tab="Insurances">Insurances</a>
+		      <a class=" item" data-tab="MachindID">RamQ Credentials</a>
 		      <a class="item" data-tab="About">About</a>
 		    </div>
   		</div>
 		 <div class="twelve wide stretched column">
 
-		  <div class="ui tab teal segment" data-tab="Insurances">
+		  <div class="ui tab active teal segment" data-tab="Insurances">
 		  			<table class="ui table" id="insr_tbl" width="100%">
 		      		<thead>
-		      			<th>Code</th>
+		      			<th data-code="code">Code</th>
 		      			<th>No Id</th>
 		      			<th>Nom</th>
 		      			<th>Adresse</th>
@@ -113,7 +116,7 @@
 		      			<div class="twelve wide column"></div>
 		      			<div class="four wide column">
 		      				<div class="ui tiny button teal" onclick="modAdInsr()">Ajouter</div>	
-		      			
+		      				<div class="ui tiny button teal" onclick="modTest()">Test</div>	
 		      			
 		      				<div class="ui tiny button teal">Supprimer</div>	
 		      			</div>
@@ -122,14 +125,16 @@
 		      	</div>
 		    </div>
 
+
+
 		    <div class="ui tab teal segment" data-tab="Dashboard">
-		  		Dashboard
+		  		<h3 style="text-align: center;">Welcome to Dashboard</h3>
 
 		    </div>
 		    <script type="text/javascript">
 		    	
 		    </script>
-		    <div class="ui active tab teal segment" data-tab="MachindID">
+		    <div class="ui tab teal segment" data-tab="MachindID">
 		    	<div class="ui grid">
 		    		<div class="row">
 		    			<div class="seven wide column">
@@ -232,11 +237,11 @@
   						<div class="fields">
   								<div class="field">
 	  								<label>Code</label>
-	  								<input type="text" name="">
+	  								<input type="text" name="code">
   								</div>
   								<div class="field">
 	  								<label>ID</label>
-	  								<input type="text" name="">
+	  								<input type="text" name="numera_id">
   								</div>
   								<div class="field">
 	  								<label>#Prochaine Transaction</label>
@@ -246,32 +251,32 @@
 						<div class="two fields">
 						<div class="six wide field">
 							<label>Nom</label>
-							<input type="text" name="">
+							<input type="text" name="nom">
   						</div>
   						<div class="ten wide field">
 							<label>Adresse</label>
-							<input type="text" name="">
+							<input type="text" name="adress">
   						</div>
   					</div>
   						<div class="two fields">
   						<div class="field">
 							<label>Ville</label>
-							<input type="text" name="">
+							<input type="text" name="ville">
   						</div>
   							
   								<div class="field">
 									<label>Province</label>
-									<input type="text" name="">
+									<input type="text" name="prov">
   								</div>
   								<div class="field">
 									<label>Code postal</label>
-									<input type="text" name="">
+									<input type="text" name="postal">
   								</div>
   							</div>		
 
   						<div class="four wide field">
 							<label>Téléphone</label>
-							<input type="text" name="">
+							<input type="text" name="tel">
   						</div>
   						<div class="two fields">
   						<div class="field">
@@ -280,14 +285,14 @@
   						</div>
   						<div class="field">
 							<label>Remarque</label>
-							<input type="text" name="">
+							<input type="text" name="remarque">
   						</div>
   					</div>
   				</div>
   				<div class="ui form orange segment">
   					<h4>Opérations acceptées</h4>
   					<div class="two fields"	>
-  						<div class="inline field"	>
+  						<div class="inline field">
   							<input type="checkbox" name="">
   							<label>Annulation</label>	
   						</div>
@@ -326,7 +331,7 @@
 					<h4>Réseau</h4>	
 					<div class="field">
 						<label>Fournisseur de réseau</label>
-						<select class="four wide field">
+						<select class="four wide field" name="carrier">
 							<option>AHI</option>
 							<option>NDC</option>
 							<option>Dentaide</option>
@@ -370,7 +375,7 @@
 
   
 </body>
-<script type="text/javascript">
+<!-- <script type="text/javascript">
 
 var insuranceData;
      $.ajax({
@@ -382,7 +387,7 @@ var insuranceData;
     insuranceData=data;
    }
  })
-console.log(insuranceData);
+// console.log(insuranceData);
 
 var insuranceData_Array=[];
  $.each(insuranceData,function(key,val){
@@ -401,7 +406,7 @@ var insuranceData_Array=[];
  	insuranceData_Array.push(temp_Array);
  })
 
- console.log(insuranceData_Array);
+ // console.log(insuranceData_Array);
 
 $(document).ready(function() {
 
@@ -409,7 +414,20 @@ $(document).ready(function() {
     	data:insuranceData_Array
 	})
 
+
+
 } );
+
+
+$(document).on('click','#insr_tbl_body tr', function(){
+	// console.log($(this).tr());
+	this_tr=$(this).closest('tr');
+	this_tds=$(this_tr).children();
+	$.each(this_tds,function(key,val){
+		console.log($(val).text());
+	})
+
+});
 
 function populateInsrTable(){
 
@@ -432,13 +450,29 @@ $('tabular.menu .item').on('ready', function() {
   })
 ;
          
-$('.tabular.menu .item').tab();
+
 
 function modAdInsr(){
 	$('.modal.modalAdInsr').modal('show');
 }
 
 
+</script> -->
+<!-- ====TEST=================xxxx -->
+
+<script type="text/javascript">
+	
+	function modTest(){
+		$('.modalCdan2.modal').modal('show');
+	}
+</script>
+ <!-- ====TEST=================xxxx -->
+
+
+
+<script src="javascript/axxium/insurance_tbl.js"></script>
+<script type="text/javascript">
+	$('.tabular.menu .item').tab();
 </script>
 </body>
 </html>

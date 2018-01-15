@@ -19,7 +19,4 @@
   {
     $('.modalFactAnticip').modal('show')
   }
-    function modCdan()
-  {
-    $('.modalCdan').modal('show')
-  }
+  
