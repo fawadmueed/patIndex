@@ -307,6 +307,7 @@
 	
 			if(insurance == 'BES' || insurance == 'AMQ') {
 				if($.inArray(code, regiecodes) == -1) {
+					// -1 If Not Found , if its not -1 its FOUND
 					console.log(code);
 					warnMsg(msgerror.msg0162.replace("@@", code));
 						return false;	

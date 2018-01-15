@@ -137,7 +137,7 @@ function newRecordFact(){
           case 'codeRole':
 
           
-              tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i]).text(1)
+              tblData=$('<td>').attr('contenteditable','true').attr('data-target',fields[i])
               .bind('keypress', function (e)
               {
                 if(e.which == 13) {
