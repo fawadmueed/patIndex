@@ -1,6 +1,6 @@
 //var globCdaReq4Obj = {};
 
-var globCdaV4TransType = 'Claim';
+//var globCdaV4TransType = 'Claim';
 var globCdaV4g01 = '';
 
 function CdaV4SendRequestToCdaNet() {
@@ -10,6 +10,21 @@ function CdaV4SendRequestToCdaNet() {
 function CdaV4CallCDAService() {
     var strRequest = CdaV4CreateRequestString();
     // TODO: call WebService and send strRequest as a parameter.
+
+    var inputXMl = {
+        "request" : strRequest, //request to send
+        "info" : { 'NoSeq' : '', 'Description' : '', 'NoDossier': '', 'Prenom' : '', 'Nom':'', 'Ass': '', 'Couver' : '', 'Date': '', 'NoRef': ''} // JSON data
+    };
+
+    $.post("allScriptsv1.py", {tx: "sendInsurance", clinicId: 'AGP18011', patientId: '234577', nodossier: 'ABC444' , nofact: '1', lun : '000', json: JSON.stringify(inputXMl)}, 
+        function(result){
+            var xml = result.message;
+            $("#message").append(xml);
+        });
+
+
+
+
 
     var responseLine = 'xxxxxxxxxxxxxxxxxxxx21xxxxxx';
     var objResp = CdaV4ReadResponse(responseLine);
@@ -24,13 +39,13 @@ function CdaV4CallCDAService() {
 //Returns request string depends on transaction type.
 function CdaV4CreateRequestString() {
     var strRequest = "";
-    switch (transactionType) {
+    switch (globCdanetTranscode) {
         case "Eligibility":
             {
                 strRequest = CdaV4CreateEligibilityRequest();
             }
             break;
-        case "Claim":
+        case "1"://"Claim"
             {
                 strRequest = CdaV4CreateClaimRequest();
             }
@@ -40,7 +55,7 @@ function CdaV4CreateRequestString() {
                 strRequest = CdaV4CreateCOBClaimRequest();
             }
             break;
-        case "ClaimReversal":
+        case "2"://"ClaimReversal":
             {
                 strRequest = CdaV4CreateClaimReversalRequest();
             }
@@ -1997,24 +2012,89 @@ function CdaV4GetResponseListForEmail(pResp)
     var ResponseList = '';
 
     ResponseList +='Réponse par courriel CDANET' + '/n';
-    ResponseList +='Date : ' + CdaCommConvertDate('00000000'); //Current date?
+    ResponseList += 'Date : ' + CdaCommConvertDate('00000000') + '\n';; //Current date?
+
     var gTransref = pResp.g54;
-    ResponseList +='No de référence : ' + gTransref;
+    ResponseList += 'No de référence : ' + gTransref + '\n';
 
     var emailOfficeNumber = pResp.g48;
-    ResponseList +='No de groupe : ' + emailOfficeNumber;
+    ResponseList += 'No de groupe : ' + emailOfficeNumber + '\n';
 
-    // Continue here
-    //ResponseList.add('Destinataire :' + copy(responseline, 43, 60));
-    //ConsultPatient.CdaInfoTbemailTo.asstring := copy(responseline, 43,60);
-    //ResponseList.add('Expéditeur   :' + copy(responseline, 103, 60));
-    //ConsultPatient.CdaInfoTbemailFrom.asstring := copy(responseline, 103,60);
-    //ResponseList.add('Objet        :' + copy(responseline, 163, 60));
+    var emailTo = pResp.g49;
+    ResponseList += 'Destinataire :' + emailTo + '\n';
+
+    var emailFrom = pResp.g50;
+    ResponseList += 'Expéditeur :' + emailFrom + '\n';
+
+    var emailSubject = pResp.g51;
+    ResponseList.add('Objet: ' + emailFrom) + '\n';
+
+    var emailNoteLinesNum = pResp.g52;
+    for (var i = 0; i < emailNoteLinesNum; i++)
+    {
+        var emailNoteLine = pResp.g53[i];
+        ResponseList += emailNoteLine + '\n';
+    }
+    
+
     return ResponseList;
 }
 //18
 function CdaV4GetResponseListForEligibility(pResp) {
     var ResponseList = '';
+
+    ResponseList +='Réponse à l\'interrogation sur l\'admissibilité'+ '\n';
+    var gTransref = pResp.g01;
+    ResponseList += 'No de Référence: ' + gTransref;
+
+    var responsestatus = pResp.g05;
+    var responsemess = '';
+    var errorCodeNum = 0;
+    switch(responsemess)
+    {
+        case 'E':
+        case 'M':
+            responsemess = 'Patient admissible à la date soumise...';
+            break;
+        case 'R':
+            {
+                errorCodeNum = pResp.g06;
+                if(errorCodeNum = 0)
+                    responsemess =  'Patient inadmissible...'
+                else
+                    responsemess = 'Il y a des erreurs dans la demande...Veuillez corriger les erreurs avant de la re-soumttre'; 
+
+            }
+            break;
+    }
+    ResponseList += responsemess + '\n';
+    var disposition = pResp.g07;
+    ResponseList += disposition + '\n';
+
+    if (errorCodeNum > 0)
+    {
+        ResponseList += 'Nombre d\'erreurs : ' + errorCodeNum + '\n';
+    }
+
+    for (var i = 0; i < errorCodeNum; i++)
+    {
+        var errorCode = pResp.g08[i];
+        ResponseList += 'Erreur No: ' + CdaCommGetCDANETMessage(errorCode) + '\n';
+    }
+
+    var messageCount = pResp.g31;
+    if (messageCount > 0)
+    {
+        ResponseList += 'Messages  (' + messageCount + ')' 
+        for (var j = 0; j < messageCount; j++)
+        {
+            var displayMessage = CdaCommFrompage850(pResp.g32[j]);
+            ResponseList += displayMessage + '\n';
+        }
+    }
+
+    var formId = pResp.g42;
+    ResponseList.add('Type de Formulaire  à imprimer :' + CdaCommGetFormToPrint(formId)) + '\n';
 
     return ResponseList;
 }
@@ -2347,6 +2427,53 @@ function CdaV4GetResponseListForEligibility(pResp) {
                 count++;
         }
         return count;
+    }
+
+    function CdaV4GetTransactionName(pTransNumber) {
+        var transName = '';
+
+        //TODO: Translate to french.
+        switch (pTransNumber) {
+            case '1':
+            case '01': transName = 'Claim'; break;
+
+            case '11': transName = 'Claim Acknowledgment'; break;
+            case '21': transName = 'Explanation of Benefit'; break;
+
+            case '2':
+            case '02': transName = 'Reversal'; break;
+
+            case '12': transName = 'Reversal Response'; break;
+
+            case '3':
+            case '03': transName = 'Predetermination'; break;
+
+            case '13': transName = 'Predetermination Acknowledgment'; break;
+            case '23': transName = 'Predetermination Explanation of Benefit'; break;
+
+            case '4': transName = ''; break;
+            case '04': transName = 'Request for Outstanding Transactions'; break;
+
+            case '14': transName = 'Response to Request for Outstanding Transactions'; break;
+
+            case '5':
+            case '05': transName = 'Request for Summary Reconciliation'; break;
+
+            case '15': transName = 'Summary Reconciliation Transaction'; break;
+
+            case '6':
+            case '06': transName = 'Request for Payment Reconciliation'; break;
+
+            case '7': transName = ''; break;
+            case '07': transName = 'Coordination of Benefit Claim'; break;
+
+            case '8':
+            case '08': transName = 'Eligibility'; break;
+
+            case '18': transName = 'Eligibility Response'; break;
+
+        }
+        return transName;
     }
 
 

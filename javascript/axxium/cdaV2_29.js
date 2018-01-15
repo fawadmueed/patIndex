@@ -9,14 +9,27 @@ function CdaV2SendRequestToCdaNet() {
 function CdaV2CallCDAService()
 {
     var strRequest = CdaV2CreateRequestString();
-    // TODO: call WebService and send strRequest as a parameter.
+    var randomNum = CdaCommCreateRandomNumber(0, 999);
 
-    var responseLine = 'xxxxxxxxxxxxxxxxxxxx21xxxxxx';
-    var objResp = CdaV2ReadResponse(responseLine);
-    var respMessage = CdaV2CreateRespMessage(objResp, responseLine);
-    CdaCommShowResp(respMessage);
-    //CdaCommShowResp(objResp);
+    var inputXMl = {
+        "request": strRequest, //request to send
+        //"info": { 'NoSeq': globCdaDataFromDB.a02, 'Description': CdaV2GetTransactionName(), 'NoDossier': globNoDossier, 'Prenom': globVisionRData.PrePers, 'Nom': globVisionRData.NomPers, 'Ass': globVisionRData.InsTypeList[0], 'Couver': '', 'Date': CdaCommConvertDate('00000000') } // JSON data
+        "info": { 'Prenom': globVisionRData.PrePers, 'Nom': globVisionRData.NomPers, 'Ass': globVisionRData.InsTypeList[0] } // JSON data
+    };
 
+    $.post("allScriptsv1.py", { tx: "sendInsurance", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, lun: randomNum, json: JSON.stringify(inputXMl) },
+        function (result) {
+            if (result.outcome === 'error')
+                alert(result.message);
+            else
+            {
+                var responseLine = result.message;
+                var objResp = CdaV2ReadResponse(responseLine);
+                var respMessage = CdaV2CreateRespMessage(objResp, responseLine);
+                CdaCommShowResp(respMessage);
+            }
+            
+        });
 }
 
 //============================================= Create request string =============================================
@@ -384,6 +397,8 @@ function CdaV2PopulatePendedClaimsObj() {
 //============================================= Read and Parse response ============================================= 
 
 function CdaV2ReadResponse(pResponse) {
+
+
     var res = {};
     var transCode = '';
     if (pResponse) {
@@ -1037,6 +1052,43 @@ function CdaV2GetResponseListForEligibil(pResp) {
     }
 
     return ResponseList;
+}
+
+function CdaV2GetTransactionName() {
+    var transName = '';
+
+    //TODO: Translate to french.
+    switch (globCdanetTranscode) {
+        case '': transName = ''; break;
+        case '00': transName = 'Eligibility'; break;
+
+        case '1':
+        case '01': transName = 'Réclamation'; break;
+
+        case '10': transName = 'Eligibility Response'; break;
+
+
+        case '11': transName = 'Claim Response'; break;
+        case '21': transName = 'Explanation of Benefit'; break;
+
+        case '31': transName = 'Coordination of Benefit Claim'; break;
+
+        case '2':
+        case '02': transName = 'Annulation'; break;
+
+        case '12': transName = 'Reversal Response'; break;
+
+        case '3':
+        case '03': transName = 'Predetermination'; break;
+
+        case '13': transName = 'Response to Pre-Determination'; break;
+        case '23': transName = 'Coordination of Benefit Pre-Determination'; break;
+
+        case '4': transName = ''; break;
+        case '04': transName = 'Request for Pended Claims'; break;
+
+    }
+    return transName;
 }
 
 
