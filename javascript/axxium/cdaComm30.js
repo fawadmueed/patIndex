@@ -28,9 +28,9 @@ function CdaCommShowResp(pRespMessage)
     //para.document.write(message);
     ////var node = document.createTextNode(message);
     //para.appendChild(node);
-
-    
     //div.appendChild(para);
+
+    //Show modal
     modResponseCDANET();
 }
 
@@ -75,30 +75,30 @@ function CdaCommTopage850(pString) {
         for (var i = 0; i < arrString.length; i++) {
             code = arrString[i].charCodeAt(0);
             switch (arrString[i]) {
-                case 'É': code = 144; break;
-                case 'È': code = 212; break;
-                case 'Ê': code = 210; break;
-                case 'À': code = 183; break;
-                case 'Â': code = 182; break;
-                case 'Ï': code = 216; break;
-                case 'Î': code = 215; break;
-                case 'Ô': code = 226; break;
-                case 'Ö': code = 153; break;
-                case 'Û': code = 234; break;
-                case 'Ü': code = 154; break;
-                case 'Ç': code = 128; break;
-                case 'é': code = 130; break;
-                case 'è': code = 138; break;
-                case 'ê': code = 136; break;
-                case 'à': code = 133; break;
-                case 'â': code = 131; break;
-                case 'ï': code = 139; break;
-                case 'î': code = 140; break;
-                case 'ô': code = 147; break;
-                case 'ö': code = 148; break;
-                case 'û': code = 150; break;
-                case 'ü': code = 129; break;
-                case 'ç': code = 135; break;
+                case 'Ã‰': code = 144; break;
+                case 'Ãˆ': code = 212; break;
+                case 'ÃŠ': code = 210; break;
+                case 'Ã€': code = 183; break;
+                case 'Ã‚': code = 182; break;
+                case 'Ã': code = 216; break;
+                case 'ÃŽ': code = 215; break;
+                case 'Ã”': code = 226; break;
+                case 'Ã–': code = 153; break;
+                case 'Ã›': code = 234; break;
+                case 'Ãœ': code = 154; break;
+                case 'Ã‡': code = 128; break;
+                case 'Ã©': code = 130; break;
+                case 'Ã¨': code = 138; break;
+                case 'Ãª': code = 136; break;
+                case 'Ã ': code = 133; break;
+                case 'Ã¢': code = 131; break;
+                case 'Ã¯': code = 139; break;
+                case 'Ã®': code = 140; break;
+                case 'Ã´': code = 147; break;
+                case 'Ã¶': code = 148; break;
+                case 'Ã»': code = 150; break;
+                case 'Ã¼': code = 129; break;
+                case 'Ã§': code = 135; break;
             }
             arrString[i] = String.fromCharCode(code);
         }
@@ -114,70 +114,70 @@ function CdaCommFrompage850(pString) {
         for (var i = 0; i < arrString.length; i++) {
             code = arrString[i].charCodeAt(0);
             switch (code) {
-                case 144: arrString[i] = 'É'; break;
-                case 212: arrString[i] = 'È'; break;
-                case 210: arrString[i] = 'Ê'; break;
-                case 211: arrString[i] = 'Ë'; break;
-                case 183: arrString[i] = 'À'; break;
-                case 182: arrString[i] = 'Â'; break;
-                case 181: arrString[i] = 'Á'; break;
-                case 142: arrString[i] = 'Ä'; break;
-                case 143: arrString[i] = 'Å'; break;
-                case 146: arrString[i] = 'Æ'; break;
-                case 216: arrString[i] = 'Ï'; break;
-                case 215: arrString[i] = 'Î'; break;
-                case 222: arrString[i] = 'Ì'; break;
-                case 214: arrString[i] = 'Í'; break;
+                case 144: arrString[i] = 'Ã‰'; break;
+                case 212: arrString[i] = 'Ãˆ'; break;
+                case 210: arrString[i] = 'ÃŠ'; break;
+                case 211: arrString[i] = 'Ã‹'; break;
+                case 183: arrString[i] = 'Ã€'; break;
+                case 182: arrString[i] = 'Ã‚'; break;
+                case 181: arrString[i] = 'Ã'; break;
+                case 142: arrString[i] = 'Ã„'; break;
+                case 143: arrString[i] = 'Ã…'; break;
+                case 146: arrString[i] = 'Ã†'; break;
+                case 216: arrString[i] = 'Ã'; break;
+                case 215: arrString[i] = 'ÃŽ'; break;
+                case 222: arrString[i] = 'ÃŒ'; break;
+                case 214: arrString[i] = 'Ã'; break;
 
-                case 226: arrString[i] = 'Ô'; break;
-                case 153: arrString[i] = 'Ö'; break;
-                case 224: arrString[i] = 'Ó'; break;
-                case 227: arrString[i] = 'Ò'; break;
-                case 229: arrString[i] = 'Õ'; break;
+                case 226: arrString[i] = 'Ã”'; break;
+                case 153: arrString[i] = 'Ã–'; break;
+                case 224: arrString[i] = 'Ã“'; break;
+                case 227: arrString[i] = 'Ã’'; break;
+                case 229: arrString[i] = 'Ã•'; break;
 
-                case 235: arrString[i] = 'Ù'; break;
-                case 233: arrString[i] = 'Ú'; break;
-                case 234: arrString[i] = 'Û'; break;
-                case 154: arrString[i] = 'Ü'; break;
+                case 235: arrString[i] = 'Ã™'; break;
+                case 233: arrString[i] = 'Ãš'; break;
+                case 234: arrString[i] = 'Ã›'; break;
+                case 154: arrString[i] = 'Ãœ'; break;
 
-                case 128: arrString[i] = 'Ç'; break;
-                case 237: arrString[i] = 'Ý'; break;
+                case 128: arrString[i] = 'Ã‡'; break;
+                case 237: arrString[i] = 'Ã'; break;
 
-                case 130: arrString[i] = 'é'; break;
-                case 138: arrString[i] = 'è'; break;
-                case 136: arrString[i] = 'ê'; break;
-                case 137: arrString[i] = 'ë'; break;
+                case 130: arrString[i] = 'Ã©'; break;
+                case 138: arrString[i] = 'Ã¨'; break;
+                case 136: arrString[i] = 'Ãª'; break;
+                case 137: arrString[i] = 'Ã«'; break;
 
-                case 133: arrString[i] = 'à'; break;
-                case 131: arrString[i] = 'â'; break;
-                case 160: arrString[i] = 'á'; break;
-                case 198: arrString[i] = 'ã'; break;
-                case 132: arrString[i] = 'ä'; break;
-                case 134: arrString[i] = 'å'; break;
-                case 145: arrString[i] = 'æ'; break;
+                case 133: arrString[i] = 'Ã '; break;
+                case 131: arrString[i] = 'Ã¢'; break;
+                case 160: arrString[i] = 'Ã¡'; break;
+                case 198: arrString[i] = 'Ã£'; break;
+                case 132: arrString[i] = 'Ã¤'; break;
+                case 134: arrString[i] = 'Ã¥'; break;
+                case 145: arrString[i] = 'Ã¦'; break;
 
-                case 139: arrString[i] = 'ï'; break;
-                case 140: arrString[i] = 'î'; break;
-                case 141: arrString[i] = 'ì'; break;
-                case 161: arrString[i] = 'í'; break;
+                case 139: arrString[i] = 'Ã¯'; break;
+                case 140: arrString[i] = 'Ã®'; break;
+                case 141: arrString[i] = 'Ã¬'; break;
+                case 161: arrString[i] = 'Ã­'; break;
 
-                case 147: arrString[i] = 'ô'; break;
-                case 148: arrString[i] = 'ö'; break;
-                case 149: arrString[i] = 'ò'; break;
-                case 228: arrString[i] = 'õ'; break;
-                case 162: arrString[i] = 'ó'; break;
+                case 147: arrString[i] = 'Ã´'; break;
+                case 148: arrString[i] = 'Ã¶'; break;
+                case 149: arrString[i] = 'Ã²'; break;
+                case 228: arrString[i] = 'Ãµ'; break;
+                case 162: arrString[i] = 'Ã³'; break;
 
-                case 208: arrString[i] = 'ð'; break;
+                case 208: arrString[i] = 'Ã°'; break;
 
-                case 150: arrString[i] = 'û'; break;
-                case 129: arrString[i] = 'ü'; break;
-                case 151: arrString[i] = 'ù'; break;
-                case 163: arrString[i] = 'ú'; break;
+                case 150: arrString[i] = 'Ã»'; break;
+                case 129: arrString[i] = 'Ã¼'; break;
+                case 151: arrString[i] = 'Ã¹'; break;
+                case 163: arrString[i] = 'Ãº'; break;
 
-                case 152: arrString[i] = 'ÿ'; break;
-                case 236: arrString[i] = 'ý'; break;
+                case 152: arrString[i] = 'Ã¿'; break;
+                case 236: arrString[i] = 'Ã½'; break;
 
-                case 135: arrString[i] = 'ç'; break;
+                case 135: arrString[i] = 'Ã§'; break;
             }
         }
     }
@@ -190,141 +190,141 @@ function CdaCommGetCDANETMessage(p)
     var temp = '';
     switch (p)
     {
-        case '001': temp = '(001) Préfixe de transaction absent ou invalide '; break;
-        case '002': temp = '(002) No. de demande ou de séquence absent ou invalide '; break;
+        case '001': temp = '(001) PrÃ©fixe de transaction absent ou invalide '; break;
+        case '002': temp = '(002) No. de demande ou de sÃ©quence absent ou invalide '; break;
         case '003': temp = '(003) No. de version absent ou invalide '; break;
         case '004': temp = '(004) Code de transaction absent ou invalide '; break;
         case '005': temp = '(005) No. d\'identification de l\'assureur absent ou invalide '; break;
         case '006': temp = '(006) No du logiciel dentaire absent ou invalide'; break;
-        case '007': temp = '(007) No. du dentiste attribué par ACDQ absent ou invalide '; break;
-        case '008': temp = '(008) No. de cabinet attribué par ACDQ absent ou invalide '; break;
-        case '009': temp = '(009) No. de police ou régime(premier assureur) absent ou invalide '; break;
+        case '007': temp = '(007) No. du dentiste attribuÃ© par ACDQ absent ou invalide '; break;
+        case '008': temp = '(008) No. de cabinet attribuÃ© par ACDQ absent ou invalide '; break;
+        case '009': temp = '(009) No. de police ou rÃ©gime(premier assureur) absent ou invalide '; break;
         case '010': temp = '(010) No. de section ou de division absent ou invalide '; break;
         case '011': temp = '(011) No. du titulaire de l\'assurance absent ou invalide '; break;
-        case '012': temp = '(012) Code de lien de parenté absent ou invalide '; break;
+        case '012': temp = '(012) Code de lien de parentÃ© absent ou invalide '; break;
         case '013': temp = '(013) Sexe du patient absent ou invalide '; break;
         case '014': temp = '(014) Date de naissance du patient absente ou invalide '; break;
         case '015': temp = '(015) Nom du patient absent '; break;
-        case '016': temp = '(016) Prénom du patient absent '; break;
-        case '017': temp = '(017) Code indiquant exception quant à l\'admissibilité absent ou invalide '; break;
-        case '018': temp = '(018) Nom d\'établissement scolaire absent '; break;
+        case '016': temp = '(016) PrÃ©nom du patient absent '; break;
+        case '017': temp = '(017) Code indiquant exception quant Ã  l\'admissibilitÃ© absent ou invalide '; break;
+        case '018': temp = '(018) Nom d\'Ã©tablissement scolaire absent '; break;
         case '019': temp = '(019) Nom de famille du titulaire absent ou non conforme au dossier '; break;
-        case '020': temp = '(020) Prénom de famille du titulaire absent ou non conforme au dossier '; break;
+        case '020': temp = '(020) PrÃ©nom de famille du titulaire absent ou non conforme au dossier '; break;
         case '021': temp = '(021) Adresse du titulaire de l\'assurance absente '; break;
         case '022': temp = '(022) Ville du titulaire de l\'assurance absente '; break;
         case '023': temp = '(023) Code postal du titulaire de l\'assurance absent ou invalide '; break;
         case '024': temp = '(024) Langue du titulaire de l\'assurance invalide '; break;
         case '025': temp = '(025) Date de naissance du titulaire de l\'assurance absente ou invalide '; break;
         case '026': temp = '(026) No. du second assureur invalide '; break;
-        case '027': temp = '(027) No. de police ou régime(second assureur) absent ou invalide '; break;
+        case '027': temp = '(027) No. de police ou rÃ©gime(second assureur) absent ou invalide '; break;
         case '028': temp = '(028) No. de division ou section (second assureur)absent ou invalide '; break;
         case '029': temp = '(029) No. du titulaire(second assureur) absent ou invalide '; break;
         case '030': temp = '(030) Date de naissance du titulaire(second assureur) absente ou invalide '; break;
-        case '031': temp = '(031) Demande doit être d\'abord soumise au second assureur(second assureur=premier assureur) '; break;
+        case '031': temp = '(031) Demande doit Ãªtre d\'abord soumise au second assureur(second assureur=premier assureur) '; break;
         case '032': temp = '(032) Destinataire du paiement absent ou invalide '; break;
         case '033': temp = '(033) Date de l\'accident invalide '; break;
-        case '034': temp = '(034) Nombre d\'actes exécutés absent ou invalide '; break;
+        case '034': temp = '(034) Nombre d\'actes exÃ©cutÃ©s absent ou invalide '; break;
         case '035': temp = '(035) Code de l\'acte absent ou invalide '; break;
-        case '036': temp = '(036) Date à laquelle l\'acte a été executé absente ou invalide '; break;
+        case '036': temp = '(036) Date Ã  laquelle l\'acte a Ã©tÃ© executÃ© absente ou invalide '; break;
         case '037': temp = '(037) No. international de dent, de sextant, de quadrant ou site absent ou invalide '; break;
         case '038': temp = '(038) Surface de la dent absente ou invalide '; break;
         case '039': temp = '(039) Date de la mise en bouche initiale au maxillaire absente ou invalide '; break;
-        case '040': temp = '(040) Réponse absente ou invalide :Le traitement est-il requis en vue de soins d\'orthodonthie?'; break;
-        case '041': temp = '(041) Honoraires demandés par le dentiste absents ou invalides '; break;
+        case '040': temp = '(040) RÃ©ponse absente ou invalide :Le traitement est-il requis en vue de soins d\'orthodonthie?'; break;
+        case '041': temp = '(041) Honoraires demandÃ©s par le dentiste absents ou invalides '; break;
         case '042': temp = '(042) Frais de laboratoire absents ou invalides '; break;
-        case '043': temp = '(043) Unité de temps absente ou invalide '; break;
-        case '044': temp = '(044) Longueur du message indiquée non identique à la longueur du message reçu'; break;
-        case '045': temp = '(045) Indicateur de courrier électronique absent ou invalide '; break;
-        case '046': temp = '(046) No. de référence de la demande de prestations absent ou invalide '; break;
-        case '047': temp = '(047) Le dentiste n\'a pas accés au réseau ACDQ-CDANet'; break;
+        case '043': temp = '(043) UnitÃ© de temps absente ou invalide '; break;
+        case '044': temp = '(044) Longueur du message indiquÃ©e non identique Ã  la longueur du message reÃ§u'; break;
+        case '045': temp = '(045) Indicateur de courrier Ã©lectronique absent ou invalide '; break;
+        case '046': temp = '(046) No. de rÃ©fÃ©rence de la demande de prestations absent ou invalide '; break;
+        case '047': temp = '(047) Le dentiste n\'a pas accÃ©s au rÃ©seau ACDQ-CDANet'; break;
         case '048': temp = '(048) S.V.P. soummettre la demande manuellement'; break;
-        case '049': temp = '(049) Pas de réponse en suspens provenant du réseau '; break;
+        case '049': temp = '(049) Pas de rÃ©ponse en suspens provenant du rÃ©seau '; break;
         case '050': temp = '(050) No. de ligne d\'acte absent ou imvalide '; break;
         case '051': temp = '(051) No. du plan de traitement introuvable '; break;
         case '052': temp = '(052) Demande de prestations ou plan de traitement doit contenir au moins un acte'; break;
         case '053': temp = '(053) Province du titulaire absente ou invalide'; break;
-        case '054': temp = '(054) No du titulaire sur refus non conforme à la demande originale '; break;
+        case '054': temp = '(054) No du titulaire sur refus non conforme Ã  la demande originale '; break;
         case '055': temp = '(055) Anulation ne concerne pas la transaction du jour'; break;
-        case '056': temp = '(056) Code de spécialité du dentiste non conforme au dossier '; break;
-        case '057': temp = '(057) Réponse absente ou invalide :S\'agit-il de la mise en bouche initiale? '; break;
-        case '058': temp = '(058) Nombre d\'actes non conforme au nombre indqué'; break;
-        case '059': temp = '(059) Logiciel dentaire du cabinet non autorisé à transmette des transactions au réseau ACDQ-CDANet '; break;
-        case '060': temp = '(060) L\'annulation ne peut pas être acceptée maintenant.Veuillez réessayer plus tard aujourd\'hui'; break;
-        case '061': temp = '(061) Erreur du réseau.Veuillez recommencer '; break;
-        case '062': temp = '(062) Numéro du dentiste bénéficiaire du paiement absent ou invalide '; break;
-        case '063': temp = '(063) Numéro du cabinet bénéficiaire du paiement absent ou invalide '; break;
-        case '064': temp = '(064) Dentiste ayant référé le patient absent ou invalide '; break;
+        case '056': temp = '(056) Code de spÃ©cialitÃ© du dentiste non conforme au dossier '; break;
+        case '057': temp = '(057) RÃ©ponse absente ou invalide :S\'agit-il de la mise en bouche initiale? '; break;
+        case '058': temp = '(058) Nombre d\'actes non conforme au nombre indquÃ©'; break;
+        case '059': temp = '(059) Logiciel dentaire du cabinet non autorisÃ© Ã  transmette des transactions au rÃ©seau ACDQ-CDANet '; break;
+        case '060': temp = '(060) L\'annulation ne peut pas Ãªtre acceptÃ©e maintenant.Veuillez rÃ©essayer plus tard aujourd\'hui'; break;
+        case '061': temp = '(061) Erreur du rÃ©seau.Veuillez recommencer '; break;
+        case '062': temp = '(062) NumÃ©ro du dentiste bÃ©nÃ©ficiaire du paiement absent ou invalide '; break;
+        case '063': temp = '(063) NumÃ©ro du cabinet bÃ©nÃ©ficiaire du paiement absent ou invalide '; break;
+        case '064': temp = '(064) Dentiste ayant rÃ©fÃ©rÃ© le patient absent ou invalide '; break;
         case '065': temp = '(065) Code indiquant motif de la recommandation absent ou invalide '; break;
-        case '066': temp = '(066) Indicateur d\'un régime de soin absent ou invalide '; break;
-        case '067': temp = '(067) Champs se rapportant au régime NNSA absents '; break;
-        case '068': temp = '(068) Numéro de la bande absent ou invalide '; break;
-        case '069': temp = '(069) Numéro de la famille absent ou invalide '; break;
+        case '066': temp = '(066) Indicateur d\'un rÃ©gime de soin absent ou invalide '; break;
+        case '067': temp = '(067) Champs se rapportant au rÃ©gime NNSA absents '; break;
+        case '068': temp = '(068) NumÃ©ro de la bande absent ou invalide '; break;
+        case '069': temp = '(069) NumÃ©ro de la famille absent ou invalide '; break;
         case '070': temp = '(070) Odontogramme des dents manquantes, absent ou invalide '; break;
-        case '071': temp = '(071) Code indiquant parenté patient-titulaire(second assureur)absent ou invalide '; break;
+        case '071': temp = '(071) Code indiquant parentÃ© patient-titulaire(second assureur)absent ou invalide '; break;
         case '072': temp = '(072) Code indiquant type d\'acte absent ou invalide '; break;
         case '073': temp = '(073) Codes de remarques absentes ou invalides '; break;
-        case '074': temp = '(074) Date à laquelle l\'acte a été éxécuté est une date ultérieure '; break;
-        case '075': temp = '(075) Date à laquelle l\'acte a été éxécuté est au-delà d\'un an '; break;
-        case '076': temp = '(076) Groupe non accepté par l\'EDI '; break;
+        case '074': temp = '(074) Date Ã  laquelle l\'acte a Ã©tÃ© Ã©xÃ©cutÃ© est une date ultÃ©rieure '; break;
+        case '075': temp = '(075) Date Ã  laquelle l\'acte a Ã©tÃ© Ã©xÃ©cutÃ© est au-delÃ  d\'un an '; break;
+        case '076': temp = '(076) Groupe non acceptÃ© par l\'EDI '; break;
         case '077': temp = '(077) Type d\'acte non couvert par l\'assureur '; break;
         case '078': temp = '(078) Veuillez soumettre plan de traitement manuellement '; break;
         case '079': temp = '(079) Duplicata d\'une demande de prestations '; break;
         case '080': temp = '(080) Compteur des transactions par assureur absent ou invalide '; break;
-        case '081': temp = '(081) Date d\'admisibilité invalide '; break;
-        case '082': temp = '(082) Numéro de séquence ou version de la carte invalide '; break;
+        case '081': temp = '(081) Date d\'admisibilitÃ© invalide '; break;
+        case '082': temp = '(082) NumÃ©ro de sÃ©quence ou version de la carte invalide '; break;
         case '083': temp = '(083) Nom de famille du titulaire(second assureur)absent ou invalide '; break;
-        case '084': temp = '(084) Prénom du titulaire (second assureur) absent ou invalide '; break;
-        case '085': temp = '(085) Lettre initiale du second prénom du titulaire(second assureur) absente '; break;
-        case '086': temp = '(086) Première ligne de l\'adresse du titulaire (second assureur) absente '; break;
+        case '084': temp = '(084) PrÃ©nom du titulaire (second assureur) absent ou invalide '; break;
+        case '085': temp = '(085) Lettre initiale du second prÃ©nom du titulaire(second assureur) absente '; break;
+        case '086': temp = '(086) PremiÃ¨re ligne de l\'adresse du titulaire (second assureur) absente '; break;
         case '087': temp = '(087) Ville du titulaire (second assureur) absente '; break;
         case '088': temp = '(088) Province ou Etat du titulaire (second assureur) absent '; break;
         case '089': temp = '(089) Code postal ou zip du titulaire (second assureur) absent '; break;
-        case '090': temp = '(090) Réponse absente ou invalide: S\'agit-il de la mise en bouche initiale à la mandibule? '; break;
-        case '091': temp = '(091) Date de la mise en bouche initiale à la mandibule absente ou invalide '; break;
-        case '092': temp = '(092) Matériau de la prothèse au maxillaire absent ou invalide '; break;
-        case '093': temp = '(093) Matériau de la prothèse à la mandibule absent ou invalide '; break;
+        case '090': temp = '(090) RÃ©ponse absente ou invalide: S\'agit-il de la mise en bouche initiale Ã  la mandibule? '; break;
+        case '091': temp = '(091) Date de la mise en bouche initiale Ã  la mandibule absente ou invalide '; break;
+        case '092': temp = '(092) MatÃ©riau de la prothÃ¨se au maxillaire absent ou invalide '; break;
+        case '093': temp = '(093) MatÃ©riau de la prothÃ¨se Ã  la mandibule absent ou invalide '; break;
         case '094': temp = '(094) Nombre de dents extraites absent ou invalide '; break;
-        case '095': temp = '(095) Numéro de la dent extraite absent ou invalide '; break;
+        case '095': temp = '(095) NumÃ©ro de la dent extraite absent ou invalide '; break;
         case '096': temp = '(096) Date de l\'extraction absente ou invalide '; break;
-        case '097': temp = '(097) Décalage du rapprochement invalide '; break;
+        case '097': temp = '(097) DÃ©calage du rapprochement invalide '; break;
         case '098': temp = '(098) Code pour frais de laboratoire absent ou invalide '; break;
         case '099': temp = '(099) Code pour chiffrement invalide '; break;
         case '100': temp = '(100) Chiffrement invalide '; break;
-        case '101': temp = '(101) Initiale du second prénom du titulaire invalide '; break;
-        case '102': temp = '(102) Initiale du second prénom du patient invalide '; break;
-        case '103': temp = '(103) Code de la personne à charge (première assurance) absent ou invalide '; break;
-        case '104': temp = '(104) Code de la personne à charge (seconde assurance) absente ou invalide '; break;
-        case '105': temp = '(105) Numéro de séquence /version de la carte (seconde assurence) absente ou invalide '; break;
+        case '101': temp = '(101) Initiale du second prÃ©nom du titulaire invalide '; break;
+        case '102': temp = '(102) Initiale du second prÃ©nom du patient invalide '; break;
+        case '103': temp = '(103) Code de la personne Ã  charge (premiÃ¨re assurance) absent ou invalide '; break;
+        case '104': temp = '(104) Code de la personne Ã  charge (seconde assurance) absente ou invalide '; break;
+        case '105': temp = '(105) NumÃ©ro de sÃ©quence /version de la carte (seconde assurence) absente ou invalide '; break;
         case '106': temp = '(106) Langue de titulaire (seconde assurance)absente ou invalide '; break;
-        case '107': temp = '(107) Indicateur de régime (seconde assurance) absente ou invalide '; break;
+        case '107': temp = '(107) Indicateur de rÃ©gime (seconde assurance) absente ou invalide '; break;
         case '108': temp = '(108) Champs portant sur la seconde assurance absents '; break;
-        case '109': temp = '(109) Numéro de séquence (seconde assurance) absent ou invalide '; break;
+        case '109': temp = '(109) NumÃ©ro de sÃ©quence (seconde assurance) absent ou invalide '; break;
         case '110': temp = '(110) Indicateur de plan de traitement d\'orthodontie absent ou invalide '; break;
         case '111': temp = '(111) Tarif du premier examen absent ou invalide '; break;
         case '112': temp = '(112) Tarif de la phase diagnostique absent ou invalide '; break;
         case '113': temp = '(113) Paiement initial absent ou invalide '; break;
         case '114': temp = '(114) Mode de paiement absent ou invalide '; break;
-        case '115': temp = '(115) Durée du traitement absente ou invalide '; break;
-        case '116': temp = '(116) Nombre prévu de paiements absent ou invalide'; break;
-        case '117': temp = '(117) Montant prévu du paiement absent ou invalide '; break;
+        case '115': temp = '(115) DurÃ©e du traitement absente ou invalide '; break;
+        case '116': temp = '(116) Nombre prÃ©vu de paiements absent ou invalide'; break;
+        case '117': temp = '(117) Montant prÃ©vu du paiement absent ou invalide '; break;
         case '118': temp = '(118) Code des frais de laboratoire # 2 absent ou invalid '; break;
         case '119': temp = '(119) Frais de laboratoire #2 absent ou invalide '; break;
-        case '120': temp = '(120) Début prévue de traitement '; break;
-        case '121': temp = '(121) Détail des prestations(première assurance) modifié, différent de l\'original '; break;
+        case '120': temp = '(120) DÃ©but prÃ©vue de traitement '; break;
+        case '121': temp = '(121) DÃ©tail des prestations(premiÃ¨re assurance) modifiÃ©, diffÃ©rent de l\'original '; break;
         case '122': temp = '(122) Date plus disponible '; break;
-        case '123': temp = '(123) Numéro de page du rapprochement absent ou invalide '; break;
-        case '124': temp = '(124) Type de Transaction non supportée par l\'assureur '; break;
-        case '125': temp = '(125) Version de transaction non acceptée '; break;
+        case '123': temp = '(123) NumÃ©ro de page du rapprochement absent ou invalide '; break;
+        case '124': temp = '(124) Type de Transaction non supportÃ©e par l\'assureur '; break;
+        case '125': temp = '(125) Version de transaction non acceptÃ©e '; break;
         case '126': temp = '(126) Code diagnostic absent ou invalide '; break;
         case '127': temp = '(127) Code institutionnel absent ou invalide '; break;
-        case '128': temp = '(128) Numéro de page du plan de traitement courant absent ou invalide '; break;
-        case '129': temp = '(129) Numéro de page du dernier plan de traitement absent ou invalide '; break;
+        case '128': temp = '(128) NumÃ©ro de page du plan de traitement courant absent ou invalide '; break;
+        case '129': temp = '(129) NumÃ©ro de page du dernier plan de traitement absent ou invalide '; break;
         case '130': temp = '(130) Nombre du plan du dossier gouvernemental absent ou invalide '; break;
         case '131': temp = '(131) Plan du dossier gouvernemental absent ou invalide '; break;
         case '132': temp = '(132) Nombre de dossier secondaire absent ou invalide '; break;
-        case '997': temp = '(997) Dernière transaction illisible '; break;
+        case '997': temp = '(997) DerniÃ¨re transaction illisible '; break;
         case '998': temp = '(998) Pour usage futur par l\'ADC '; break;
-        case '999': temp = '(999) Erreur du système central, S.V.P. soumettre manuellement '; break;
+        case '999': temp = '(999) Erreur du systÃ¨me central, S.V.P. soumettre manuellement '; break;
 
         default:
             temp='(' + p + ') Erreur inconnue';
@@ -339,16 +339,84 @@ function CdaCommGetFormToPrint(pFormId)
     var res = '';
     switch (pFormId)
     {
-        case '01': res = 'EXPLICATION DES PRESTATIONS-RÉCLAMATION'; break;
+        case '01': res = 'EXPLICATION DES PRESTATIONS-RÃ‰CLAMATION'; break;
         case '02': res = 'DENTAIDE'; break;
-        case '03': res = 'ACCUSÉ DE RÉCEPTION-RÉCLAMATION'; break;
+        case '03': res = 'ACCUSÃ‰ DE RÃ‰CEPTION-RÃ‰CLAMATION'; break;
         case '04': res = 'FORMULAIRE DE VALIDATION PAR L\'EMPLOYEUR'; break;
         case '05': res = 'FORMULAIRE NORMAL'; break;
-        case '06': res = 'ACCUSÉ DE RÉCEPTION-PLAN DE TRAITEMENT'; break;
+        case '06': res = 'ACCUSÃ‰ DE RÃ‰CEPTION-PLAN DE TRAITEMENT'; break;
         case '07': res = 'EXPLICATION DES PRESTATIONS-PLAN DE TRAITEMENT'; break;
-        case '08': res = 'FORMULAIRE D\'ADMISSIBILITÉ'; break;
+        case '08': res = 'FORMULAIRE D\'ADMISSIBILITÃ‰'; break;
     }
     return res;
 }
 
+//returns random number, adds extra '0' to the left. Ex: 002
+function CdaCommCreateRandomNumber(min, max)
+{
+    var random =  (Math.floor(Math.random() * (max - min + 1)) + min).toString();
 
+    var len = max.toString().length;
+
+    while (random.length < len)
+    {
+        random += '0' + random;
+    }
+
+    return random;
+}
+
+function CdaCommGetCommStatus(pResponseLine)
+{
+    var CommErrormess = '';
+    var startPos = pResponseLine.indexOf(',') +1;
+    var endPos = pResponseLine.indexOf(',',startPos);
+
+    var result = parseInt(pResponseLine.substring(startPos, endPos));
+    switch(result)
+    {
+        case 1001: CommErrormess = ('Erreur interne .Consulter le fichier CDALOG.TXT pour plus de dÃ©tails'); break;
+        case 1003: CommErrormess = ('Appel interrompu par l\'utilisateur...'); break;
+        case 1011: CommErrormess = ('Cryptage non autorisÃ©.' + '\n'+ 'Le cryptage a  Ã©tÃ© dÃ©clarÃ© dans le fichier de requÃªte mais pas dans le fichier de configuration CCD.INI...'); break;
+        case 1012: CommErrormess = ('Ne peut encrypter .' + '\n' + 'Le cryptage nÃ©cessite une connexion de 8 bits alors que la connexion dÃ©clarÃ©e dans CCD.INI est de 7 bits...'); break;
+        case 1013: CommErrormess = ('Le fichier de configuration de l\'encryptage ACDQ-CDA.CFG manquant ou non valide...'); break;
+        case 1021:
+        case 1002: CommErrormess = ('DÃ©lai de composition Ã©chu.Le serveur n\'a pu Ãªtre joint...'); break;
+        case 1022: CommErrormess = ('Pas de tonalitÃ© .VÃ©rifier le branchement de la ligne ...'); break;
+        case 1023: CommErrormess = ('Ligne engagÃ©e...'); break;
+        case 1024: CommErrormess = ('Bris de communication pendant l\'attente d\'une rÃ©ponse...'); break;
+        case 1025: CommErrormess = ('Le logiciel n\'a pu Ã©tablir un protocole compatible avec le serveur CDANet...'); break;
+        case 1026: CommErrormess = ('Le serveur ne rÃ©pond pas...'); break;
+        case 1027: CommErrormess = ('La connexion DATAPACC a Ã©tÃ© annulÃ©e.Le serveur CDANet est peut Ãªtre occupÃ©.' + '\n'+ 'RÃ©essayer plus tard...'); break;
+        case 1028: CommErrormess = ('Erreur de script dans le fichier CCD.INI...'); break;
+        case 1031: CommErrormess = ('Erreur de protocole...'); break;
+        case 1032: CommErrormess = ('Erreur de dÃ©compression.Le fichier de rÃ©ponse est possiblement corrompu...'); break;
+        case 1033: CommErrormess = ('Erreur de lecture du fichier de requÃªte... '); break;
+        case 1034: CommErrormess = ('Le fichier de requÃªte n\'est pas conforme au format CDANet...'); break;
+        case 1041: CommErrormess = ('La connexion a Ã©tÃ© Ã©tablie mais le serveur CADNet a des problÃ¨mes...'); break;
+        case 1042: CommErrormess = ('La requÃªte est envoyÃ©e mais aucune rÃ©ponse n\'est reÃ§ue du serveur CDANet...'); break;
+        case 1044: CommErrormess = ('Probablement une mauvaise ligne .RÃ©essayer...'); break;
+        case 1045: CommErrormess = ('Le serveur CDANet a brusquement mis fin Ã  la communication...'); break;
+        case 1051: CommErrormess = ('Le port de communication n\'a pu Ãªtre ouvert...' + '\n' + 'Le port est mal configurÃ© ou utilisÃ© par un autre programme...'); break;
+        case 1052: CommErrormess = ('Erreur dans les paramÃ¨tres du port de communication...'); break;
+        case 1053: CommErrormess = ('Erreur d\'Ã©criture vers le port de communication...' + '\n' + 'Veuillez vÃ©rifier le modem...'); break;
+        case 1054: CommErrormess = ('Erreur de lecture Ã  partir du port de communication...'); break;
+    }
+
+
+//if result = 0 then
+//begin
+//ResponseLine := copy(ResponseLine, pos(',', ResponseLine) + 1, length(ResponseLine));
+//ResponseLine := copy(ResponseLine, pos(',', ResponseLine) + 1, length(ResponseLine));
+//end else
+//begin
+//responselist.add('Erreur de communication ' + inttostr(result));
+//responselist.add(CommErrormess);
+//CommErrormess := 'Erreur de communication ' + inttostr(result) + #13#10 +
+//   CommErrormess;
+//if (result <> 1003) and (result <> 1022) and (result <> 1023) then
+//CommErrormess := CommErrormess;
+//messagedlg(CommErrormess, mtWarning, [mbok], 0);
+//end;
+
+}
