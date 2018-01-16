@@ -1,5 +1,7 @@
 	var init_code;
 
+// ~Updated
+
  function get_type_surf(val){
  	
         // LINE 1525 u_fact2

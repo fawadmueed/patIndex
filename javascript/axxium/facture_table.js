@@ -408,6 +408,8 @@ function emptyTable (option){
   arrGrilleDeFacturation=[];
   arrGrilleDeFacturation_forms=[];
   dent_Type=''; 
+  init_code='';
+  surf_type='';
   checkDentType();
   //IMP! call Dent_type Modal again for selection in Main FactTabl
   $("#factTableBody tr").remove(); 
