@@ -1,6 +1,6 @@
 	var init_code;
 
-// ~Updated
+// ~Updated GIT F
 
  function get_type_surf(val){
  	

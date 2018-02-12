@@ -139,7 +139,7 @@
     var dent_chck=$(this).siblings("td[data-target='Dent']").text();
     var code_chck=$(this).siblings("td[data-target='Code']").text();
     
-    console.log($(this).siblings("td[data-target='Code']"));
+    // console.log($(this).siblings("td[data-target='Code']"));
     var chckDentSurf=chckDentSurfExistTbl(dent_chck,surf_chck);
     if(!chckDentSurf){
       warnMsg('Same procedure already exist. Please change Dent or Surface values');
@@ -731,7 +731,8 @@ console.log('In type surf case 3 ');
     // console.log(dent_Type);
 
     val=parseInt(val);
-    switch(dent_Type){
+    switch(dent_Type)
+    {
   
     case 'Denturologiste':
       if((val>=11 && val<=18)||(val>=21 && val<=28)||(val>=31 && val<=38)||(val>=41 && val<=48)||(val>=51 && val<=55)||(val>=61 && val<=65)||(val>=71 && val<=75)||(val>=81 && val<=88))
@@ -1004,11 +1005,11 @@ function get_age(){
 function checkInsuranceExist(compny){ 
   var validation;
 
-  $.each(insuranceData,function(key,val){
+  $.each(insuranceData,function(key,val)
+  {
     if(val.code==compny)
     { 
       validation=true;
-      
     }
 
   })
@@ -1016,7 +1017,8 @@ function checkInsuranceExist(compny){
   if (validation==true){
       return true;
   }
-  else{
+  else
+  {
     return false;
   }
   
