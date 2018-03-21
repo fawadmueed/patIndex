@@ -230,7 +230,7 @@ function RamqGetVisionRData() {
                       //Display Patient name
                       var patName = globVisionRData.PrePers + ' ' + globVisionRData.NomPers;
                       var pat_Age=get_age();
-                      $('#patNameSub').html(globNoDossier+' - '+patName +' - '+ pat_Age+' ans');
+                      $('#patName').html(globNoDossier+' - '+patName +' - '+ pat_Age+' ans');
                       populatePatientInfo();
                       // $('#patAge').html(pat_Age);
 
