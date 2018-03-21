@@ -6,34 +6,103 @@
 
 [
 
+[ {"type":"T", "desc":"Observations"},
+  {"type":"C", "desc":"Q. Médical Vérifié"},
+  {"type":"C", "desc":"Dentition H/B"},
+  {"type":"C", "desc":"1/2 Bouche"},
+  {"type":"C", "desc":"6 Dents"},
+  {"type":"C", "desc":"Implants"} ],
 
-[ {"type":"N", "desc":"Examen complet"},{"type":"T", "desc":"Observation"},{"type":"T", "desc":"Diagnostics"},{"type":"T", "desc":"Recommandations"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"T", "desc":"Diagnostics"},
+  {"type":"T", "desc":"BW / No"},
+  {"type":"T", "desc":"Périap / No"},
+  {"type":"C", "desc":"Panorex"},
+  {"type":"C", "desc":"Ceph"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"N", "desc":"Examen rappel"},{"type":"T", "desc":"Observation"},{"type":"T", "desc":"Diagnostics"},{"type":"T", "desc":"Recommandations"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Etat Normal"},
+  {"type":"T", "desc":"Carie oui"},
+  {"type":"C", "desc":"Carie non"},
+  {"type":"T", "desc":"Fracture oui"},
+  {"type":"C", "desc":"Fracture non"} ],
 
-[ {"type":"N", "desc":"Examen d'urgence"},{"type":"T", "desc":"Observation"},{"type":"T", "desc":"Diagnostics"},{"type":"T", "desc":"Recommandations"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"T", "desc":"Obturations défectueux"},
+  {"type":"T", "desc":"Endo défectueux"},
+  {"type":"T", "desc":"Dent incluse"},
+  {"type":"C", "desc":"Péricoronite aigüe"},
+  {"type":"C", "desc":"Operculite aigüe"} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Carie oui"},{"type":"C", "desc":"Carie non"},{"type":"C", "desc":"Obturations défectueux"},{"type":"C", "desc":"Endo défectueux"},{"type":"C", "desc":"Nécrose pulpaire"} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Édentation partielle"},
+  {"type":"C", "desc":"Migration Dentaire"},
+  {"type":"C", "desc":"Édentation complète"},
+  {"type":"T", "desc":"Absence Congénitale"},
+  {"type":"T", "desc":"Mobilité Dentaire"} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Fracture oui"},{"type":"C", "desc":"Fracture non"},{"type":"C", "desc":"Fistules"},{"type":"C", "desc":"Lésion périapicales"},{"type":"C", "desc":"Abcès alvéolaire"} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Nécrose pulpaire"},
+  {"type":"C", "desc":"Lésion périapicales"},
+  {"type":"C", "desc":"Abcès alvéolaire"},
+  {"type":"C", "desc":"Alvéolite aigüe"},
+  {"type":"C", "desc":"Fistules"} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Crossbite Droit"},{"type":"C", "desc":"Crosbite Gauche"},{"type":"C", "desc":"Crosbite Antérieur"},{"type":"T", "desc":"Crosbite Dent"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"T", "desc":"Abfractions"},
+  {"type":"T", "desc":"Abrasions"},
+  {"type":"T", "desc":"Attrition"},
+  {"type":"T", "desc":"Erosions"},
+  {"type":"T", "desc":"Récessions"} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Chevauchement Ant Sup"},{"type":"C", "desc":"Chevauchement Ant Inf"},{"type":"T", "desc":"Overjet mm"},{"type":"T", "desc":"Overbite %"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Ging Marg Aigue"},
+  {"type":"C", "desc":"Ging Marg Chron Déb"},
+  {"type":"C", "desc":"Ging Marg Chron Moy"},
+  {"type":"C", "desc":"Ging Marg Chron Acancée"},
+  {"type":"C", "desc":"GUNA"} ],
 
-[ {"type":"N", "desc":"Diagnostic"},{"type":"C", "desc":"Abfractions"},{"type":"C", "desc":"Abrasions"},{"type":"C", "desc":"Attrition"},{"type":"C", "desc":"Erosions"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Paro Marg Aigue"},
+  {"type":"C", "desc":"Paro Marg Chron Déb"},
+  {"type":"C", "desc":"Paro Marg Moy"},
+  {"type":"C", "desc":"Paro Marg Aigue Acancée"},
+  {"type":"T", "desc":"Poches Péridentaires"} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Diastèmes"},{"type":"C", "desc":"Absence dentaire"},{"type":"C", "desc":"Migration dentaire"},{"type":"C", "desc":"Récessions"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Diastèmes"},
+  {"type":"C", "desc":"Occlusion Cl 1"},
+  {"type":"C", "desc":"Occlusion Cl 2"},
+  {"type":"C", "desc":"Occlusion Cl 3"},
+  {"type":"C", "desc":"Occlusion Cl 2 Div 2"} ],
+  
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Crossbite Droit"},
+  {"type":"C", "desc":"Crossbite Gauche"},
+  {"type":"C", "desc":"Crossbite Antérieur"},
+  {"type":"T", "desc":"Crossbite Dent"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Mobilité dentaire"},{"type":"C", "desc":"Alvéolite aigüe"},{"type":"C", "desc":"Péricoronite aigüe"},{"type":"C", "desc":"Abcès alvéolaire"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Chevauchement Ant Sup"},
+  {"type":"C", "desc":"Chevauchement Ant Inf"},
+  {"type":"T", "desc":"Overjet mm"},
+  {"type":"T", "desc":"Overbite %"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"N", "desc":"Gingivite marg"},{"type":"C", "desc":"Aigue"},{"type":"C", "desc":"Chron déb."},{"type":"C", "desc":"Moyenne"},{"type":"C", "desc":"Acancée"},{"type":"C", "desc":"GUNA"} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Pronostic excellent"},
+  {"type":"C", "desc":"Pronostic bon"},
+  {"type":"C", "desc":"Pronostic moyen"},
+  {"type":"C", "desc":"Pronostic pauvre"},
+  {"type":"C", "desc":"Pronostic nul"} ],
 
-[ {"type":"N", "desc":"Parodontite marg"},{"type":"C", "desc":"Aigue"},{"type":"C", "desc":"Chron déb."},{"type":"C", "desc":"Moyenne"},{"type":"C", "desc":"Acancée"},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"T", "desc":"Poches péridentaires"},{"type":"C", "desc":"Occlusion  Cl 1"},{"type":"C", "desc":"Occlusion  Cl 2"},{"type":"C", "desc":"Occlusion  Cl 3"},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Édentation partielle"},{"type":"C", "desc":"Édentation complète"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
+[ {"type":"T", "desc":"Recommandations"},
+  {"type":"T", "desc":"Référer Chir Buccal Dr"},
+  {"type":"T", "desc":"Référer Parodontiste Dr"},
+  {"type":"T", "desc":"Référer Endodontiste Dr"},
+  {"type":"N", "desc":""},
+  {"type":"C", "desc":"RV manqué"} ]
 
 ]
 
@@ -43,57 +112,54 @@
 
 [
 
-[ {"type":"N", "desc":"Hygiène"},{"type":"C", "desc":"Excellente"},{"type":"C", "desc":"Moyenne"},{"type":"C", "desc":"Insuffisante"},{"type":"C", "desc":"Instructions d'hygiène"},{"type":"N", "desc":""} ],
+[ {"type":"T", "desc":"Observations"},
+  {"type":"C", "desc":"Hygiène seulement"},
+  {"type":"C", "desc":"Dentition H/B"},
+  {"type":"C", "desc":"1/2 Bouche"},
+  {"type":"C", "desc":"6 Dents"},
+  {"type":"C", "desc":"Implants"} ],
 
-[ {"type":"N", "desc":"Traitements préventifs"},{"type":"C", "desc":"Prophylaxie"},{"type":"C", "desc":"Prophyjet"},{"type":"C", "desc":"Soie"},{"type":"C", "desc":"Fluor"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Hygiène Excellente"},
+  {"type":"C", "desc":"Hygiène Bonne"},
+  {"type":"C", "desc":"Hygiène Moyenne"},
+  {"type":"C", "desc":"Hygiène Insuffisante"},
+  {"type":"C", "desc":"Détartrage complémentaire"} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Détartrage Cl I"},{"type":"C", "desc":"Détartrage Cl II"},{"type":"C", "desc":"Détartrage Cl III"},{"type":"C", "desc":"Détartrage Cl IV"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Rinçage CHX pré-op"},
+  {"type":"C", "desc":"Détartrage Cl I"},
+  {"type":"C", "desc":"Détartrage Cl II"},
+  {"type":"C", "desc":"Détartrage Cl III"},
+  {"type":"C", "desc":"Détartrage Cl IV"} ],
 
-[ {"type":"N", "desc":"Recommandations"},{"type":"C", "desc":"Soie dentaire"},{"type":"C", "desc":"Super Floss/Enfileur"},{"type":"C", "desc":"Soft Pick"},{"type":"C", "desc":"Brosse interproximale"},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Manuel"},
+  {"type":"C", "desc":"Cavitron"},
+  {"type":"C", "desc":"Piezon"},
+  {"type":"C", "desc":"Prophylaxie"},
+  {"type":"C", "desc":"Prophyjet"} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"End-Tuff"},{"type":"C", "desc":"Rincage CHX"},{"type":"T", "desc":"Brosse"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Soie Dentaire"},
+  {"type":"C", "desc":"Super Floss/Enfileur"},
+  {"type":"C", "desc":"Application Fluorure"},
+  {"type":"C", "desc":"Désensibilisant"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"N", "desc":"Hygiène seulement"},{"type":"T", "desc":"Observation"},{"type":"T", "desc":"Recommandation"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
+[ {"type":"T", "desc":"Recommandations"},
+  {"type":"C", "desc":"Instruction d'hygiène"},
+  {"type":"T", "desc":"Brosse"},
+  {"type":"C", "desc":"Soft Pick"},
+  {"type":"C", "desc":"Brosse interproximale"},
+  {"type":"C", "desc":"End-Tuff"} ],
 
-]
-
-},
-
-"Occlusion": { "short":"D.O", "columns":6, "rows":
-
-[
-
-[ {"type":"C", "desc":"Etch"},{"type":"C", "desc":"Inoseal"},{"type":"C", "desc":"CHX"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"C", "desc":"Solo +"},{"type":"C", "desc":"Dy"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"T", "desc":"Grandisio / COUL"},{"type":"C", "desc":"Zonalin"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"T", "desc":"Grandisio Flow / COUL"},{"type":"C", "desc":"Cavit"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Verre Ionomère"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
-
-]
-
-},
-
-"Chirurgie": { "short":"CHIR", "columns":6, "rows":
-
-[
-
-[ {"type":"C", "desc":"Exo simple"},{"type":"C", "desc":"Décorticeur"},{"type":"C", "desc":"E-303"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"C", "desc":"Exo chirurgicale"},{"type":"C", "desc":"Luxation"},{"type":"C", "desc":"Élévateur radiculaire"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"C", "desc":"Hémostase (2x2) controlée"},{"type":"T", "desc":"Davier NO"},{"type":"C", "desc":"Rongueur"},{"type":"C", "desc":"Bluementhal"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"C", "desc":"Hémostase (2x2) controlée"},{"type":"C", "desc":"Lambeau Enveloppe"},{"type":"C", "desc":"Lambeau 1/2 Trapèz"},{"type":"C", "desc":"Lambeau Trapèz"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Ostéoectomie"},{"type":"C", "desc":"Odontoectomie"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Point suture GUT"},{"type":"C", "desc":"Point Suture Soie"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Conseil Post-Op Verbal"},{"type":"C", "desc":"Conseil Post-op Écrit"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
+[ {"type":"N", "desc":""},
+  {"type":"C", "desc":"Soie"},
+  {"type":"T", "desc":"Dentifrice"},
+  {"type":"C", "desc":"Sensodyne"},
+  {"type":"C", "desc":"SPF pp, etch, Clinpro"},
+  {"type":"N", "desc":""} ]
 
 ]
 
@@ -103,33 +169,33 @@
 
 [
 
-[ {"type":"C", "desc":"AIG 25"},{"type":"C", "desc":"I.B."},{"type":"C", "desc":"x 1.8cc Articaine 4%"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"SPIX"},
+  {"type":"C", "desc":"I.B."},
+  {"type":"C", "desc":"MENT"},
+  {"type":"C", "desc":"I.P."},
+  {"type":"C", "desc":"I.L."},
+  {"type":"C", "desc":"I.Lig"} ],
 
-[ {"type":"C", "desc":"AIG 27"},{"type":"C", "desc":"I.P."},{"type":"C", "desc":"x 1.8cc Xylocaine 2%"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Benzocaine 20% Topic"},
+  {"type":"C", "desc":"Benzocaine 20% Spray"},
+  {"type":"T", "desc":"1.8cc Xylo 2% 1:100000 / No"},
+  {"type":"T", "desc":"1.8cc Supra 2% 1:100000 / No"},
+  {"type":"T", "desc":"1.8cc Citanest Pl 4% / No"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"C", "desc":"AIG 30"},{"type":"C", "desc":"I.L."},{"type":"C", "desc":"x 1.8cc Citanest P 4%"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"AIG 25 L"},
+  {"type":"C", "desc":"AIG 27 C"},
+  {"type":"C", "desc":"AIG 30 C"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"T", "desc":"AIG NO"},{"type":"C", "desc":"MENT"},{"type":"C", "desc":"Benzocaine 20% Topic"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"C", "desc":"SPIX"},{"type":"C", "desc":"Benzocaine 20% Spray"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"N", "desc":""},{"type":"C", "desc":"I.Lig"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
-
-]
-
-},
-
-"Parodontie": { "short":"PARO", "columns":6, "rows":
-
-[
-
-[ {"type":"C", "desc":"Curretage"},{"type":"C", "desc":"Applanissements"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"C", "desc":"Piezon/Cavitron"},{"type":"C", "desc":"Manuel"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"C", "desc":"Irrigation"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
-
-[ {"type":"C", "desc":"Greffe gingivale Collagène"},{"type":"C", "desc":"Déplac coronaire"},{"type":"C", "desc":"EDTA"},{"type":"C", "desc":"Applanissement"},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
+[ {"type":"C", "desc":"Sans anesth"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
 
 ]
 
@@ -139,13 +205,162 @@
 
 [
 
-[ {"type":"C", "desc":"Isolation digue"},{"type":"C", "desc":"Lime TF 25/06"},{"type":"C", "desc":"Irrigation Zonite"},{"type":"C", "desc":"Ouatte"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Quantec Analytic"},
+  {"type":"T", "desc":"Dent"},
+  {"type":"C", "desc":"Isolation digue"},
+  {"type":"T", "desc":"Crampon / No"},
+  {"type":"T", "desc":"Lime K-FILES"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"T", "desc":"Crampon NO"},{"type":"C", "desc":"Lime TF 25/08"},{"type":"C", "desc":"Irrigation Rcprep + KY"},{"type":"C", "desc":"Cavit"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Lime TF 25/06"},
+  {"type":"C", "desc":"Lime TF 25/08"},
+  {"type":"C", "desc":"Lime TF 30/06"},
+  {"type":"C", "desc":"Lime TF 30/08"},
+  {"type":"T", "desc":"Limes"},
+  {"type":"C", "desc":"Ouverture d'urgence"} ],
 
-[ {"type":"C", "desc":"Quantec Analytic"},{"type":"C", "desc":"Lime TF 30/06"},{"type":"C", "desc":"Irrigation Sear Clear"},{"type":"C", "desc":"Zonalin"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"T", "desc":"Canal en mm"},
+  {"type":"T", "desc":"Canal B en mm"},
+  {"type":"T", "desc":"Canal L en mm"},
+  {"type":"T", "desc":"Canal D en mm"},
+  {"type":"T", "desc":"Canal P en mm"},
+  {"type":"C", "desc":"Débridement"} ],
 
-[ {"type":"T", "desc":"Lime K-FILES NO"},{"type":"C", "desc":"Lime TF 30/08"},{"type":"C", "desc":"Irrigation Multi-Cal"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
+[ {"type":"T", "desc":"Canal MB en mm"},
+  {"type":"T", "desc":"Canal ML en mm"},
+  {"type":"T", "desc":"Canal DB en mm"},
+  {"type":"T", "desc":"Canal accessoire"},
+  {"type":"C", "desc":"Localisateur Root-ZX"},
+  {"type":"C", "desc":"Drainage"} ],
+
+[ {"type":"C", "desc":"Irrigation Zonite"},
+  {"type":"C", "desc":"Irrigation Rcprep + KY"},
+  {"type":"C", "desc":"Irrigation Sear Clear"},
+  {"type":"C", "desc":"Eucalyptus"},
+  {"type":"C", "desc":"Médic Multi-Cal"},
+  {"type":"C", "desc":"Rc-Prep"} ],
+
+[ {"type":"C", "desc":"Obt GP/Tubli-Seal"},
+  {"type":"C", "desc":"Condensation à chaud"},
+  {"type":"C", "desc":"2e vague GP chaude/Sybron"},
+  {"type":"C", "desc":"Pas de 2e vague"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Ouatte"},
+  {"type":"C", "desc":"Cavit"},
+  {"type":"C", "desc":"Zonalin"},
+  {"type":"T", "desc":"Périap / No"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Bleach Zoom 2 H/B"},
+  {"type":"C", "desc":"3 x 15 min"},
+  {"type":"C", "desc":"Isolation Labiale/Gingivale"},
+  {"type":"C", "desc":"Conseils post-op"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Occlusion": { "short":"D.O", "columns":6, "rows":
+
+[
+
+[ {"type":"C", "desc":"Près du pulpe"},
+  {"type":"C", "desc":"Expo pulpe"},
+  {"type":"C", "desc":"CHX 2%"},
+  {"type":"C", "desc":"Dy"},
+  {"type":"C", "desc":"Ionoseal Etch"},
+  {"type":"C", "desc":"Etch Ionoseal"} ],
+
+[ {"type":"C", "desc":"Etch sélectif"},
+  {"type":"C", "desc":"Total Etch"},
+  {"type":"C", "desc":"Solo +"},
+  {"type":"T", "desc":"Grandisio Flow / COUL"},
+  {"type":"T", "desc":"Grandisio / COUL"},
+  {"type":"T", "desc":"Compo"} ],
+
+[ {"type":"T", "desc":"Verre Ionomère Equia / Coul"},
+  {"type":"C", "desc":"Zonalin"},
+  {"type":"C", "desc":"Cavit"},
+  {"type":"C", "desc":"Ajustement occlusion"},
+  {"type":"C", "desc":"Polissage"},
+  {"type":"C", "desc":"Ajustement avec Prothèses"} ]
+
+]
+
+},
+
+"Chirurgie": { "short":"CHIR", "columns":6, "rows":
+
+[
+
+[ {"type":"C", "desc":"Exo Simple"},
+  {"type":"C", "desc":"Exo Chirurgicale"},
+  {"type":"C", "desc":"Lambeau Enveloppe"},
+  {"type":"C", "desc":"Lambeau 1/2 Trapèz"},
+  {"type":"C", "desc":"Lambeau Trapèz"},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Décorticeur"},
+  {"type":"C", "desc":"Ostéoectomie"},
+  {"type":"C", "desc":"Odontoectomie"},
+  {"type":"C", "desc":"Luxation"},
+  {"type":"C", "desc":"E-303"},
+  {"type":"C", "desc":"Élévateur radiculaire"} ],
+
+[ {"type":"T", "desc":"Davier NO"},
+  {"type":"C", "desc":"Bluementhal"},
+  {"type":"C", "desc":"Rongueur"},
+  {"type":"C", "desc":"Limes à Os"},
+  {"type":"C", "desc":"Curretage"},
+  {"type":"C", "desc":"Exérèse Pt Osseuse"} ],
+
+[ {"type":"T", "desc":"Pt Suture GUT / No"},
+  {"type":"T", "desc":"Pt Suture Soie / No"},
+  {"type":"C", "desc":"Hémostase (2x2) controlée"},
+  {"type":"C", "desc":"Conseil Post-Op Verbal"},
+  {"type":"C", "desc":"Conseil Post-Op Écrit"},
+  {"type":"C", "desc":"Contrôle de guérison"} ]
+
+]
+
+},
+
+"Parodontie": { "short":"PARO", "columns":6, "rows":
+
+[
+
+[ {"type":"T", "desc":"Curretage"},
+  {"type":"C", "desc":"Piezon/Cavitron"},
+  {"type":"C", "desc":"Manuel"},
+  {"type":"C", "desc":"Applanissements"},
+  {"type":"C", "desc":"Irrigation CHX"},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Greffe gingivale Collagène"},
+  {"type":"C", "desc":"Applanissement"},
+  {"type":"C", "desc":"Ondoplastie"},
+  {"type":"C", "desc":"EDTA"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Lambeau attaché"},
+  {"type":"C", "desc":"Déplacé coronaire"},
+  {"type":"C", "desc":"Collagène Bioguide"},
+  {"type":"T", "desc":"Pt Suture GUT lasso / No"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Contrôle de guérison"},
+  {"type":"C", "desc":"Plaque Occlusale"},
+  {"type":"C", "desc":"Emp Alginate H/B"},
+  {"type":"C", "desc":"Emp Cerec CAD/CAM"},
+  {"type":"C", "desc":"Mise en bouche / Ajust Occl"},
+  {"type":"N", "desc":""} ]
 
 ]
 
@@ -155,13 +370,41 @@
 
 [
 
-[ {"type":"C", "desc":"Contrôle Invisalign"},{"type":"C", "desc":"Tracking excellent"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Contrôle Invisalign"},
+  {"type":"C", "desc":"Tracking excellent"},
+  {"type":"T", "desc":"Tracking a/s"},
+  {"type":"T", "desc":"Perte Tracking"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"C", "desc":"IPR"},{"type":"C", "desc":"Tracking a/s"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Attachements"},
+  {"type":"C", "desc":"IPR"},
+  {"type":"C", "desc":"Conseils d'usage"},
+  {"type":"T", "desc":"Appareils remis"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"C", "desc":"Attachements"},{"type":"C", "desc":"Perte tracking"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Contrôle Appareil ortho"},
+  {"type":"C", "desc":"Activation 1 X/sem"},
+  {"type":"C", "desc":"Activation 2 X/sem"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
 
-[ {"type":"C", "desc":"Contrôle Appareil ortho"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ]
+]
+
+},
+
+"Prothèses amovibles": { "short":"PPA", "columns":6, "rows":
+
+[
+
+[ {"type":"C", "desc":"Référer P Deschamps d.d."},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
 
 ]
 
@@ -171,19 +414,104 @@
 
 [
 
-[ {"type":"C", "desc":"Couronne"},{"type":"C", "desc":"3/4"},{"type":"C", "desc":"Céramo métallique"},{"type":"C", "desc":"Céramique"},{"type":"C", "desc":"Zircon"},{"type":"C", "desc":"Temporaire"} ],
+[ {"type":"T", "desc":"Prép Piles"},
+  {"type":"T", "desc":"Prép Canal"},
+  {"type":"C", "desc":"Pivot métal"},
+  {"type":"T", "desc":"Pivot Pré fab"},
+  {"type":"C", "desc":"Empreinte Impregum"},
+  {"type":"C", "desc":"Empreinte Cerec CAD/CAM"} ],
 
-[ {"type":"C", "desc":"Incrustration"},{"type":"C", "desc":"Onlay"},{"type":"C", "desc":"Recouvrement cuspide"},{"type":"C", "desc":"Inlay"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"T", "desc":"Couronne"},
+  {"type":"T", "desc":"Pont"},
+  {"type":"C", "desc":"3/4"},
+  {"type":"C", "desc":"Céramo métallique"},
+  {"type":"C", "desc":"Céramique"},
+  {"type":"C", "desc":"Zircon"} ],
 
-[ {"type":"C", "desc":"Cerec"},{"type":"C", "desc":"e-max"},{"type":"C", "desc":"CeltraDuo"},{"type":"C", "desc":"Cerec Blocs"},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"T", "desc":"Incrustration"},
+  {"type":"C", "desc":"Onlay"},
+  {"type":"C", "desc":"Recouvrement cuspide"},
+  {"type":"C", "desc":"Inlay"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"C", "desc":"Couleur"},{"type":"T", "desc":"Vita No"},{"type":"C", "desc":"Vita 3D"},{"type":"N", "desc":""},{"type":"N", "desc":""},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Temporaire"},
+  {"type":"C", "desc":"CAI"},
+  {"type":"C", "desc":"Carboxylate"},
+  {"type":"T", "desc":"Structure Coul"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"C", "desc":"Rétraction"},{"type":"C", "desc":"Corde"},{"type":"C", "desc":"Hemodent"},{"type":"C", "desc":"Retractor 3M"},{"type":"C", "desc":"Cotton Caps"},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"e-max"},
+  {"type":"C", "desc":"CeltraDuo"},
+  {"type":"C", "desc":"Cerec Blocs"},
+  {"type":"T", "desc":"Vita No"},
+  {"type":"T", "desc":"Vita 3D no"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"C", "desc":"Cimentation"},{"type":"C", "desc":"Dy"},{"type":"C", "desc":"CHX"},{"type":"C", "desc":"etch"},{"type":"C", "desc":"Solo +"},{"type":"N", "desc":""} ],
+[ {"type":"C", "desc":"Rétraction"},
+  {"type":"C", "desc":"Corde"},
+  {"type":"C", "desc":"Hemodent"},
+  {"type":"C", "desc":"Retractor 3M"},
+  {"type":"C", "desc":"Cotton Caps"},
+  {"type":"N", "desc":""} ],
 
-[ {"type":"N", "desc":""},{"type":"C", "desc":"Silane"},{"type":"C", "desc":"Multilink"},{"type":"C", "desc":"Variolink"},{"type":"C", "desc":"Rely X Unicem"},{"type":"C", "desc":"Multibound +"} ]
+[ {"type":"C", "desc":"Cimentation"},
+  {"type":"C", "desc":"Dy"},
+  {"type":"C", "desc":"CHX"},
+  {"type":"C", "desc":"etch"},
+  {"type":"C", "desc":"Solo +"},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Zanolin"},
+  {"type":"C", "desc":"Silane"},
+  {"type":"C", "desc":"Multibound +"},
+  {"type":"T", "desc":"Multilink"},
+  {"type":"T", "desc":"Variolink"},
+  {"type":"T", "desc":"Rely X Unicem"} ],
+
+[ {"type":"C", "desc":"Durelon"},
+  {"type":"C", "desc":"Empreinte alginate"},
+  {"type":"C", "desc":"Haut"},
+  {"type":"C", "desc":"Bas"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
+
+]
+
+},
+
+"Implant": { "short":"IMPLANT", "columns":6, "rows":
+
+[
+
+[ {"type":"T", "desc":"Type d'implant"},
+  {"type":"T", "desc":"Cour sur implant"},
+  {"type":"T", "desc":"Pont sur implants"},
+  {"type":"C", "desc":"Vissé"},
+  {"type":"C", "desc":"Cimenté"},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"C", "desc":"Emp Impregum"},
+  {"type":"C", "desc":"Emp Cerec CAD/CAM"},
+  {"type":"C", "desc":"Bouton de guérison"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"T", "desc":"Pilier TI"},
+  {"type":"T", "desc":"Pilier Zircon"},
+  {"type":"C", "desc":"Mise en bouche Torque 25"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ],
+
+[ {"type":"T", "desc":"RelyX Unicem"},
+  {"type":"T", "desc":"Ciment"},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""},
+  {"type":"N", "desc":""} ]
 
 ]
 

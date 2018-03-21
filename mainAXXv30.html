@@ -42,7 +42,10 @@
    <script src="javascript/pdf/jspdf.min.js"></script>
    <!-- Alex Files -->
    <script src="javascript/axxium/facture28.js"></script>
-   <script src="javascript/axxium/ramq31.js"></script>
+   <!-- <script src="javascript/axxium/ramq31.js"></script> -->
+<!-- Adding ramq.js -->
+   <script src="javascript/axxium/ramq.js"></script>
+
    <script src="javascript/axxium/ramqCredentials28.js"></script>
    <script src="javascript/axxium/ramqEC29.js"></script>
    <script src="javascript/axxium/ramqBill29.js"></script>
@@ -50,6 +53,10 @@
    <script src="javascript/axxium/cdaV2_29.js"></script>
    <script src="javascript/axxium/cdaV4_29.js"></script>
    <script src="javascript/axxium/cdaComm30.js"></script>
+<!-- Adding cdaComm30 -->
+   <script src="javascript/axxium/cdaComm.js"></script>
+   <script src="javascript/axxium/tarif_list_tbl.js"></script>
+
 
    <script src="javascript/axxium/printing1.js"></script>
 
@@ -158,6 +165,18 @@
         }
       
       }
+
+      function initialize()
+      {
+        // ASSIGNNN ============
+          // curDentist = data["name"];
+          // curInitials = data["init"];
+          // curPrat = data["prat"];
+          loadPAT();
+
+          $('#loadingText').removeClass('active');
+
+      }
       
       function updatePrix()
       {
@@ -198,9 +217,9 @@
       <div class="ui borderless large menu">
          <!-- <div class="ui container"> -->
          <!-- <img src="images/tooth.png"> -->
-         <a class="item">
-            <h3><i class="doctor blue icon"></i></h3>
-            MP
+         <a class="item" id="dentInitial">
+            <h3 ><i class="doctor blue icon" ></i></h3>
+            
          </a>
          <a class="item" onclick="reOpenSearch();">
             <h3><i class="user green icon"></i></h3>
@@ -245,8 +264,8 @@
    <div class="container">
       <div id="context1">
          <div class="ui top attached tabular menu active">
-            <div class="item" data-tab="patient"><i class="user circular orange icon trn" data-trn-key=""></i>Patient</div>
-            <div class="item active" data-tab="facturation" id="facturation" onclick="checkDentType();"><i class="dollar circular  blue icon trn" data-trn-key=""></i>Facturation</div>
+            <div class="item active" data-tab="patient"><i class="user circular orange icon trn" data-trn-key=""></i>Patient</div>
+            <!-- <div class="item " data-tab="facturation" id="facturation" onclick="checkDentType();"><i class="dollar circular  blue icon trn" data-trn-key=""></i>Facturation</div>
             <div class="item" id="" data-tab="plans"><i class="list circular blue icon trn" data-trn-key=""></i>Plan RDV</div>
             <div class="item" data-tab=""><i class="edit icon trn" data-trn-key=""></i>Paiements</div>
             <div class="item " id="" data-tab="antecedents"><i class="heartbeat circular red icon trn" data-trn-key=""></i>Historique</div>
@@ -258,7 +277,7 @@
             <div class="item" data-tab=""><i class="edit circular icon trn" data-trn-key=""></i>Hist Med</div>
             <div class="item" data-tab=""><i class="edit circular icon trn" data-trn-key=""></i>Ex dentaire</div>
             <div class="item" data-tab="" onclick="modSuivi()"><i class="radio yellow circular icon trn" data-trn-key="" ></i>Suivi Médical</div>
-
+ -->
             <div class="item " id="disb2" data-tab="examens"><i class="doctor circular purple icon trn" data-trn-key=""></i>Exam</div>
             <div class="item" id="disb2" data-tab="odontos"><i class="crosshairs circular orange icon trn" data-trn-key=""></i>Odon</div>
             <div class="item" id="disb4" data-tab="traitements"><i class="treatment circular yellow icon trn" data-trn-key=""></i>Traits</div>
@@ -283,7 +302,7 @@
       </div>
    </div>
    </div>
-   <div class="ui bottom attached tab " data-tab="patient">
+   <div class="ui bottom attached tab active " data-tab="patient">
       <div id="context2">
          <div class="ui pointing secondary menu">
             <a class="item trn" data-tab="Dossier" >Dossier Patient</a>
@@ -438,31 +457,31 @@
                               <div class="two fields">
                                  <div class="field">
                                     <label>Nom</label>
-                                    <input id="Efirst"  type="text" >
+                                    <input id="Efirst"  type="text" readonly="">
                                  </div>
                                  <div class="field">
                                     <label>Prenom</label>
-                                    <input id="Elast"  type="text">
+                                    <input id="Elast"  type="text" readonly="">
                                  </div>
                               </div>
                               <div class="two fields">
                                  <div class="field">
                                     <label>Rue</label>
-                                    <input id="Elast" readonly="" type="text">
+                                    <input id="ERue" readonly="" type="text">
                                  </div>
                                  <div class="field">
                                     <label>Ville</label>
-                                    <input id="Elast" readonly="" type="text">
+                                    <input id="EVille" readonly="" type="text">
                                  </div>
                               </div>
                               <div class="two fields">
                                  <div class="eight wide field">
                                     <label>Province</label>
-                                    <input id="Elast" readonly="" type="text">
+                                    <input id="EProvince" readonly="" type="text">
                                  </div>
                                  <div class="eight wide field">
                                     <label>Code Postal</label>
-                                    <input id="Elast" readonly="" type="text">
+                                    <input id="EPostal" readonly="" type="text" >
                                  </div>
                               </div>
                            </div>
@@ -478,21 +497,21 @@
                                  </div>
                                  <div class="field">
                                     <label>Expiration</label>
-                                    <input type="date" id="ramq_exp">
+                                    <input type="text" id="ramq_exp" readonly="">
                                  </div>
                               </div>
                               <div class="three fields">
                                  <div class="nine wide field">
                                     <label>Date de nais.</label>
-                                    <input type="date" id="Ebirth" >
+                                    <input type="text" id="Ebirth" readonly="">
                                  </div>
                                  <div class="field">
                                     <label>Sexe</label>
-                                    <input type="text" id="sexe">
+                                    <input type="text" id="sexe" readonly="">
                                  </div>
                                  <div class="five wide field">
                                     <label>Age</label>
-                                    <input type="text" id="age">
+                                    <input type="text" id="age" readonly="">
                                  </div>
                               </div>
                            </div>
@@ -502,27 +521,27 @@
                               <div class="two fields">
                                  <div class="field">
                                     <label>Principal</label>
-                                    <input type="text" name="" value="514">
+                                    <input type="text" name="" value="" readonly="">
                                  </div>
                                  <div class="field">
                                     <label>Cellulaire</label>
-                                    <input type="text" name="" value="514">
+                                    <input type="text" name="" value="" id='ETel' readonly="">
                                  </div>
                               </div>
                               <div class="two fields">
                                  <div class="field">
                                     <label>Bureau</label>
-                                    <input type="text" name="" value="514">
+                                    <input type="text" name="" value="" readonly="">
                                  </div>
                                  <div class="field">
                                     <label>Poste</label>
-                                    <input type="text" name="" value="514">
+                                    <input type="text" name="" value="" readonly="">
                                  </div>
                               </div>
                               <div class="two fields">
                                  <div class="eleven wide field">
                                     <label>Courriel</label>
-                                    <input type="text" name="">
+                                    <input type="text" name="" id="ECourriel">
                                  </div>
                                  <div class="field">
                                     <label>  </label>
@@ -1225,7 +1244,7 @@
          </div>
       </div>
    </div>
-   <div class="ui bottom attached tab segment active" data-tab="facturation">
+   <div class="ui bottom attached tab segment " data-tab="facturation">
       <div id="context3">
          <!-- ===========Tabs 2========= -->
          <div class="ui secondary pointing menu" >
@@ -1322,6 +1341,7 @@
                                  <th>Dent</th>
                                  <th>Surface</th>
                                  <th>Code</th>
+                                 <th></th>
                                  <th>Description</th>
                                  <th class="mont">Frais Lab.</th>
                                  <th></th>
@@ -1930,6 +1950,10 @@
       </div>
    </div>
    </div>
+
+
+
+
    <div class="ui modalSign0 modal">
       <i class="close icon"></i>
       <div class="header" id="signHeader0">
@@ -6864,6 +6888,10 @@
         // tabs are inside of this element
         context: $('#context2')
       });
+      // $('#context1').tab({
+      //   // tabs are inside of this element
+      //   context: $('#context1')
+      // });
        $('#context3 .menu .item').tab({
         // tabs are inside of this element
         context: $('#context3')
@@ -6938,15 +6966,45 @@
         $('.modalFactTableMore_Up.modal').modal('setting','allowMultiple',true);
       
       loadParams();
-        getPIN();
-        loadQJSON(firstJSON);
-        loadQEXA(firstEXA);
-       loadCODES();
-        loadProts();
-        loadSelect();
-        loadSelo();
+        // getPIN();
+        initialize();
+        $('#context1 .menu .item').tab('change tab', 'patient');
+        // populatePatientInfo();
+        //JSON LOADED
+        // loadQJSON(firstJSON);
+        //Loading EXAMENS
+        //loadQEXA(firstEXA);
+       //Load Code Data 
+       //loadCODES();
+        //loadProts();
+       // loadSelect();
+        //loadSelo();
         //loadPAT();
       });
+
+
+
+      function populatePatientInfo()
+      {
+        var pat_Age=get_age();
+        var Adress=globVisionRData.AdrPersPatnt.split(',');
+
+        $('#EID').val(globNoDossier);
+        $('#Efirst').val(globVisionRData.PrePers);
+        $('#Elast').val(globVisionRData.NomPers);
+        $('#ERue').val(Adress[0]);
+        $('#EVille').val(Adress[1]);
+        $('#EPostal').val(Adress[3]);
+        $('#EProvince').val(Adress[2]);
+        $('#ETel').val(globVisionRData.Tel);
+        $('#ramq_no').val(globVisionRData.IdPers);
+        $('#Ebirth').val(globVisionRData.DatNaissPers);
+        $('#age').val(pat_Age);
+        $('#ECourriel').val(globVisionRData.Email);
+        $('#ramq_exp').val(globVisionRData.NamExpDate);
+        $('#dentInitial').append(globDentist);
+
+      }
       
       $("#odonto").on('mouseup', function(evt) {
         if (!isLockedODO)
@@ -7155,6 +7213,20 @@
    </script>
    <script type="text/javascript">
 
+
+    function get_date(){
+                //Returns yy-mm-dd format STANDARD 
+
+                var d1=new Date();
+
+                var curMonth=("0" + (d1.getMonth() + 1)).slice(-2)
+                var day=("0" + d1.getDate()).slice(-2);
+                var year=d1.getFullYear();
+
+                var fullDate=year+'-'+curMonth+'-'+day;
+                return fullDate;
+
+            }
       function changeLang(x)
         {
           if(x=='en')
@@ -7174,6 +7246,9 @@
         }
       
       $(document).ready(function(){
+
+
+            
       
         locatn=curr_location();
         var thisTag = [];

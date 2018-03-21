@@ -429,34 +429,34 @@
     {// code for IE6, IE5
     xmlhttp2=new ActiveXObject("Microsoft.XMLHTTP");
     }
-  xmlhttp2.onreadystatechange=function()
-    {
-    if (xmlhttp2.readyState==4 && xmlhttp2.status==200)
-      {
-      //alert(xmlhttp2.responseText.length);
-      qPAT = JSON.parse(xmlhttp2.responseText);
-      qSearch = qPAT.patients;
-      var ctrpr = 0;
-      for (pat in qPAT.patients)
-          {
-            div = document.createElement("tr");
-              div.setAttribute("id", qPAT.patients[pat].id);
-              div.setAttribute("name", ctrpr);
-              div.innerHTML = '<td>'+qPAT.patients[pat].last+'</td><td>'+qPAT.patients[pat].first+'</td><td>'+qPAT.patients[pat].id+'</td><td>'+qPAT.patients[pat].NAM+'</td><td>'+qPAT.patients[pat].birth+'</td>';
-            document.getElementById("eachPat").appendChild(div);
-            ctrpr = ctrpr + 1;
-          }
-      $('table.eachPat tbody tr').click(function(){
-        // alert('Load Patient');
-          //alert($(this).find('td')[2].innerHTML);
-          curPatient = $(this).attr("id");
-          curPatRow = $(this).attr("name");
-          $('.modalSearch.modal').modal('hide');
-          fullLoadPatient();
-      });
-      setTimeout(setupDataTable, 2000);
-      }
-  }
+  // xmlhttp2.onreadystatechange=function()
+  //   {
+  //   if (xmlhttp2.readyState==4 && xmlhttp2.status==200)
+  //     {
+  //     //alert(xmlhttp2.responseText.length);
+  //     qPAT = JSON.parse(xmlhttp2.responseText);
+  //     qSearch = qPAT.patients;
+  //     var ctrpr = 0;
+  //     for (pat in qPAT.patients)
+  //         {
+  //           div = document.createElement("tr");
+  //             div.setAttribute("id", qPAT.patients[pat].id);
+  //             div.setAttribute("name", ctrpr);
+  //             div.innerHTML = '<td>'+qPAT.patients[pat].last+'</td><td>'+qPAT.patients[pat].first+'</td><td>'+qPAT.patients[pat].id+'</td><td>'+qPAT.patients[pat].NAM+'</td><td>'+qPAT.patients[pat].birth+'</td>';
+  //           document.getElementById("eachPat").appendChild(div);
+  //           ctrpr = ctrpr + 1;
+  //         }
+  //     $('table.eachPat tbody tr').click(function(){
+  //       // alert('Load Patient');
+  //         //alert($(this).find('td')[2].innerHTML);
+  //         curPatient = $(this).attr("id");
+  //         curPatRow = $(this).attr("name");
+  //         $('.modalSearch.modal').modal('hide');
+  //         fullLoadPatient();
+  //     });
+  //     setTimeout(setupDataTable, 2000);
+  //     }
+  // }
 
   //alert("Get the Files!");
   xmlhttp2.open("GET","allScriptsv1.py?tx=getPATv1&clinID=1",true);
@@ -589,7 +589,7 @@
       qParams = JSON.parse(xmlhttp2.responseText);
       if (qParams["logo"])
       {
-        document.getElementById("topLogo").setAttribute("src", "images/"+qParams["logo"]);
+        // document.getElementById("topLogo").setAttribute("src", "images/"+qParams["logo"]);
       }
     }
   }

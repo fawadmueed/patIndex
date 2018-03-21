@@ -3,7 +3,8 @@
       alert("")
      var output; 
 
-      $.getJSON("json/params/codes6.json",function(data){
+     // TODO: Each dentist will have its own codes file. This needs to be fixed!
+      $.getJSON("json/params/codes.json",function(data){
 
       var search1= $('#search1').val();
       var reg=new RegExp(search1,'i');

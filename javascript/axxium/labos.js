@@ -6,8 +6,8 @@
   
   function showLabos()
   {
-	// document.getElementById("loadingText").setAttribute("class", "ui active inverted dimmer");
-    	// loadAllLABOS();
+	document.getElementById("loadingText").setAttribute("class", "ui active inverted dimmer");
+    	loadAllLABOS();
   }
   
   function setupLaboTable()
@@ -37,7 +37,7 @@
 	;
 	document.getElementById("labList_filter").parentElement.setAttribute("class","left aligned eight wide column");
 	//alert(document.getElementById("labList_filter").parentElement.getAttribute("class"));
-	// document.getElementById("loadingText").setAttribute("class", "ui inverted dimmer");
+	document.getElementById("loadingText").setAttribute("class", "ui inverted dimmer");
   }
 
   function loadAllLABOS()

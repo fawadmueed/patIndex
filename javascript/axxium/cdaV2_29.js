@@ -6,30 +6,59 @@ function CdaV2SendRequestToCdaNet() {
     CdaV2GetDataFromDB();
 }
 
-function CdaV2CallCDAService()
+function CdaV2CallCDAService(pReqString)
 {
-    var strRequest = CdaV2CreateRequestString();
-    var randomNum = CdaCommCreateRandomNumber(0, 999);
+    var strRequest = '';
+    if (pReqString) {
+        strRequest = pReqString;
+    }
+    else {
+        strRequest = CdaV2CreateRequestString();
+    }
 
+    var randomNum = CdaCommCreateRandomNumber(1, 999);
+    //var transCode = globCdaDataFromDB.a04;//TODO: send to server
     var inputXMl = {
         "request": strRequest, //request to send
-        //"info": { 'NoSeq': globCdaDataFromDB.a02, 'Description': CdaV2GetTransactionName(), 'NoDossier': globNoDossier, 'Prenom': globVisionRData.PrePers, 'Nom': globVisionRData.NomPers, 'Ass': globVisionRData.InsTypeList[0], 'Couver': '', 'Date': CdaCommConvertDate('00000000') } // JSON data
         "info": { 'Prenom': globVisionRData.PrePers, 'Nom': globVisionRData.NomPers, 'Ass': globVisionRData.InsTypeList[0] } // JSON data
     };
-
-    $.post("allScriptsv1.py", { tx: "sendInsurance", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, lun: randomNum, json: JSON.stringify(inputXMl) },
+    //Show progress
+    document.getElementById("loaderCdan2Form").setAttribute("class", "ui active inverted dimmer");
+    document.getElementById("loaderMain").setAttribute("class", "ui active inverted dimmer");
+    try {
+        $.post("allScriptsv1.py", { tx: "sendInsurance", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, lun: randomNum, json: JSON.stringify(inputXMl) },
         function (result) {
+            //Hide progress
+            document.getElementById("loaderCdan2Form").setAttribute("class", "ui inverted dimmer");
+            document.getElementById("loaderMain").setAttribute("class", "ui inverted dimmer");
             if (result.outcome === 'error')
                 alert(result.message);
-            else
-            {
+            else {
                 var responseLine = result.message;
-                var objResp = CdaV2ReadResponse(responseLine);
-                var respMessage = CdaV2CreateRespMessage(objResp, responseLine);
-                CdaCommShowResp(respMessage);
+                var communicationResult = CdaCommGetCommStatus(responseLine);
+                if (communicationResult == 0)// No errors
+                {
+                    var transactionLine = responseLine.split(',').slice(3); // extract string after 3th comma
+
+                    globCdaRespObj = CdaV2ReadResponse(transactionLine);
+                    if (globCdaRespObj) {
+                        respMessage = CdaV2CreateRespMessage(globCdaRespObj, transactionLine);
+                    }
+                    else {
+                        respMessage = 'Parsing CdaNet response failed.'
+                    }
+
+                    CdaCommShowResp(respMessage);
+                }
             }
-            
         });
+    }
+    catch (e)
+    {
+        document.getElementById("loaderCdan2Form").setAttribute("class", "ui inverted dimmer");
+        document.getElementById("loaderMain").setAttribute("class", "ui inverted dimmer");
+        alert(e.message);
+    }
 }
 
 //============================================= Create request string =============================================
@@ -48,12 +77,12 @@ function CdaV2CreateRequestString() {
                 strRequest = CdaV2CreateClaimRequest();
             }
             break;
-        case "ClaimReversal":
+        case '2'://"ClaimReversal":
             {
                 strRequest = CdaV2CreateClaimReversalRequest();
             }
             break;
-        case "Predetermination":
+        case "3":
             {
                 strRequest = CdaV2CreatePredeterminationRequest();
             }
@@ -107,7 +136,7 @@ function CdaV2CreateClaimReversalRequest(pG01) {
     res += req.b01 + req.b02;
     res += req.c01 + req.c11 + req.c02 + req.c03;
     res += req.d02 + req.d03 + req.d04;
-    res += CdaV2FormatField(pG01, 'AN', 14);
+    res += req.g01;
     return res;
 }
 
@@ -119,7 +148,7 @@ function CdaV2CreatePredeterminationRequest() {
     res += req.c01 + req.c11 + req.c02 + req.c03 + req.c04 + req.c05 + req.c06 + req.c07 + req.c08 + req.c09 + req.c10;
     res += req.d01 + req.d02 + req.d03 + req.d04 + req.d05 + req.d06 + req.d07 + req.d08 + req.d09 + req.d10;
     res += req.e01 + req.e02 + req.e05 + req.e03 + req.e04;
-    res += req.f02 + req.f15 + req.f04 + req.f06;
+    res += req.f02 + req.f15 + req.f04 + req.f05 +req.f06;
 
     for (var i = 0; i < req.f06; i++) {
         res += req.f07[i] + req.f08[i] + req.f10[i] + req.f11[i] + req.f12[i] + req.f13[i] +req.f14[i];
@@ -189,7 +218,7 @@ function CdaV2PopulateClaimObj() {
     obj.a05 = CdaV2FormatField(objDataFromDB.a05, 'N', 6); //Carrier Identification Number
     obj.a06 = CdaV2FormatField(objDataFromDB.a06, 'AN', 3); //Software System ID
     obj.a07 = CdaV2FormatField((370+37*CdaV2GGetNumProcedures()).toString(), 'N', 4); //Message Length
-    obj.a08 = CdaV2FormatField(objDataFromDB.a08, 'A', 1); //E-Mail Flag
+    obj.a08 = CdaV2FormatField(CdaV2GetEmailFlag(), 'A', 1); //E-Mail Flag
 
     //B Provider Identification
     obj.b01 = CdaV2FormatField(objDataFromDB.b01, 'AN', 9); //CDA Provider Number
@@ -201,7 +230,7 @@ function CdaV2PopulateClaimObj() {
     obj.c02 = CdaV2FormatField(objDataFromDB.c02, 'AN', 11); //Subscriber Identification Number
     obj.c03 = CdaV2FormatField(objDataFromDB.c03, 'N', 1); //Relationship Code
     obj.c04 = CdaV2FormatField(objDataFromDB.c04, 'A', 1); //Patient's Sex
-    obj.c05 = CdaV2FormatField(objDataFromDB.c05, 'N', 8); //Patient's Birthday
+    obj.c05 = CdaV2FormatField(CdaCommGetDateOfBirthFromRamq(globVisionRData.IdPers), 'N', 8); //Patient's Birthday
     obj.c06 = CdaV2FormatField(objDataFromDB.c06, 'A', 25); //Patient's Last Name
     obj.c07 = CdaV2FormatField(objDataFromDB.c07, 'A', 15); //Patient's First Name
     obj.c08 = CdaV2FormatField(objDataFromDB.c08, 'A', 1); //Patient's Middle Initial
@@ -231,22 +260,15 @@ function CdaV2PopulateClaimObj() {
     obj.f01 = CdaV2FormatField($("#cdan1_payabl").val(), 'N', 1); //Payee Code
     obj.f02 = CdaV2FormatField($('#cdan1_date_accident').val(), 'N', 8); //Accident Date
     obj.f03 = CdaV2FormatField($('#cdan1_no_confrmtn_plan').val(), 'AN', 14); //Predetermination Number
-    obj.f15 = CdaV2FormatField($('#cdan1_placmnt').val(), 'A', 1); //Initial Placement Upper
-    obj.f04 = CdaV2FormatField($('#cdan1_placmnt_date').val(), 'N', 8); //Date of Initial Placement Upper
+    obj.f15 = CdaV2FormatField($('#cdan1_placmnt').val(), 'A', 1); //Initial Placement 
+    obj.f04 = CdaV2FormatField($('#cdan1_placmnt_date').val(), 'N', 8); //Date of Initial Placement 
     obj.f05 = CdaV2FormatField($('#q1_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes 
     obj.f06 = CdaV2FormatField(CdaV2GGetNumProcedures(), 'N', 1); //Number of Procedures Performed 
 
 
-    obj.f07=[]; 
-    obj.f08=[]; 
-    obj.f09=[]; 
-    obj.f10=[]; 
-    obj.f11=[]; 
-    obj.f12=[]; 
-    obj.f13=[]; 
-    obj.f14=[];
+    obj.f07 = []; obj.f08 = []; obj.f09 = []; obj.f10 = []; obj.f11 = []; obj.f12 = []; obj.f13 = []; obj.f14 = [];
+    var lineCount = 0;
     for (var i = 0; i < arrGrilleDeFacturation.length; i++) {
-        var lineCount = 0;
         if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP') {
             lineCount++;
             obj.f07[i] = CdaV2FormatField(lineCount, 'N', 1); //Procedure Line Number
@@ -256,7 +278,7 @@ function CdaV2PopulateClaimObj() {
             obj.f11[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Surface, 'A', 5); //Tooth Surface
             obj.f12[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
             obj.f13[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Frais, 'D', 6); //Lab Procedure Fee # 1
-            obj.f14[i] = '0000';
+            obj.f14[i] = '0000';// In visionR it's always '0000'
             
         }
     }
@@ -270,7 +292,7 @@ function CdaV2PopulateClaimReversalObj() {
 
     //A Transaction Header
     obj.a01 = CdaV2FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
-    obj.a02 = CdaV2FormatField(objDataFromDB.a02, 'N', 6); //Office Sequence Number
+    obj.a02 = CdaV2FormatField(globCdaTransHistSelectedData[0], 'N', 6); //Office Sequence Number
     obj.a03 = CdaV2FormatField(objDataFromDB.a03, 'N', 2); //Format Version Number
     obj.a04 = CdaV2FormatField(objDataFromDB.a04, 'N', 2); //Transaction Code
     obj.a05 = CdaV2FormatField(objDataFromDB.a05, 'N', 6); //Carrier Identification Number
@@ -292,7 +314,7 @@ function CdaV2PopulateClaimReversalObj() {
     obj.d03 = CdaV2FormatField(objDataFromDB.d03, 'A', 15); //Subscriber's First Name
     obj.d04 = CdaV2FormatField(objDataFromDB.d04, 'A', 1); //Subscriber's Middle Initial
 
-    //obj.g01 = CdaV2FormatField(pG01, 'AN', 14); //Transaction Reference Number of Orig Claim
+    obj.g01 = CdaV2FormatField(globCdaTransHistSelectedData[8], 'AN', 14); //Transaction Reference Number of Orig Claim
 
     return obj;
 }
@@ -301,7 +323,9 @@ function CdaV2PopulatePredeterminationObj() {
     var obj = {};
     var transactionType = "Predetermination";
     var objDataFromDB = globCdaDataFromDB;
-    var objDataFromUI = CdaV2GetDataFromUI();
+    //var objDataFromUI = CdaV2GetDataFromUI();
+
+    obj.f07 = []; obj.f08=[]; obj.f10=[]; obj.f11=[]; obj.f12=[]; obj.f13=[]; obj.f14=[];
 
     //A Transaction Header
     obj.a01 = CdaV2FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
@@ -323,7 +347,7 @@ function CdaV2PopulatePredeterminationObj() {
     obj.c02 = CdaV2FormatField(objDataFromDB.c02, 'AN', 11); //Subscriber Identification Number
     obj.c03 = CdaV2FormatField(objDataFromDB.c03, 'N', 1); //Relationship Code
     obj.c04 = CdaV2FormatField(objDataFromDB.c04, 'A', 1); //Patient's Sex
-    obj.c05 = CdaV2FormatField(objDataFromDB.c05, 'N', 8); //Patient's Birthday
+    obj.c05 = CdaV2FormatField(CdaCommGetDateOfBirthFromRamq(globVisionRData.IdPers), 'N', 8); //Patient's Birthday
     obj.c06 = CdaV2FormatField(objDataFromDB.c06, 'A', 25); //Patient's Last Name
     obj.c07 = CdaV2FormatField(objDataFromDB.c07, 'A', 15); //Patient's First Name
     obj.c08 = CdaV2FormatField(objDataFromDB.c08, 'A', 1); //Patient's Middle Initial
@@ -356,20 +380,18 @@ function CdaV2PopulatePredeterminationObj() {
     obj.f05 = CdaV2FormatField($('#q1_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes
     obj.f06 = CdaV2FormatField(CdaV2GGetNumProcedures(), 'N', 1); //Number of Procedures Performed 
 
-    for (var i = 0; i < arrGrilleDeFacturation.length; i++) {
+    for (var i = 0; i < arrGrilleDeFacturation_planTrait.length; i++) {
         var lineCount = 1;
-        if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP') {
-            obj.f07[i] = CdaV2FormatField(lineCount, 'N', 1); //Procedure Line Number
-            obj.f08[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Code, 'N', 5); //Procedure Code
-            //obj.f09[i] = CdaV2FormatField(CdaV2GetCurrentDate(), 'N', 8); //Date of Service
-            obj.f10[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Dent, 'N', 2); //International Tooth, Sextant, Quad or Arch
-            obj.f11[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Surface, 'A', 5); //Tooth Surface
+        obj.f07[i] = CdaV2FormatField(lineCount, 'N', 1); //Procedure Line Number
+        obj.f08[i] = CdaV2FormatField(arrGrilleDeFacturation_planTrait[i].Code, 'N', 5); //Procedure Code
+        //obj.f09[i] = CdaV2FormatField(CdaV2GetCurrentDate(), 'N', 8); //Date of Service
+        obj.f10[i] = CdaV2FormatField(arrGrilleDeFacturation_planTrait[i].Dent, 'N', 2); //International Tooth, Sextant, Quad or Arch
+        obj.f11[i] = CdaV2FormatField(arrGrilleDeFacturation_planTrait[i].Surface, 'A', 5); //Tooth Surface
 
-            obj.f12[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
-            obj.f13[i] = CdaV2FormatField(arrGrilleDeFacturation[i].Frais, 'D', 6); //Lab Procedure Fee # 1
-            obj.f14[i] = '0000';
-            lineCount++;
-        }
+        obj.f12[i] = CdaV2FormatField(arrGrilleDeFacturation_planTrait[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
+        obj.f13[i] = CdaV2FormatField(arrGrilleDeFacturation_planTrait[i].Frais, 'D', 6); //Lab Procedure Fee # 1
+        obj.f14[i] = '0000';
+        lineCount++;
     }
     return obj;
 }
@@ -402,7 +424,7 @@ function CdaV2ReadResponse(pResponse) {
     var res = {};
     var transCode = '';
     if (pResponse) {
-        transCode = pResponse.substring(20, 22);
+        transCode = pResponse.toString().substring(20, 22);
 
         switch (transCode) {
             case '10':
@@ -428,6 +450,9 @@ function CdaV2ReadResponse(pResponse) {
 
 function CdaV2ParseEligibilityResp(pResponse) {
     var res = {};
+    res.g08 = [];
+
+    pResponse = pResponse.toString();
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -454,6 +479,10 @@ function CdaV2ParseEligibilityResp(pResponse) {
 
 function CdaV2ParseClaimAcknResp(pResponse) {
     var res = {};
+    res.f07 = [];
+    res.g08 = [];
+
+    pResponse = pResponse.toString();
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -469,7 +498,7 @@ function CdaV2ParseClaimAcknResp(pResponse) {
     res.g06 = parseInt(pResponse.substring(60, 62));//Number of Error Codes
     res.g07 = pResponse.substring(62, 137);//Disposition Message
     res.g02 = pResponse.substring(137,138);//Employer Certified Flag
-    res.g04 = (parseFloat(pResponse.substring(138, 145)) / 100).toFixed(2);//Total Amount of Service
+    res.g04 = (parseFloat(pResponse.substring(138, 145))/100).toFixed(2);//Total Amount of Service
     res.g27 = pResponse.substring(145, 146);//Language of the Insured
 
     var lastPos = 146;
@@ -488,6 +517,11 @@ function CdaV2ParseClaimAcknResp(pResponse) {
 
 function CdaV2ParseEOBResp(pResponse) {
     var res = {};
+    res.f07 = []; res.g12 = []; res.g13 = []; res.g14 = []; res.g15 = []; res.g16 = []; res.g17 = [];
+    res.g18 = []; res.g19 = []; res.g20 = []; res.g21 = []; res.g22 = []; res.g23 = []; res.g24 = []; res.g25 = [];
+    res.g26 = [];
+
+    pResponse = pResponse.toString();
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -500,7 +534,7 @@ function CdaV2ParseEOBResp(pResponse) {
 
     res.g01 = pResponse.substring(45, 59); //Transaction Reference Number
     res.g03 = parseInt(pResponse.substring(59, 67));//Expected Payment Date
-    res.g04 = (parseFloat(pResponse.substring(67, 74)) / 100).toFixed(2);//Total Amount of Service
+    res.g04 = (parseFloat(pResponse.substring(67, 74))/100).toFixed(2);//Total Amount of Service
     res.g27 = pResponse.substring(74, 75);//Language of the Insured
     res.g09 = pResponse.substring(75, 76);//E-Mail Flag
     res.f06 = parseInt(pResponse.substring(76, 77));//Number of Procedures Performed
@@ -559,6 +593,8 @@ function CdaV2ParseEOBResp(pResponse) {
 
 function CdaV2ParseClaimReversResp(pResponse) {
     var res = {};
+    res.g08 = [];
+    pResponse = pResponse.toString();
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -585,6 +621,8 @@ function CdaV2ParseClaimReversResp(pResponse) {
 
 function CdaV2ParsePredetAcknResp(pResponse) {
     var res = {};
+    res.f07 = []; res.g08 = [];
+    pResponse = pResponse.toString();
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -761,17 +799,23 @@ function CdaV2GetDataFromDB() {
             success: function (result) {
                 switch (globCdanetTranscode) {
                     case '1'://Claim
+                    case '2'://Claim reversial
                         {
                             globCdaDataFromDB = result;
                             CdaV2CallCDAService();
                         }
-                    break;
+                        break;
+                    case '3'://Predetermination
+                        {
+                            globCdaDataFromDB = result;
+                            PlnTrSendToCdaNet();
+                        }
                 }
 
                 //console.log(result);
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                debugger;
+                //debugger;
                 alert(xhr.statusText);
             }
         });
@@ -843,17 +887,17 @@ function CdaV2GetResponseListForEOB(pResp)
     var gNoConfirm = (pResp.g30) ? pResp.g30 : '';
     objResponseList = 'No de confirmation: ' + gNoConfirm + '\n';
 
-    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04) / 100;
+    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04);
     ResponseList += 'Montant réclamé: ' + montantReclame.toFixed(2) + '\n';
 
-    var montantDuDeductibleNonAlloue = (isNaN(parseFloat(pResp.g29))) ? 0 : parseFloat(pResp.g29) / 100;
+    var montantDuDeductibleNonAlloue = (isNaN(parseFloat(pResp.g29))) ? 0 : parseFloat(pResp.g29);
     ResponseList += 'Montant du déductible non alloué: ' + montantDuDeductibleNonAlloue.toFixed(2) + '\n';
 
-    var montantTotalRembourse = (isNaN(parseFloat(pResp.g28))) ? 0 : parseFloat(pResp.g28) / 100;
+    var montantTotalRembourse = (isNaN(parseFloat(pResp.g28))) ? 0 : parseFloat(pResp.g28);
     ResponseList += 'Montant total remboursé: ' + montantTotalRembourse.toFixed(2) + '\n';
 
     var dateDePaiement = CdaCommConvertDate(pResp.g03);
-    ResponseList += 'Date de paiement : ' + dateDePaiement;
+    ResponseList += 'Date de paiement : ' + dateDePaiement + '\n';
 
     var g11 = parseInt(pResp.g11);
     g11 = (isNaN(g11)) ? 0 : g11;
@@ -878,7 +922,7 @@ function CdaV2GetResponseListForClaimAck(pResp)
     else
         responsemess = 'Réponse la demande de réglement: ';
 
-    ResponseList += Responsemess;
+    ResponseList += responsemess;
     var responsestatus = pResp.g05;
 
     switch (responsestatus) {
@@ -910,7 +954,7 @@ function CdaV2GetResponseListForClaimAck(pResp)
     var gTransref = (pResp.g01) ? pResp.g01 : '';
     ResponseList += 'No de Référence: ' + gTransref + '\n';
 
-    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04) / 100;
+    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04);
     ResponseList += 'Montant réclamé : ' + montantReclame.toFixed(2) + '\n';
 
 
@@ -950,9 +994,9 @@ function CdaV2GetResponseListForPredeterm(pResp) {
     ResponseList += responsemess;
     ResponseList += CdaCommFrompage850(pResp.g07) + '\n'; //g07 disposition;
 
-    ResponseList.add('No de Référence: ' + pResp.g01) + '\n';
+    ResponseList += 'No de Référence: ' + pResp.g01 + '\n';
 
-    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04) / 100;
+    var montantReclame = (isNaN(parseFloat(pResp.g04))) ? 0 : parseFloat(pResp.g04);
     ResponseList += 'Montant réclamé : ' + montantReclame.toFixed(2) + '\n';
 
     var g06 = parseInt(pResp.g06);
@@ -1054,11 +1098,11 @@ function CdaV2GetResponseListForEligibil(pResp) {
     return ResponseList;
 }
 
-function CdaV2GetTransactionName() {
+function CdaV2GetTransactionName(pTransNumber) {
     var transName = '';
 
     //TODO: Translate to french.
-    switch (globCdanetTranscode) {
+    switch (pTransNumber) {
         case '': transName = ''; break;
         case '00': transName = 'Eligibility'; break;
 
@@ -1089,6 +1133,22 @@ function CdaV2GetTransactionName() {
 
     }
     return transName;
+}
+
+function CdaV2GetEmailFlag()
+{
+    var res = '';
+    if ($('#chkCda2FollowNo').prop('checked'))
+    {
+        res = '0'
+    }
+    else if ($('#chkCda2FollowEmail').prop('checked')) {
+        res = '1'
+    }
+    else if ($('#chkCda2FollowLettre').prop('checked')) {
+        res = '2'
+    }
+    return res;
 }
 
 

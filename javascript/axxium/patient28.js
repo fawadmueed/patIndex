@@ -428,6 +428,7 @@
     {// code for IE6, IE5
     xmlhttp2=new ActiveXObject("Microsoft.XMLHTTP");
     }
+    
   xmlhttp2.onreadystatechange=function()
     {
     if (xmlhttp2.readyState==4 && xmlhttp2.status==200)
@@ -588,7 +589,7 @@
       qParams = JSON.parse(xmlhttp2.responseText);
       if (qParams["logo"])
       {
-        document.getElementById("topLogo").setAttribute("src", "images/"+qParams["logo"]);
+        // document.getElementById("topLogo").setAttribute("src", "images/"+qParams["logo"]);
       }
     }
   }

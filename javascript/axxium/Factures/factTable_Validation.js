@@ -2,46 +2,46 @@
   function drawOdonFact(aCanvas)
   {
     //alert("Draw the whole thing!");
-  // 	var canvas = document.getElementById(aCanvas);
-  //   var ctx = canvas.getContext("2d");
-  // 	canvas.width = 600 * odoX;
-  // 	canvas.height = 395 * odoY;
-  // 	var background = new Image();
-  // 	background.src = "images/odontogramme.png";
+  	var canvas = document.getElementById(aCanvas);
+    var ctx = canvas.getContext("2d");
+  	canvas.width = 600 * odoX;
+  	canvas.height = 395 * odoY;
+  	var background = new Image();
+  	background.src = "images/odontogramme.png";
 
-  // 	background.onload = function(){
-  //     	ctx.drawImage(background,0,0,canvas.width,canvas.height);
+  	background.onload = function(){
+      	ctx.drawImage(background,0,0,canvas.width,canvas.height);
 
-		// //Amalgame and Composite
-		// drawRest(ctx,mapping["amalgame"],mapping["composite"],odonto.exist);
+		//Amalgame and Composite
+		drawRest(ctx,mapping["amalgame"],mapping["composite"],odonto.exist);
 
-		// //Exo
-		// drawExo(ctx,"ffffff",odonto.exist);
+		//Exo
+		drawExo(ctx,"ffffff",odonto.exist);
 
-		// //Endo
-		// drawEnd(ctx,mapping["exist"],odonto.exist);
+		//Endo
+		drawEnd(ctx,mapping["exist"],odonto.exist);
 
-		// //Peripiale
-		// drawPer(ctx,mapping["todo"],odonto.exist);
+		//Peripiale
+		drawPer(ctx,mapping["todo"],odonto.exist);
 
-		// //Rotation top
-		// drawRto(ctx,mapping["todo"],odonto.exist);
+		//Rotation top
+		drawRto(ctx,mapping["todo"],odonto.exist);
 
-		// //Rotation bottom
-		// drawRbo(ctx,mapping["todo"],odonto.exist);
+		//Rotation bottom
+		drawRbo(ctx,mapping["todo"],odonto.exist);
 
-		// //Corps etranger
-		// drawEtr(ctx,mapping["todo"],odonto.exist);
+		//Corps etranger
+		drawEtr(ctx,mapping["todo"],odonto.exist);
 
-		// //Incluse
-		// drawInc(ctx,mapping["todo"],odonto.exist);
+		//Incluse
+		drawInc(ctx,mapping["todo"],odonto.exist);
 
-		// //Pontique
-		// drawPon(ctx,mapping["exist"],odonto.exist);
+		//Pontique
+		drawPon(ctx,mapping["exist"],odonto.exist);
 
-		// //Couronne
-		// drawCou(ctx,mapping["exist"],odonto.exist);
-	 //  };
+		//Couronne
+		drawCou(ctx,mapping["exist"],odonto.exist);
+	  };
   }
 
   var dataJson_Code;

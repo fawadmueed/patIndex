@@ -1,7 +1,7 @@
 
   function drawOdonFact(aCanvas)
   {
-    //alert("Draw the whole thing!");
+  //   //alert("Draw the whole thing!");
   // 	var canvas = document.getElementById(aCanvas);
   //   var ctx = canvas.getContext("2d");
   // 	canvas.width = 600 * odoX;

@@ -14,7 +14,7 @@
             - save MachineId and MachineIdPassword in the json file in our server.
         2.2. If request returns credentials (means MachineId was generated),
             -Check expiration date.
-                - if credentials will be expired soon (less than 5 days), 
+                - if credentials will be expired soon (less than 5 days),
                     - show popup that allows user to insert three parameters:
                         - Numéro de transmission de l’agence (we can get it from VisionR if they have it).
                         - Identifiant machine (we can get it from Credentials json file from our server).
@@ -22,25 +22,51 @@
                     - send these parameters to RAMQ in order to get new MachineIdPassword
                     - get new MachineIdPassword and save it in the appropriate json file.
     Also, user should be able to change MachineIdPassword at any time. So, we need an appropriate button anywhere.
-   
+
 
 */
 
-var globServerUrl = 'http://144.217.219.194/axxium/';
-var globRamqApiPath = "http://semiosisaxxiumwebapi20171101022833.azurewebsites.net/";
-var globRamqObjCredentials;
-var globClinicId = "";
-var globPatientId = "";
-var globNoDossier = "";
-var globDentist = "";
 
-//Page load
-$(function () {
+
+////Page load
+//$(function () {
+//    //Get parameters from url and put it in global variable
+//    globClinicId = GetParamFromUrl("clinicId");
+//    globPatientId = GetParamFromUrl("patientId");
+//    globNoDossier = GetParamFromUrl("dossierNo");
+//    globDentist = GetParamFromUrl("dentist");
+//});
+
+$(document).ready(function () {
     //Get parameters from url and put it in global variable
-    globClinicId = GetParamFromUrl("clinicId");
-    globPatientId = GetParamFromUrl("patientId");
-    globNoDossier = GetParamFromUrl("dossierNo");
-    globDentist = GetParamFromUrl("dentist");
+    globClinicId = RamqGetParamFromUrl("clinicId");
+    globPatientId = RamqGetParamFromUrl("patientId");
+    globNoDossier = RamqGetParamFromUrl("dossierNo");
+    globDentist = RamqGetParamFromUrl("dentist");
+    globLang = RamqGetParamFromUrl('lng');
+
+    ////Change language
+    //if (globLang === 'en') {
+    //    changeLang('en');
+    //}
+    //else {
+    //    globLang = 'fr'; //French by default
+    //    changeLang('fr');
+    //}
+
+  //$.ajax({
+  //	type:'GET',
+  //	url:"json/params/codtar"+globDentist+".json",
+  //	//url:"json/params/codes6.json",
+  //	async:false,
+  //	dataType: 'json',
+  //	success: function (data) {
+  //  	dataJson_Code=data;
+  //	}
+  //})
+
+  //  RamqCheckCredentials();
+  //  RamqGetVisionRData();
 });
 
 function RamqCheckCredentials()
@@ -102,8 +128,12 @@ function RamqCheckIfMachineIdExpired()
 
 //Call this function when the button OK is clicked on the module UpdateMachineId.
 function RamqUpdateMachineId() {
+    //Show progress
+    document.getElementById("loaderAdminMain").setAttribute("class", "ui active inverted dimmer");
     $.post("allScriptsv1.py", { tx: "ChangePassword", clinicId: globClinicId },
             function (result) {
+                //Hide progress
+                document.getElementById("loaderAdminMain").setAttribute("class", "ui inverted dimmer");
                 if (result.outcome === 'error')
                     alert(result.message);
                 else
@@ -137,11 +167,11 @@ function RamqDayDiff(date1, date2)
 
 
 //returns param value for the given param name.
-function GetParamFromUrl(name) {
+function RamqGetParamFromUrl(name) {
     //TODO: uncomment for production.
-    // var url = location.href;
-    //var url = window.location.href;
-    var url = "http://myserver/action?clinicId=AGP18011&patientId=234577&dossierNo=000192&dentist=MM";// For test only.
+    var url = location.href;
+    var url = window.location.href;
+    //var url = "http://myserver/action?clinicId=AGP18011&patientId=234577&dossierNo=114625&dentist=AR";// For test only.
 
     if (!url) url = location.href;
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -149,5 +179,39 @@ function GetParamFromUrl(name) {
     var regex = new RegExp(regexS);
     var results = regex.exec(url);
     return results === null ? null : results[1];
+}
+
+function RamqGetVisionRData() {
+    $.ajax(
+              {
+                  url: globRamqAPIuri + "PostRamqParameterRequired",
+                  type: "POST",
+                  contentType: "application/json",
+                  data: JSON.stringify({ NoDossier: globNoDossier, Dentiste: globDentist }),
+                  success: function (result) {
+                      //alert(result.Result);
+                      globVisionRData = RamqPopulateVisionRDataObj(result);
+                      globCdaVersion = CdaCommGetVersion(globVisionRData.InsTypeList[0]);
+                      newRecordFact(); //facture_table.js
+
+                      $('#pamnt_no_prof').val(globVisionRData.IdProf);
+
+                      //Display Patient name
+                      var patName = globVisionRData.PrePers + ' ' + globVisionRData.NomPers;
+                      $('#patNameSub').html(patName);
+
+                    //   //Show prof name on Payment -> Assurances
+                    //   document.getElementById("assurProfName").innerHTML = globVisionRData.ProfName;
+                    //   //Show prof name on CDANET Modal - 1 -> Requérant
+                    //   document.getElementById("cdan1_req").value = globVisionRData.ProfName;
+                    //   //Show prof name on CDANET Modal - 2 -> Requérant
+                    //   document.getElementById("cdan2_req").value = globVisionRData.ProfName;
+
+                  },
+                  error: function (xhr, ajaxOptions, thrownError) {
+                      //debugger;
+                      alert(xhr.statusText);
+                  }
+              });
 }
 

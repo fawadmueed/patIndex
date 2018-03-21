@@ -4,34 +4,78 @@
 var globCdaV4g01 = '';
 
 function CdaV4SendRequestToCdaNet() {
-    CdaV4GetDataFromDB();
+
+    //TODO: functionality with 2 insurance is not implemented
+    //Check if patient has two insurance
+    if ($('#asur_2_oui').is(':checked')) {
+        //Check if patient has two same insurance
+        if (globVisionRData.InsTypeList[0] === globVisionRData.InsTypeList[1]) {
+            //Start request process
+            CdaV4GetDataFromDB();
+        }
+    }
+    else {
+        //Start request process
+        CdaV4GetDataFromDB();
+    }
 }
 
-function CdaV4CallCDAService() {
-    var strRequest = CdaV4CreateRequestString();
-    // TODO: call WebService and send strRequest as a parameter.
+function CdaV4CallCDAService(pReqString) {
+    var strRequest ='';
+    if (pReqString) {
+        strRequest = pReqString;
+    }
+    else {
+        strRequest = CdaV4CreateRequestString();
+    } 
 
+    var randomNum = CdaCommCreateRandomNumber(1, 999);
     var inputXMl = {
-        "request" : strRequest, //request to send
-        "info" : { 'NoSeq' : '', 'Description' : '', 'NoDossier': '', 'Prenom' : '', 'Nom':'', 'Ass': '', 'Couver' : '', 'Date': '', 'NoRef': ''} // JSON data
+        "request": strRequest, //request to send
+        "info": { 'Prenom': globVisionRData.PrePers, 'Nom': globVisionRData.NomPers, 'Ass': globVisionRData.InsTypeList[0] } // JSON data
     };
 
-    $.post("allScriptsv1.py", {tx: "sendInsurance", clinicId: 'AGP18011', patientId: '234577', nodossier: 'ABC444' , nofact: '1', lun : '000', json: JSON.stringify(inputXMl)}, 
-        function(result){
-            var xml = result.message;
-            $("#message").append(xml);
+    //Show progress
+    document.getElementById("loaderCdan4Form").setAttribute("class", "ui active inverted dimmer");
+    document.getElementById("loaderMain").setAttribute("class", "ui active inverted dimmer");
+    try {
+
+        $.post("allScriptsv1.py", { tx: "sendInsurance", clinicId: globClinicId, patientId: globPatientId, nodossier: globNoDossier, nofact: globBillNumber, lun: randomNum, json: JSON.stringify(inputXMl) },
+        function (result) {
+            //Hide progress
+            document.getElementById("loaderCdan4Form").setAttribute("class", "ui inverted dimmer");
+            document.getElementById("loaderMain").setAttribute("class", "ui inverted dimmer");
+            
+
+            if (result.outcome === 'error')
+                alert(result.message);
+            else {
+                var responseLine = result.message;
+                var communicationResult = CdaCommGetCommStatus(responseLine);
+                if (communicationResult == 0)// No errors
+                {
+                    var transactionLine = responseLine.split(',').slice(3); // extract string after 3th comma
+
+                    globCdaRespObj = CdaV4ReadResponse(transactionLine);
+                    var respMessage = '';
+                    if (globCdaRespObj) {
+                        respMessage = CdaV4CreateRespMessage(globCdaRespObj, transactionLine);
+                    }
+                    else {
+                        respMessage = 'Parsing CdaNet response failed.'
+                    }
+
+                    CdaCommShowResp(respMessage);
+                }
+            }
         });
-
-
-
-
-
-    var responseLine = 'xxxxxxxxxxxxxxxxxxxx21xxxxxx';
-    var objResp = CdaV4ReadResponse(responseLine);
-    var respMessage = CdaV4CreateRespMessage(objResp, responseLine);
-    CdaCommShowResp(respMessage);
-    //CdaCommShowResp(objResp);
-
+    }
+    catch (e)
+    {
+        document.getElementById("loaderCdan4Form").setAttribute("class", "ui inverted dimmer");
+        document.getElementById("loaderMain").setAttribute("class", "ui inverted dimmer");
+        alert(e.message);
+    }
 }
 
 //============================================= Create request string =============================================
@@ -60,7 +104,7 @@ function CdaV4CreateRequestString() {
                 strRequest = CdaV4CreateClaimReversalRequest();
             }
             break;
-        case "Predetermination":
+        case "3"://Predetermination
             {
                 strRequest = CdaV4CreatePredeterminationRequest();
             }
@@ -102,6 +146,8 @@ function CdaV4CreateEligibilityRequest() {
 function CdaV4CreateClaimRequest() {
     var res = "";
     var req = CdaV4PopulateClaimObj();
+    
+    
     res += req.a01 + req.a02 + req.a03 + req.a04 + req.a05 + req.a06 + req.a10 + req.a07 + req.a08 + req.a09;
     res += req.b01 + req.b02 + req.b03 + req.b04 + req.b05 + req.b06;
     res += req.c01 + req.c11 + req.c02 + req.c17 + req.c03 + req.c04 + req.c05 + req.c06 + req.c07 + req.c08 + req.c09 + req.c10 + req.c12 + req.c18;
@@ -201,11 +247,13 @@ function CdaV4CreatePredeterminationRequest() {
     }
     res += req.f02 + req.f15 + req.f04 + req.f18 + req.f19 + req.f05 + req.f20 + req.f21;
 
-    //Extracted Teeth Count //TODO: check if convertion required.
-    //TODO: check if have to loop through array.
-    if (req.f22 > 0)
+    //Extracted Teeth Count 
+
+    if (req.f22 > 0) //Extracted Teeth Count //TODO: check if convertion required.
     {
-        res += req.f23[0] + req.f24[0];
+        for (var i = 0; i < req.f22; i++) {
+            res += req.f23[i] + req.f24[i]; //Extracted Tooth Number, Extraction Date
+        }
     }
 
     res += req.g46 + req.g47;
@@ -320,7 +368,28 @@ function CdaV4PopulateClaimObj()
     var transactionType = "Claim";
     var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
-    
+    var procLineNumber = CdaV4GGetNumProcedures(); //Number of insurance lines.
+    obj.f23 = []; obj.f24 = []; obj.f07 = []; obj.f08 = []; obj.f09 = []; obj.f10 = []; obj.f11 = []; obj.f12 = []; obj.f13 = []; obj.f34 = []; obj.f35 = []; obj.f36 = [];
+
+    //calculate transaction length
+    var transLength = 0;
+    if (objDataFromDB.e20 == '1') {
+        transLength = 536;
+    }
+    else {
+        transLength = 344;
+    }
+    transLength += 44;
+
+    if (parseInt(objDataFromDB.f22) > 0) {
+        transLength += parseInt(objDataFromDB.f22) * 10;
+    }
+
+    if (parseInt(objDataFromDB.c18) > 0) {
+        transLength += 30;
+    }
+    transLength += 56 * procLineNumber;
+
     //A Transaction Header
     obj.a01 = CDAV4FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
     obj.a02 = CDAV4FormatField(objDataFromDB.a02, 'N', 6); //Office Sequence Number
@@ -330,7 +399,7 @@ function CdaV4PopulateClaimObj()
     obj.a06 = CDAV4FormatField(objDataFromDB.a06, 'AN', 3); //Software System ID
     obj.a10 = CDAV4FormatField(objDataFromDB.a10, 'N', 1); //Encryption Method
 
-    obj.a07 = CDAV4FormatField(objDataFromDB.a07, 'N', 5); //Message Length
+    obj.a07 = CDAV4FormatField(transLength, 'N', 5); //Message Length
     obj.a08 = CDAV4FormatField(objDataFromDB.a08, 'AN', 1); //Materials Forwarded
     obj.a09 = CDAV4FormatField(objDataFromDB.a09, 'N', 5); //Carrier Transaction Counter
 
@@ -349,7 +418,7 @@ function CdaV4PopulateClaimObj()
     obj.c17 = CDAV4FormatField(objDataFromDB.c17, 'N', 2); //Primary Dependant Code
     obj.c03 = CDAV4FormatField(objDataFromDB.c03, 'N', 1); //Relationship Code
     obj.c04 = CDAV4FormatField(objDataFromDB.c04, 'A', 1); //Patient's Sex
-    obj.c05 = CDAV4FormatField(objDataFromDB.c05, 'N', 8); //Patient's Birthday
+    obj.c05 = CDAV4FormatField(CdaCommGetDateOfBirthFromRamq(globVisionRData.IdPers), 'N', 8); //Patient's Birthday
     obj.c06 = CDAV4FormatField(objDataFromDB.c06, 'AE', 25); //Patient's Last Name
     obj.c07 = CDAV4FormatField(objDataFromDB.c07, 'AE', 15); //Patient's First Name
     obj.c08 = CDAV4FormatField(objDataFromDB.c08, 'AE', 1); //Patient's Middle Initial
@@ -377,11 +446,12 @@ function CdaV4PopulateClaimObj()
     obj.e20 = CDAV4FormatField(objDataFromDB.e20, 'N', 1); //Secondary Record Count
 
     //F Procedure Information
-    obj.f06 = CDAV4FormatField(CdaV4GGetNumProcedures(), 'N', 1); //Number of Procedures Performed 
-    obj.f22 = CDAV4FormatField(objDataFromUI.f22, 'N', 2); //Extracted Teeth Count
+    obj.f06 = CDAV4FormatField(procLineNumber, 'N', 1); //Number of Procedures Performed 
+    obj.f22 = CDAV4FormatField(objDataFromDB.f22, 'N', 2); //Extracted Teeth Count// TODO: if it comes from DB?
+
 
     //If E20 = 1 then the following Secondary Carrier fields would appear (E19 to E07)
-    if (obj.e20 == 1)
+    if (obj.e20 == '1')
     {
         obj.e19 = CDAV4FormatField(objDataFromDB.e19, 'N', 6); //Secondary Carrier Transaction Counter
         obj.e01 = CDAV4FormatField(objDataFromDB.e01, 'N', 6); //Secondary Carrier Id Number
@@ -411,23 +481,28 @@ function CdaV4PopulateClaimObj()
     obj.f03 = CDAV4FormatField($("#cdan2_no_confrmtn_plan").val(), 'AN', 14); //Predetermination Number
     obj.f15 = CDAV4FormatField($("#cdan_placmnt_maxl").val(), 'A', 1); //Initial Placement Upper
     obj.f04 = CDAV4FormatField($("#cdan_date_plcmnt_maxl").val(), 'N', 8); //Date of Initial Placement Upper
-    obj.f18 = CDAV4FormatField(objDataFromDB.f18, 'A', 1); //Initial Placement Lower
-    obj.f19 = CDAV4FormatField(objDataFromDB.f19, 'N', 8); //Date of Initial Placement Lower
+    obj.f18 = CDAV4FormatField($("#cdan_placmnt_mand").val(), 'A', 1); //Initial Placement Lower
+    obj.f19 = CDAV4FormatField($("#cdan_date_plcmnt_mand").val(), 'N', 8); //Date of Initial Placement Lower
     obj.f05 = CDAV4FormatField($('#q2_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes 
     obj.f20 = CDAV4FormatField(objDataFromDB.f20, 'N', 1); //Maxillary Prosthesis Material
     obj.f21 = CDAV4FormatField(objDataFromDB.f21, 'N', 1); //Mandibular Prosthesis Material
 
-    for (var i = 0; i < obj.f22; i++)
+    
+    for (var i = 0; i < parseInt(obj.f22); i++)
     {
         obj.f23[i] = CDAV4FormatField(objDataFromDB.f23[i], 'N', 2); //Extracted Tooth Number
         obj.f24[i] = CDAV4FormatField(objDataFromDB.f24[i], 'N', 8); //Extraction Date
     }
 
+    obj.f16 = []; obj.f17 = [];
+    var lineCount = 1;
     for (var i = 0; i<arrGrilleDeFacturation.length; i++)
     {
-        var lineCount = 1;
-        if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP')
-        {
+        
+        if (CdaCommIsRamqCode(arrGrilleDeFacturation[i].Type) || (CdaV4IsLabProc(arrGrilleDeFacturation[i].Code || arrGrilleDeFacturation[i].Code.trim() != '') && arrGrilleDeFacturation[i].Code != '99111'))
+            continue;
+        
+       
             obj.f07[i] = CDAV4FormatField(lineCount, 'N', 1); //Procedure Line Number
             obj.f08[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Code, 'AN', 5); //Procedure Code
             obj.f09[i] = CDAV4FormatField(CDAV4GetCurrentDate(), 'N', 8); //Date of Service
@@ -435,17 +510,58 @@ function CdaV4PopulateClaimObj()
             obj.f11[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Surface, 'A', 5); //Tooth Surface
 
             obj.f12[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
-            obj.f34[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 1  //TODO:???????????????????????????????????????
+            obj.f34[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 1. Initilite it with spaces.
             obj.f13[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Frais, 'D', 6); //Lab Procedure Fee # 1
-            obj.f35[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 2 //TODO:
-            obj.f36[i] = CDAV4FormatField('', 'D', 6); //Lab Procedure Fee # 2 //TODO:
-            obj.f16[i] = CDAV4FormatField('', 'A', 5); //Procedure Type Codes
+
+            obj.f35[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 2 initialisation
+            obj.f36[i] = CDAV4FormatField('', 'D', 6); //Lab Procedure Fee # 2 initialisation
+
+
+            var honoraire = 0.00;
+            if (lineCount + 1 <= procLineNumber && arrGrilleDeFacturation[i + 1]) //if there is at least one line after
+
+            {
+                if (!CdaCommIsRamqCode(arrGrilleDeFacturation[i + 1].Type) && CdaV4IsLabProc(arrGrilleDeFacturation[i + 1].Code))
+                {
+                    obj.f34 = CDAV4FormatField(arrGrilleDeFacturation[i + 1].Code, 'AN', 5); //new -Lab Proc code 1
+
+                    
+                    if (arrGrilleDeFacturation[i + 1].Code.trim() == '99111')
+                    {
+                        honoraire = parseFloat(arrGrilleDeFacturation[i + 1].Honoraires) + parseFloat(arrGrilleDeFacturation[i+1].Frais);
+                    }
+                    else
+                    {
+                        honoraire = parseFloat(arrGrilleDeFacturation[i + 1].Honoraires) ;
+                    }
+                    obj.f13[i] = CDAV4FormatField(honoraire, 'D', 6); //Lab Procedure Fee # 1
+                }
+            }
+
+
+            if (lineCount + 2 <= procLineNumber && arrGrilleDeFacturation[i + 2])
+
+            {
+                honoraire = 0.00;
+                if (!CdaCommIsRamqCode(arrGrilleDeFacturation[i + 1].Type) && !CdaCommIsRamqCode(arrGrilleDeFacturation[i + 2].Type) && CdaV4IsLabProc(arrGrilleDeFacturation[i + 1].Code) && CdaV4IsLabProc(arrGrilleDeFacturation[i + 2].Code))
+                {
+                    obj.f35[i] = CDAV4FormatField(arrGrilleDeFacturation[i + 2].Code, 'AN', 5); //Lab Procedure Code # 2 
+                    if (arrGrilleDeFacturation[i + 2].Code == '99111') {
+                        honoraire = parseFloat(arrGrilleDeFacturation[i + 2].Honoraires) + parseFloat(arrGrilleDeFacturation[i + 2].Frais);
+                    }
+                    else {
+                        honoraire = parseFloat(arrGrilleDeFacturation[i + 2].Honoraires);
+                    }
+                    obj.f36[i] = CDAV4FormatField(honoraire, 'D', 6); //Lab Procedure Fee # 2 
+                }
+            }
+            
+            obj.f16[i] = CDAV4FormatField('X', 'A', 5); //Procedure Type Codes
             obj.f17[i] = CDAV4FormatField(00, 'N', 2); //Remarks Code
 
             lineCount++;
-        }
     }
-    if(obj.c18 ==1)
+    if(obj.c18 =='1')
         obj.c19 = CDAV4FormatField(objDataFromDB.c19, 'AN', 30); //Plan Record
 
     return obj;
@@ -519,7 +635,7 @@ function CdaV4PopulateCOBClaimObj(pEob)
     obj.g39 = CDAV4FormatField(objDataFromDB.g39, 'N', 4);//Embedded Transaction Length
 
     //If E20 = 1 then the following Secondary Carrier fields would appear (E19 to E07)
-    if (obj.e20 == 1)
+    if (obj.e20 == '1')
     {
         obj.e19 = CDAV4FormatField(objDataFromDB.e19, 'N', 6); //Secondary Carrier Transaction Counter
         obj.e01 = CDAV4FormatField(objDataFromDB.e01, 'N', 6); //Secondary Carrier Id Number
@@ -556,7 +672,7 @@ function CdaV4PopulateCOBClaimObj(pEob)
     obj.f21 = CDAV4FormatField(objDataFromDB.f21, 'N', 1); //Mandibular Prosthesis Material
 
 
-    for (var i = 0; i < obj.f22; i++) {
+    for (var i = 0; i < parseInt(obj.f22); i++) {
         obj.f23[i] = CDAV4FormatField(objDataFromDB.f23[i], 'N', 2); //Extracted Tooth Number
         obj.f24[i] = CDAV4FormatField(objDataFromDB.f24[i], 'N', 8); //Extraction Date
     }
@@ -582,7 +698,7 @@ function CdaV4PopulateCOBClaimObj(pEob)
         }
     }
 
-    if(obj.c18==1)
+    if(obj.c18=='1')
         obj.c19 = CDAV4FormatField(objDataFromDB.c19, 'AN', 30); //Plan Record
     obj.eob = pEob;
     return obj;
@@ -593,10 +709,11 @@ function PopulateClaimReversalObj() {
     var transactionType = "ClaimReversal";
     var objDataFromDB = globCdaDataFromDB;
     var objDataFromUI = CdaV4GetDataFromUI();
+    var oficeSeqNumber = globCdaTransHistSelectedData[13].substring(12, 18);
 
     //A Transaction Header
     obj.a01 = CDAV4FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
-    obj.a02 = CDAV4FormatField(objDataFromDB.a02, 'N', 6); //Office Sequence Number
+    obj.a02 = CDAV4FormatField(oficeSeqNumber, 'N', 6); //Office Sequence Number
     obj.a03 = CDAV4FormatField(objDataFromDB.a03, 'N', 2); //Format Version Number
     obj.a04 = CDAV4FormatField(objDataFromDB.a04, 'N', 2); //Transaction Code
     obj.a05 = CDAV4FormatField(objDataFromDB.a05, 'N', 6); //Carrier Identification Number
@@ -631,7 +748,35 @@ function PopulatePredeterminationObj() {
     var obj = {};
     var transactionType = "Predetermination";
     var objDataFromDB = globCdaDataFromDB;
-    var objDataFromUI = CdaV4GetDataFromUI();
+    //var objDataFromUI = CdaV4GetDataFromUI();
+    var procLineNumber = arrGrilleDeFacturation_planTrait.length;
+    obj.f23 = []; obj.f24 = []; obj.f07 = []; obj.f08 = []; obj.f09 = []; obj.f10 = []; obj.f11 = []; obj.f12 = []; obj.f13 = []; obj.f34 = []; obj.f35 = []; obj.f36 = [];
+
+    //calculate transaction length
+    var transLength = 0;
+    if (objDataFromDB.e20 == '1') {
+        transLength = 537;
+    }
+    else {
+        transLength = 345;
+    }
+    transLength += 29;
+
+    if (parseInt(objDataFromDB.f22) > 0) {
+        transLength += parseInt(objDataFromDB.f22) * 10;
+    }
+
+    transLength += 2; //g46 and g47
+
+    if (objDataFromDB.f25 == '1') //ortho flag
+        transLength += 37;
+
+
+    if (parseInt(objDataFromDB.c18) > 0) {
+        transLength += 30;//c19
+    }
+    transLength += 48 * procLineNumber;
+
 
     //A Transaction Header
     obj.a01 = CDAV4FormatField(objDataFromDB.a01, 'AN', 12); //Transaction Prefix
@@ -641,7 +786,7 @@ function PopulatePredeterminationObj() {
     obj.a05 = CDAV4FormatField(objDataFromDB.a05, 'N', 6); //Carrier Identification Number
     obj.a06 = CDAV4FormatField(objDataFromDB.a06, 'AN', 3); //Software System ID
     obj.a10 = CDAV4FormatField(objDataFromDB.a10, 'N', 1); //Encryption Method
-    obj.a07 = CDAV4FormatField(objDataFromDB.a07, 'N', 5); //Message Length
+    obj.a07 = CDAV4FormatField(transLength, 'N', 5); //Message Length
     obj.a08 = CDAV4FormatField(objDataFromDB.a08, 'AN', 1); //Materials Forwarded
     obj.a09 = CDAV4FormatField(objDataFromDB.a09, 'N', 5); //Carrier Transaction Counter
 
@@ -660,7 +805,7 @@ function PopulatePredeterminationObj() {
     obj.c17 = CDAV4FormatField(objDataFromDB.c17, 'N', 2); //Primary Dependant Code
     obj.c03 = CDAV4FormatField(objDataFromDB.c03, 'N', 1); //Relationship Code
     obj.c04 = CDAV4FormatField(objDataFromDB.c04, 'A', 1); //Patient's Sex
-    obj.c05 = CDAV4FormatField(objDataFromDB.c05, 'N', 8); //Patient's Birthday
+    obj.c05 = CDAV4FormatField(CdaCommGetDateOfBirthFromRamq(globVisionRData.IdPers), 'N', 8); //Patient's Birthday
     obj.c06 = CDAV4FormatField(objDataFromDB.c06, 'AE', 25); //Patient's Last Name
     obj.c07 = CDAV4FormatField(objDataFromDB.c07, 'AE', 15); //Patient's First Name
     obj.c08 = CDAV4FormatField(objDataFromDB.c08, 'AE', 1); //Patient's Middle Initial
@@ -690,7 +835,8 @@ function PopulatePredeterminationObj() {
     //F Procedure Information
     obj.f06 = CDAV4FormatField(CdaV4GGetNumProcedures(), 'N', 1); //Number of Procedures Performed 
     obj.f22 = CDAV4FormatField(objDataFromDB.f22, 'N', 2); //Extracted Teeth Count //TODO: where from get this data?
-    obj.f25 = CDAV4FormatField(objDataFromDB.f25, 'N', 1);//Orthodontic Record Flag
+    //obj.f25 = CDAV4FormatField(objDataFromDB.f25, 'N', 1);//Orthodontic Record Flag
+    obj.f25 = CDAV4FormatField('0', 'N', 1); //This value is hardcoded as in VisionR
 
     //If E20 = 1 then the following Secondary Carrier fields would appear (E19 to E07)
     if (obj.e20 == 1) {
@@ -722,9 +868,9 @@ function PopulatePredeterminationObj() {
     //obj.f03 = CDAV4FormatField(objDataFromDB.f03, 'AN', 14); //Predetermination Number
     obj.f15 = CDAV4FormatField($("#cdan_placmnt_maxl").val(), 'A', 1); //Initial Placement Upper
     obj.f04 = CDAV4FormatField($("#cdan_date_plcmnt_maxl").val(), 'N', 8); //Date of Initial Placement Upper
-    obj.f18 = CDAV4FormatField(objDataFromDB.f18, 'A', 1); //Initial Placement Lower
-    obj.f19 = CDAV4FormatField(objDataFromDB.f19, 'N', 8); //Date of Initial Placement Lower
-    obj.f05 = CDAV4FormatField($('#q2_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes
+    obj.f18 = CDAV4FormatField($("#cdan_placmnt_mand").val(), 'A', 1); //Initial Placement Lower
+    obj.f19 = CDAV4FormatField($("#cdan_date_plcmnt_mand").val(), 'N', 8); //Date of Initial Placement Lower
+    obj.f05 = CDAV4FormatField($('#q2_orthodon_oui').is(':checked') ? 'Y' : 'N', 'A', 1); //Treatment Required for Orthodontic Purposes 
     obj.f20 = CDAV4FormatField(objDataFromDB.f20, 'N', 1); //Maxillary Prosthesis Material
     obj.f21 = CDAV4FormatField(objDataFromDB.f21, 'N', 1); //Mandibular Prosthesis Material
 
@@ -733,39 +879,100 @@ function PopulatePredeterminationObj() {
         obj.f24[i] = CDAV4FormatField(objDataFromDB.f24[i], 'N', 8); //Extraction Date
     }
 
+    obj.g46 = CDAV4FormatField('1', 'N', 1); //Current Predetermination Page Number
+    obj.g47 = CDAV4FormatField('1', 'N', 1); //Last Predetermination Page Number
+
     if (obj.f25 == 1)
     {
-        obj.f37 = CDAV4FormatField(objDataFromUI.f37, 'N', 8);//Estimated Treatment Starting Date
-        obj.f26 = CDAV4FormatField(objDataFromUI.f26, 'D', 6);//First Examination Fee
-        obj.f27 = CDAV4FormatField(objDataFromUI.f27, 'D', 6);//Diagnostic Phase Fee
-        obj.f28 = CDAV4FormatField(objDataFromUI.f28, 'D', 6);//Initial Payment
-        obj.f29 = CDAV4FormatField(objDataFromUI.f29, 'N', 1);//Payment Mode
-        obj.f30 = CDAV4FormatField(objDataFromUI.f30, 'N', 2);//Treatment Duration
-        obj.f31 = CDAV4FormatField(objDataFromUI.f31, 'N', 2);//Number of Anticipated Payments
-        obj.f32 = CDAV4FormatField(objDataFromUI.f32, 'D', 6);//Anticipated Payment Amount
+        // This part wasn't implemented in VisionR
+        //obj.f37 = CDAV4FormatField(objDataFromUI.f37, 'N', 8);//Estimated Treatment Starting Date
+        //obj.f26 = CDAV4FormatField(objDataFromUI.f26, 'D', 6);//First Examination Fee
+        //obj.f27 = CDAV4FormatField(objDataFromUI.f27, 'D', 6);//Diagnostic Phase Fee
+        //obj.f28 = CDAV4FormatField(objDataFromUI.f28, 'D', 6);//Initial Payment
+        //obj.f29 = CDAV4FormatField(objDataFromUI.f29, 'N', 1);//Payment Mode
+        //obj.f30 = CDAV4FormatField(objDataFromUI.f30, 'N', 2);//Treatment Duration
+        //obj.f31 = CDAV4FormatField(objDataFromUI.f31, 'N', 2);//Number of Anticipated Payments
+        //obj.f32 = CDAV4FormatField(objDataFromUI.f32, 'D', 6);//Anticipated Payment Amount
 
     }
 
-    for (var i = 0; i < arrGrilleDeFacturation.length; i++) {
-        var lineCount = 1;
-        if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP') {
-            obj.f07[i] = CDAV4FormatField(lineCount, 'N', 1); //Procedure Line Number
-            obj.f08[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Code, 'AN', 5); //Procedure Code
-            //obj.f09[i] = CDAV4FormatField(CDAV4GetCurrentDate(), 'N', 8); //Date of Service
-            obj.f10[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Dent, 'N', 2); //International Tooth, Sextant, Quad or Arch
-            obj.f11[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Surface, 'A', 5); //Tooth Surface
+    obj.f16 = []; obj.f17 = [];
+    var lineCount = 1;
+    for (var i = 0; i < arrGrilleDeFacturation_planTrait.length; i++) {
 
-            obj.f12[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
-            obj.f34[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 1  //TODO:
-            obj.f13[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Frais, 'D', 6); //Lab Procedure Fee # 1
-            obj.f35[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 2 //TODO:
-            obj.f36[i] = CDAV4FormatField('', 'D', 6); //Lab Procedure Fee # 2 //TODO:
-            obj.f16[i] = CDAV4FormatField('', 'A', 5); //Procedure Type Codes
-            obj.f17[i] = CDAV4FormatField(00, 'N', 2); //Remarks Code
+        obj.f07[i] = CDAV4FormatField(lineCount, 'N', 1); //Procedure Line Number
+        obj.f08[i] = CDAV4FormatField(arrGrilleDeFacturation_planTrait[i].Code, 'AN', 5); //Procedure Code
+        //obj.f09[i] = CDAV4FormatField(CDAV4GetCurrentDate(), 'N', 8); //Date of Service
+        obj.f10[i] = CDAV4FormatField(arrGrilleDeFacturation_planTrait[i].Dent, 'N', 2); //International Tooth, Sextant, Quad or Arch
+        obj.f11[i] = CDAV4FormatField(arrGrilleDeFacturation_planTrait[i].Surface, 'A', 5); //Tooth Surface
 
-            lineCount++;
+        obj.f12[i] = CDAV4FormatField(arrGrilleDeFacturation_planTrait[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
+        obj.f34[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 1. Initilite it with spaces.
+        obj.f13[i] = CDAV4FormatField(arrGrilleDeFacturation_planTrait[i].Frais, 'D', 6); //Lab Procedure Fee # 1
+
+        obj.f35[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 2 initialisation
+        obj.f36[i] = CDAV4FormatField('', 'D', 6); //Lab Procedure Fee # 2 initialisation
+
+        //obj.f17 = CDAV4FormatField('00', 'N', 2); //Remarks Code. Hardcoded in VisonR
+
+        var honoraire = 0.00;
+        if (lineCount + 1 <= procLineNumber && arrGrilleDeFacturation_planTrait[i + 1]) //if there is at least one line after
+
+        {
+            if (CdaV4IsLabProc(arrGrilleDeFacturation_planTrait[i + 1].Code)) {
+                obj.f34 = CDAV4FormatField(arrGrilleDeFacturation_planTrait[i + 1].Code, 'AN', 5); //new -Lab Proc code 1
+
+
+                if (arrGrilleDeFacturation_planTrait[i + 1].Code.trim() == '99111') {
+                    honoraire = parseFloat(arrGrilleDeFacturation_planTrait[i + 1].Honoraires) + parseFloat(arrGrilleDeFacturation_planTrait[i + 1].Frais);
+                }
+                else {
+                    honoraire = parseFloat(arrGrilleDeFacturation_planTrait[i + 1].Honoraires);
+                }
+                obj.f13[i] = CDAV4FormatField(honoraire, 'D', 6); //Lab Procedure Fee # 1
+            }
         }
+
+
+        if (lineCount + 2 <= procLineNumber && arrGrilleDeFacturation_planTrait[i + 2]) {
+            honoraire = 0.00;
+            if (CdaV4IsLabProc(arrGrilleDeFacturation_planTrait[i + 1].Code) && CdaV4IsLabProc(arrGrilleDeFacturation_planTrait[i + 2].Code)) {
+                obj.f35[i] = CDAV4FormatField(arrGrilleDeFacturation_planTrait[i + 2].Code, 'AN', 5); //Lab Procedure Code # 2 
+                if (arrGrilleDeFacturation_planTrait[i + 2].Code == '99111') {
+                    honoraire = parseFloat(arrGrilleDeFacturation_planTrait[i + 2].Honoraires) + parseFloat(arrGrilleDeFacturation_planTrait[i + 2].Frais);
+                }
+                else {
+                    honoraire = parseFloat(arrGrilleDeFacturation_planTrait[i + 2].Honoraires);
+                }
+                obj.f36[i] = CDAV4FormatField(honoraire, 'D', 6); //Lab Procedure Fee # 2 
+            }
+        }
+
+        obj.f16[i] = CDAV4FormatField('X', 'A', 5); //Procedure Type Codes
+        obj.f17[i] = CDAV4FormatField('00', 'N', 2); //Remarks Code
+
+        lineCount++;
     }
+    //for (var i = 0; i < arrGrilleDeFacturation.length; i++) {
+    //    var lineCount = 1;
+    //    if (arrGrilleDeFacturation[i].Type != 'AMQ' && arrGrilleDeFacturation[i].Type != 'BES' && arrGrilleDeFacturation[i].Type != 'HOP') {
+    //        obj.f07[i] = CDAV4FormatField(lineCount, 'N', 1); //Procedure Line Number
+    //        obj.f08[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Code, 'AN', 5); //Procedure Code
+    //        //obj.f09[i] = CDAV4FormatField(CDAV4GetCurrentDate(), 'N', 8); //Date of Service
+    //        obj.f10[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Dent, 'N', 2); //International Tooth, Sextant, Quad or Arch
+    //        obj.f11[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Surface, 'A', 5); //Tooth Surface
+
+    //        obj.f12[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Honoraires, 'D', 6); //Dentist's Fee Claimed
+    //        obj.f34[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 1  //TODO:
+    //        obj.f13[i] = CDAV4FormatField(arrGrilleDeFacturation[i].Frais, 'D', 6); //Lab Procedure Fee # 1
+    //        obj.f35[i] = CDAV4FormatField('', 'AN', 5); //Lab Procedure Code # 2 //TODO:
+    //        obj.f36[i] = CDAV4FormatField('', 'D', 6); //Lab Procedure Fee # 2 //TODO:
+    //        obj.f16[i] = CDAV4FormatField('', 'A', 5); //Procedure Type Codes
+    //        obj.f17[i] = CDAV4FormatField(00, 'N', 2); //Remarks Code
+
+    //        lineCount++;
+    //    }
+    //}
     if (obj.c18 == 1)
         obj.c19 = CDAV4FormatField(objDataFromDB.c19, 'AN', 30); //Plan Record
 
@@ -855,48 +1062,56 @@ function PopulateSumReconcilationObj() {
 
 function CdaV4ReadResponse(pResponse)
 {
+    pResponse = pResponse.toString();
     var res = {};
-    var transCode = '';
-    if(pResponse)
-    {
-        transCode = pResponse.substring(20, 23);
-        
-        switch (transCode) {
-            case '18':
-                res = CdaV4ParseEligibilityResp(pResponse);
-                break;
-            case '11':
-                res = CdaV4ParseClaimAcknResp(pResponse);
-                break;
-            case '21':
-                res = CdaV4ParseEOBResp(pResponse);
-                break;
-            case '19':
-                res = CdaV4ParseAttachmentResp(pResponse);
-                break;
-            case '12':
-                res = CdaV4ParseClaimReversResp(pResponse);
-                break;
-            case '13':
-                res = CdaV4ParsePredetAcknResp(pResponse);
-                break;
-            case '23':
-                res = CdaV4ParsePredetEOBResp(pResponse);
-                break;
-            case '14':
-                res = CdaV4ParseOutstandAcknResp(pResponse);
-                break;
-            case '24':
-                res = CdaV4ParseOutstandEmailResp(pResponse);
-                break;
-            case '16':
-                res = CdaV4ParseReconsilResp(pResponse);
-                break;
-            case '15':
-                res = CdaV4ParseSummReconsilResp(pResponse);
-                break;
+    try {
+        var transCode = '';
+        if (pResponse) {
+            transCode = pResponse.substring(20, 22);
 
+            switch (transCode) {
+                case '18':
+                    res = CdaV4ParseEligibilityResp(pResponse);
+                    break;
+                case '11':
+                    res = CdaV4ParseClaimAcknResp(pResponse);
+                    break;
+                case '21':
+                    res = CdaV4ParseEOBResp(pResponse);
+                    break;
+                case '19':
+                    res = CdaV4ParseAttachmentResp(pResponse);
+                    break;
+                case '12':
+                    res = CdaV4ParseClaimReversResp(pResponse);
+                    break;
+                case '13':
+                    res = CdaV4ParsePredetAcknResp(pResponse);
+                    break;
+                case '23':
+                    res = CdaV4ParsePredetEOBResp(pResponse);
+                    break;
+                case '14':
+                    res = CdaV4ParseOutstandAcknResp(pResponse);
+                    break;
+                case '24':
+                    res = CdaV4ParseOutstandEmailResp(pResponse);
+                    break;
+                case '16':
+                    res = CdaV4ParseReconsilResp(pResponse);
+                    break;
+                case '15':
+                    res = CdaV4ParseSummReconsilResp(pResponse);
+                    break;
+                default:
+                    res = null;
+
+            }
         }
+    }
+    catch (e)
+    {
+        return null;
     }
     return res;
 }
@@ -904,6 +1119,7 @@ function CdaV4ReadResponse(pResponse)
 function CdaV4ParseEligibilityResp(pResponse)
 {
     var res = {};
+    res.g08 = []; res.g32 = [];
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -942,6 +1158,8 @@ function CdaV4ParseEligibilityResp(pResponse)
 function CdaV4ParseClaimAcknResp(pResponse)
 {
     var res = {};
+    res.g32 = []; res.f07 = []; res.g08 = [];
+
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -996,6 +1214,11 @@ function CdaV4ParseClaimAcknResp(pResponse)
 function CdaV4ParseEOBResp(pResponse)
 {
     var res = {};
+    res.f07 = []; res.g12 = []; res.g13 = []; res.g14 = []; res.g15 = []; res.g43 = []; res.g56 = []; res.g57 = []; res.g58 = []; res.g02 = []; res.g59 = []; res.g60 = []; res.g61 = []; res.g16 = []; res.g17 = [];
+    res.g18 = []; res.g19 = []; res.g20 = []; res.g44 = []; res.g21 = []; res.g22 = []; res.g23 = []; res.g24 = []; res.g25 = [];
+    res.g41 = []; res.g45 = []; res.g26 = [];
+
+
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1035,6 +1258,7 @@ function CdaV4ParseEOBResp(pResponse)
         res.g14[i] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Eligible Percentage
         lastPos += 3;
         res.g15[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2);//Benefit Amount for the Procedure
+        lastPos += 6;
         res.g43[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 6)) / 100).toFixed(2); //Eligible Amount for Lab Procedure # 1
         lastPos += 6;
         res.g56[i] = (parseFloat(pResponse.substring(lastPos, lastPos + 5)) / 100).toFixed(2); //Deductible Amount for Lab Procedure # 1
@@ -1100,6 +1324,7 @@ function CdaV4ParseEOBResp(pResponse)
 function CdaV4ParseAttachmentResp(pResponse)
 {
     var res = {};
+    res.g08 = []; res.g32 = [];
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1136,6 +1361,7 @@ function CdaV4ParseAttachmentResp(pResponse)
 function CdaV4ParseClaimReversResp(pResponse)
 {
     var res = {};
+    res.g32 = []; res.g08 = [];
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1163,7 +1389,7 @@ function CdaV4ParseClaimReversResp(pResponse)
         lastPos += 75;
     }
 
-    for (var j = 0; j < res.g31; j++)
+    for (var j = 0; j < res.g06; j++)
     {
         res.g08[j] = parseInt(pResponse.substring(lastPos, lastPos + 3));//Error Code
         lastPos += 3;
@@ -1176,6 +1402,7 @@ function CdaV4ParseClaimReversResp(pResponse)
 function CdaV4ParsePredetAcknResp(pResponse)
 {
     var res = {};
+    res.g32 = []; res.g42 = []; res.g46 = []; res.g47 = []; res.f07 = []; res.g08 = [];
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1229,6 +1456,10 @@ function CdaV4ParsePredetAcknResp(pResponse)
 function CdaV4ParsePredetEOBResp(pResponse)
 {
     var res = {};
+    res.f07=[]; res.g12=[]; res.g13=[]; res.g14=[]; res.g15=[]; res.g43=[]; res.g56=[]; res.g57=[]; res.g58=[]; res.g02=[]; res.g59=[]; res.g60=[]; res.g61=[]; res.g16=[]; res.g17=[];
+    res.g18=[]; res.g19=[]; res.g20=[]; res.g44=[]; res.g21=[]; res.g22=[]; res.g23=[]; res.g24=[]; res.g25=[];
+    res.g41=[]; res.g45=[]; res.g26=[];
+
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1312,11 +1543,11 @@ function CdaV4ParsePredetEOBResp(pResponse)
 
     for (var k = 0; k < res.g11; k++)
     {
-        res.g41 = parseInt(pResponse.substring(lastPos, lastPos + 1));//Message Output Flag
+        res.g41[k] = parseInt(pResponse.substring(lastPos, lastPos + 1));//Message Output Flag
         lastPos += 1;
-        res.g45 = parseInt(pResponse.substring(lastPos, lastPos + 1));//Note Number
+        res.g45[k] = parseInt(pResponse.substring(lastPos, lastPos + 1));//Note Number
         lastPos += 1;
-        res.g26 = pResponse.substring(lastPos, lastPos + 1); //Note Text
+        res.g26[k] = pResponse.substring(lastPos, lastPos + 1); //Note Text
         lastPos += 1;
     }
 
@@ -1330,6 +1561,7 @@ function CdaV4ParsePredetEOBResp(pResponse)
 function CdaV4ParseOutstandAcknResp(pResponse)
 {
     var res = {};
+    res.g08 = [];
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1357,6 +1589,7 @@ function CdaV4ParseOutstandAcknResp(pResponse)
 function CdaV4ParseOutstandEmailResp(pResponse)
 {
     var res = {};
+    res.g53=[];
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1383,6 +1616,10 @@ function CdaV4ParseOutstandEmailResp(pResponse)
 function CdaV4ParseReconsilResp(pResponse)
 {
     var res = {};
+    res.b01 = []; res.b02 = []; res.b03 = []; es.a05 = []; res.a02 = []; res.g01 = []; res.g38 = [];
+    res.g41=[];    res.g26=[];
+    res.g08=[];
+
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1435,13 +1672,16 @@ function CdaV4ParseReconsilResp(pResponse)
         res.g08[k] = pResponse.substring(lastPos, lastPos + 3); //Error Code
         lastPos += 3;
     }
-
     return res;
 }
 
 function CdaV4ParseSummReconsilResp(pResponse)
 {
     var res = {};
+    res.b01 = []; res.a05 = []; res.a02 = []; res.g01 = []; res.g38 = [];
+    res.g41 = []; res.g26 = [];
+    res.g08=[];
+
     res.a01 = pResponse.substring(0, 12); //Transaction Prefix
     res.a02 = parseInt(pResponse.substring(12, 18));//Office Sequence Number
     res.a03 = parseInt(pResponse.substring(18, 20));//Format Version Number
@@ -1493,23 +1733,13 @@ function CdaV4ParseSummReconsilResp(pResponse)
 
 function CdaV4CreateRespMessage(pResp, pResponseLine) {
     var ResponseList = '';
-    ResponseList += 'cdanetTranscode : ' + globCdanetTranscode;
+    ResponseList += 'Cdanet Transcode : ' + globCdanetTranscode + '\n';
 
     if (![2, 4, 5, 6, 99].includes(parseInt(globCdanetTranscode)))
     {
         var lastName = (globVisionRData && globVisionRData.NomPers) ? globVisionRData.NomPers : '';
         var firstName = (globVisionRData && globVisionRData.PrePers) ? globVisionRData.PrePers : '';
         ResponseList += 'Patient: ' + lastName + ' ' + firstName + '\n';
-
-        //if (strToint(CDANETTranscode) = 8) and not (primaryeligibility) then
-        //ResponseList.add('Assurance secondaire : ' + policer.ass2)
-        //else
-        //    begin
-        //if coverage = 'S' then
-        //ResponseList.add('Assurance : ' + policer.ass2)
-        //else
-        //          ResponseList.add('Assurance : ' + patientr.ass);
-        //end;
 
         var isFirstCoverage = true;//TODO implement functionality to know if it is first coverage.
         var assurance;
@@ -1521,13 +1751,13 @@ function CdaV4CreateRespMessage(pResp, pResponseLine) {
         ResponseList += 'Assurance: ' + assurance + '\n';
     }
 
-    var noSequence = pResp.a02;
+    var noSequence = (pResp&&pResp.a02) ? pResp.a02 : '';
     ResponseList += 'No de Séquence: ' + noSequence + '\n';
 
-    var respCode = pResp.a04.toString();
-    ResponseList += 'responseCode: ' + respCode + '\n';
+    var respCode = (pResp && pResp.a04) ? pResp.a04.toString() : '';
+    ResponseList += 'ResponseCode: ' + respCode + '\n';
 
-    var MailBox = pResp.a11;
+    var MailBox = (pResp && pResp.a11) ? pResp.a11 : '';
     ResponseList += 'MailBox : ' + MailBox + '\n';
 
     if (respCode == '16') //Reconciliation des paiements
@@ -1733,19 +1963,19 @@ function CdaV4GetResponseListForEOB(pResp) {
     var gNoConfirm  = pResp.g30;
     ResponseList +='No de confirmation : ' + gNoConfirm + '\n';
 
-    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
+    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : pResp.g04;
     ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
 
-    var deductibleAmount = (isNaN(pResp.g29 / 100)) ? '0' : (pResp.g29 / 100).toFixed(2);
+    var deductibleAmount = (isNaN(pResp.g29 / 100)) ? '0' : pResp.g29;
     ResponseList += 'Montant du déductible non alloué : ' + deductibleAmount + '\n';
 
-    var totalBenefitAmounts = (isNaN(pResp.g28 / 100)) ? '0' : (pResp.g28 / 100).toFixed(2);
+    var totalBenefitAmounts = (isNaN(pResp.g28 / 100)) ? '0' : pResp.g28;
     ResponseList += 'Montant des prestations : ' + totalBenefitAmounts + '\n';
 
-    var adjustmentAmount = (isNaN(pResp.g33 / 100)) ? '0' : (pResp.g33 / 100).toFixed(2);
+    var adjustmentAmount = (isNaN(pResp.g33 / 100)) ? '0' : pResp.g33;
     ResponseList += 'Montant pour ajustement : ' + adjustmentAmount + '\n';
 
-    var totalPayable = (isNaN(pResp.g55 / 100)) ? '0' : (pResp.g55 / 100).toFixed(2);
+    var totalPayable = (isNaN(pResp.g55 / 100)) ? '0' : pResp.g55;
     ResponseList += 'Montant total remboursé : ' + totalPayable + '\n';
 
     var paymentDate = pResp.g03.toString();
@@ -1770,7 +2000,7 @@ function CdaV4GetResponseListForEOB(pResp) {
     var noteTxt;
     for (var i = 0; i < nNotes; i++)
     {
-        noteTxt = g45[i] + ' ' + g26[i];
+        noteTxt = pResp.g45[i] + ' ' + pResp.g26[i];
         noteTxt = CdaCommFrompage850(noteTxt);
         ResponseList += noteTxt + '\n';
     }
@@ -1800,7 +2030,7 @@ function CdaV4GetResponseListForEOBPredet(pResp)
     var nNotes = pResp.g11;
     var noteTxt;
     for (var i = 0; i < nNotes; i++) {
-        noteTxt = g45[i] + ' ' + g26[i];
+        noteTxt = pResp.g45[i] + ' ' + pResp.g26[i];
         noteTxt = CdaCommFrompage850(noteTxt);
         ResponseList += noteTxt + '\n';
     }
@@ -1817,7 +2047,7 @@ function CdaV4GetResponseListForClaimAck(pResp)
         responsemess = 'Réponse à l\'interrogation sur l\'admissibilité';
     }
     else
-        responsemess = 'Réponse la demande de réglement';
+        responsemess = 'Réponse la demande de réglement:';
 
     ResponseList += responsemess + '\n';
 
@@ -1838,7 +2068,7 @@ function CdaV4GetResponseListForClaimAck(pResp)
     var gTransref = pResp.g01; //g01
     ResponseList += 'No de Référence: ' + gTransref + '\n';
 
-    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
+    var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : pResp.g04;
     ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
 
     var nError = pResp.g06;
@@ -1861,15 +2091,20 @@ function CdaV4GetResponseListForClaimAck(pResp)
         ResponseList += 'Messages  (' + messageCount + ')' + '\n';
 
         for (var j = 0; j < messageCount; j++) {
-            var displayMessage = CdaCommFrompage850(pRes.g32[i]);
+            var displayMessage = CdaCommFrompage850(pResp.g32[i]);
             ResponseList += displayMessage + '\n';
         }
     }
 
+
     // stupid logic from VisionR
-    var mFormId = pResp.g08[g08.length - 1]; //last formid
-    if (responsestatus == 'R')
-    {
+    //var mFormId = pResp.g08[pResp.g08.length - 1]; //last formid
+    //if (responsestatus == 'R')
+    //{
+    //    ResponseList += 'Type de Formulaire  à imprimer : ' + CdaCommGetFormToPrint(mFormId) + '\n';
+    //}
+    var mFormId = pResp.g42;
+    if (responsestatus == 'R') {
         ResponseList += 'Type de Formulaire  à imprimer : ' + CdaCommGetFormToPrint(mFormId) + '\n';
     }
     return ResponseList;
@@ -1893,15 +2128,15 @@ function CdaV4GetResponseListForPredeterm(pResp)
     ResponseList += CdaCommFrompage850(disposition) + '\n';
 
     var gTransfer = pResp.g01;
-    ResponseList += 'No de Référence: ' + gTransref + '\n';
+    ResponseList += 'No de Référence: ' + gTransfer + '\n';
 
     var totalAmount = (isNaN(pResp.g04 / 100)) ? '0' : (pResp.g04 / 100).toFixed(2);
     ResponseList += 'Montant réclamé : ' + totalAmount + '\n';
 
     var errorCodeNum = pResp.g06;
-    ResponseList +='Nombre d\'erreurs : ' + errorCodes + '\n';
+    ResponseList += 'Nombre d\'erreurs : ' + errorCodeNum + '\n';
     
-    for (var i = 0; i < errorCodes; i++) {
+    for (var i = 0; i < errorCodeNum; i++) {
         var procLineNum = pResp.f07[i];
         var errorCode = pResp.g08[i];
         if (procLineNum > 0)
@@ -1957,7 +2192,7 @@ function CdaV4GetResponseListForOutstAckn(pResp) {
 function CdaV4GetResponseListForClaimRevers(pResp)
 {
     var ResponseList = '';
-    ResponseList += 'Réponse à la demande d\'annulation de la réclamation No :' + globCdaProviderSequence + '\n';
+    ResponseList += 'Réponse à la demande d\'annulation de la réclamation No :' + pResp.a02 + '\n';
 
     var gTransref = pResp.g01;
     ResponseList += 'No de Référence: ' + gTransref + '\n';
@@ -2114,126 +2349,12 @@ function CdaV4GetResponseListForEligibility(pResp) {
         return y + m + day;
     }
 
-    function CdaV4Topage850(pString) {
-        var code;
-        var arrString;
-        if (pString) {
-            arrString = pString.split('');
-            for (var i = 0; i < arrString.length; i++) {
-                code = arrString[i].charCodeAt(0);
-                switch (arrString[i]) {
-                    case 'É': code = 144; break;
-                    case 'È': code = 212; break;
-                    case 'Ê': code = 210; break;
-                    case 'À': code = 183; break;
-                    case 'Â': code = 182; break;
-                    case 'Ï': code = 216; break;
-                    case 'Î': code = 215; break;
-                    case 'Ô': code = 226; break;
-                    case 'Ö': code = 153; break;
-                    case 'Û': code = 234; break;
-                    case 'Ü': code = 154; break;
-                    case 'Ç': code = 128; break;
-                    case 'é': code = 130; break;
-                    case 'è': code = 138; break;
-                    case 'ê': code = 136; break;
-                    case 'à': code = 133; break;
-                    case 'â': code = 131; break;
-                    case 'ï': code = 139; break;
-                    case 'î': code = 140; break;
-                    case 'ô': code = 147; break;
-                    case 'ö': code = 148; break;
-                    case 'û': code = 150; break;
-                    case 'ü': code = 129; break;
-                    case 'ç': code = 135; break;
-                }
-                arrString[i] = String.fromCharCode(code);
-            }
-        }
-        return arrString.join("");
-    }
-
-    function CdaV4Frompage850(pString) {
-        var code;
-        var arrString;
-        if (pString) {
-            arrString = pString.split('');
-            for (var i = 0; i < arrString.length; i++) {
-                code = arrString[i].charCodeAt(0);
-                switch (code) {
-                    case 144: arrString[i] = 'É'; break;
-                    case 212: arrString[i] = 'È'; break;
-                    case 210: arrString[i] = 'Ê'; break;
-                    case 211: arrString[i] = 'Ë'; break;
-                    case 183: arrString[i] = 'À'; break;
-                    case 182: arrString[i] = 'Â'; break;
-                    case 181: arrString[i] = 'Á'; break;
-                    case 142: arrString[i] = 'Ä'; break;
-                    case 143: arrString[i] = 'Å'; break;
-                    case 146: arrString[i] = 'Æ'; break;
-                    case 216: arrString[i] = 'Ï'; break;
-                    case 215: arrString[i] = 'Î'; break;
-                    case 222: arrString[i] = 'Ì'; break;
-                    case 214: arrString[i] = 'Í'; break;
-
-                    case 226: arrString[i] = 'Ô'; break;
-                    case 153: arrString[i] = 'Ö'; break;
-                    case 224: arrString[i] = 'Ó'; break;
-                    case 227: arrString[i] = 'Ò'; break;
-                    case 229: arrString[i] = 'Õ'; break;
-
-                    case 235: arrString[i] = 'Ù'; break;
-                    case 233: arrString[i] = 'Ú'; break;
-                    case 234: arrString[i] = 'Û'; break;
-                    case 154: arrString[i] = 'Ü'; break;
-
-                    case 128: arrString[i] = 'Ç'; break;
-                    case 237: arrString[i] = 'Ý'; break;
-
-                    case 130: arrString[i] = 'é'; break;
-                    case 138: arrString[i] = 'è'; break;
-                    case 136: arrString[i] = 'ê'; break;
-                    case 137: arrString[i] = 'ë'; break;
-
-                    case 133: arrString[i] = 'à'; break;
-                    case 131: arrString[i] = 'â'; break;
-                    case 160: arrString[i] = 'á'; break;
-                    case 198: arrString[i] = 'ã'; break;
-                    case 132: arrString[i] = 'ä'; break;
-                    case 134: arrString[i] = 'å'; break;
-                    case 145: arrString[i] = 'æ'; break;
-
-                    case 139: arrString[i] = 'ï'; break;
-                    case 140: arrString[i] = 'î'; break;
-                    case 141: arrString[i] = 'ì'; break;
-                    case 161: arrString[i] = 'í'; break;
-
-                    case 147: arrString[i] = 'ô'; break;
-                    case 148: arrString[i] = 'ö'; break;
-                    case 149: arrString[i] = 'ò'; break;
-                    case 228: arrString[i] = 'õ'; break;
-                    case 162: arrString[i] = 'ó'; break;
-
-                    case 208: arrString[i] = 'ð'; break;
-
-                    case 150: arrString[i] = 'û'; break;
-                    case 129: arrString[i] = 'ü'; break;
-                    case 151: arrString[i] = 'ù'; break;
-                    case 163: arrString[i] = 'ú'; break;
-
-                    case 152: arrString[i] = 'ÿ'; break;
-                    case 236: arrString[i] = 'ý'; break;
-
-                    case 135: arrString[i] = 'ç'; break;
-                }
-            }
-        }
-        return arrString.join("");
-    }
 
     function CDAV4FormatField(pValue, pFormatType, pRequiredLength) {
         //convert input value to string.
-        var v = String(pValue);
+        var v = (pValue) ? String(pValue) : '';
+        v = v.trim();
+
 
         var res = '';
 
@@ -2245,8 +2366,8 @@ function CdaV4GetResponseListForEligibility(pResp) {
             */
             case 'N':
                 {
-                    if (!v)
-                        v = '0';
+                    //if (!v)
+                    //    v = '0';
                     v = v.replace(/-/g, '');// Replase '-' from date.
 
                     if (!Number.isInteger(Number(v))) {
@@ -2257,10 +2378,8 @@ function CdaV4GetResponseListForEligibility(pResp) {
                         if (len < pRequiredLength) {
                             var asciiZero = String.fromCharCode(48);
                             //Fill with zeros.
-                            var i = 0;
-                            while (i < pRequiredLength) {
+                            while (v.length < pRequiredLength) {
                                 v = asciiZero + v;
-                                i++;
                             }
                             res = v;
                         }
@@ -2287,16 +2406,15 @@ function CdaV4GetResponseListForEligibility(pResp) {
                     if (!v)
                         v = '';
                     //Convert to page850
-                    v = CdaV4Topage850(v);
+                    v = CdaCommTopage850(v);
                     v = v.trim(); //remove spaces
 
                     //Check if all characters are alphabetical
-                    if (/^[a-zA-Z]+$/.test(v) || v == '') {
+                    if (/^[a-zA-Z\s]+$/.test(v) || v == '') {
                         var len = v.length;
                         if (len < pRequiredLength) {
                             //Fill with spaces on the right.
-                            var i = 0;
-                            while (i < pRequiredLength) {
+                            while (v.length < pRequiredLength) {
                                 v += ' ';
                             }
                             res = v;
@@ -2309,7 +2427,7 @@ function CdaV4GetResponseListForEligibility(pResp) {
                         }
                     }
                     else
-                        alert('adoV4FormatField Error: Value contains not alphabetical caracters.');
+                        alert('adoV4FormatField Error: Value "'+ v +'" contains not alphabetical caracters.');
                 }
                 break;
 
@@ -2322,14 +2440,13 @@ function CdaV4GetResponseListForEligibility(pResp) {
                     if (!v)
                         v = '';
                     //Convert to page850
-                    v = CdaV4Topage850(v);
+                    v = CdaCommTopage850(v);
                     v = v.trim(); //remove spaces.
 
                     var len = v.length;
                     if (len < pRequiredLength) {
                         //Fill with spaces on the right.
-                        var i = 0;
-                        while (i < pRequiredLength) {
+                        while (v.length < pRequiredLength) {
                             v += ' ';
                         }
                         res = v;
@@ -2386,27 +2503,33 @@ function CdaV4GetResponseListForEligibility(pResp) {
         return res;
     }
 
-    function CdaV4GetDataFromDB(pRrequestType) {
+    function CdaV4GetDataFromDB() {
         $.ajax(
             {
                 url: globCdaNetAPIuri + "PostGenerTransaction",
                 type: "POST",
                 contentType: "application/json",
-                data: JSON.stringify({ Version: '2', TransactionType: globCdanetTranscode, NoDossier: globNoDossier, Dentiste: globDentist }),
+                data: JSON.stringify({ Version: '4', TransactionType: globCdanetTranscode, NoDossier: globNoDossier, Dentiste: globDentist }),
                 success: function (result) {
                     switch (globCdanetTranscode) {
                         case '1'://Claim
+                        case '2'://Claim reversial
                             {
                                 globCdaDataFromDB = result;
-                                CdaV4CallCDAService();
+                                CdaV4CallCDAService('');
                             }
                             break;
+                        case '3'://Predetermination
+                            {
+                                globCdaDataFromDB = result;
+                                PlnTrSendToCdaNet();
+                            }
                     }
 
                     //console.log(result);
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
-                    debugger;
+                    //debugger;
                     alert(xhr.statusText);
                 }
             });
@@ -2476,4 +2599,130 @@ function CdaV4GetResponseListForEligibility(pResp) {
         return transName;
     }
 
+    function CdaV4IsLabProc(pProcCode)
+    {
+        var result = false;
+        if (pProcCode == '99111' || pProcCode == '99333')
+            result = true;
+        return result;
+    }
 
+
+
+
+    //function CdaV4Topage850(pString) {
+    //    var code;
+    //    var arrString;
+    //    if (pString) {
+    //        arrString = pString.split('');
+    //        for (var i = 0; i < arrString.length; i++) {
+    //            code = arrString[i].charCodeAt(0);
+    //            switch (arrString[i]) {
+    //                case 'É': code = 144; break;
+    //                case 'È': code = 212; break;
+    //                case 'Ê': code = 210; break;
+    //                case 'À': code = 183; break;
+    //                case 'Â': code = 182; break;
+    //                case 'Ï': code = 216; break;
+    //                case 'Î': code = 215; break;
+    //                case 'Ô': code = 226; break;
+    //                case 'Ö': code = 153; break;
+    //                case 'Û': code = 234; break;
+    //                case 'Ü': code = 154; break;
+    //                case 'Ç': code = 128; break;
+    //                case 'é': code = 130; break;
+    //                case 'è': code = 138; break;
+    //                case 'ê': code = 136; break;
+    //                case 'à': code = 133; break;
+    //                case 'â': code = 131; break;
+    //                case 'ï': code = 139; break;
+    //                case 'î': code = 140; break;
+    //                case 'ô': code = 147; break;
+    //                case 'ö': code = 148; break;
+    //                case 'û': code = 150; break;
+    //                case 'ü': code = 129; break;
+    //                case 'ç': code = 135; break;
+    //            }
+    //            arrString[i] = String.fromCharCode(code);
+    //        }
+    //    }
+    //    return arrString.join("");
+    //}
+
+    //function CdaV4Frompage850(pString) {
+    //    var code;
+    //    var arrString;
+    //    if (pString) {
+    //        arrString = pString.split('');
+    //        for (var i = 0; i < arrString.length; i++) {
+    //            code = arrString[i].charCodeAt(0);
+    //            switch (code) {
+    //                case 144: arrString[i] = 'É'; break;
+    //                case 212: arrString[i] = 'È'; break;
+    //                case 210: arrString[i] = 'Ê'; break;
+    //                case 211: arrString[i] = 'Ë'; break;
+    //                case 183: arrString[i] = 'À'; break;
+    //                case 182: arrString[i] = 'Â'; break;
+    //                case 181: arrString[i] = 'Á'; break;
+    //                case 142: arrString[i] = 'Ä'; break;
+    //                case 143: arrString[i] = 'Å'; break;
+    //                case 146: arrString[i] = 'Æ'; break;
+    //                case 216: arrString[i] = 'Ï'; break;
+    //                case 215: arrString[i] = 'Î'; break;
+    //                case 222: arrString[i] = 'Ì'; break;
+    //                case 214: arrString[i] = 'Í'; break;
+
+    //                case 226: arrString[i] = 'Ô'; break;
+    //                case 153: arrString[i] = 'Ö'; break;
+    //                case 224: arrString[i] = 'Ó'; break;
+    //                case 227: arrString[i] = 'Ò'; break;
+    //                case 229: arrString[i] = 'Õ'; break;
+
+    //                case 235: arrString[i] = 'Ù'; break;
+    //                case 233: arrString[i] = 'Ú'; break;
+    //                case 234: arrString[i] = 'Û'; break;
+    //                case 154: arrString[i] = 'Ü'; break;
+
+    //                case 128: arrString[i] = 'Ç'; break;
+    //                case 237: arrString[i] = 'Ý'; break;
+
+    //                case 130: arrString[i] = 'é'; break;
+    //                case 138: arrString[i] = 'è'; break;
+    //                case 136: arrString[i] = 'ê'; break;
+    //                case 137: arrString[i] = 'ë'; break;
+
+    //                case 133: arrString[i] = 'à'; break;
+    //                case 131: arrString[i] = 'â'; break;
+    //                case 160: arrString[i] = 'á'; break;
+    //                case 198: arrString[i] = 'ã'; break;
+    //                case 132: arrString[i] = 'ä'; break;
+    //                case 134: arrString[i] = 'å'; break;
+    //                case 145: arrString[i] = 'æ'; break;
+
+    //                case 139: arrString[i] = 'ï'; break;
+    //                case 140: arrString[i] = 'î'; break;
+    //                case 141: arrString[i] = 'ì'; break;
+    //                case 161: arrString[i] = 'í'; break;
+
+    //                case 147: arrString[i] = 'ô'; break;
+    //                case 148: arrString[i] = 'ö'; break;
+    //                case 149: arrString[i] = 'ò'; break;
+    //                case 228: arrString[i] = 'õ'; break;
+    //                case 162: arrString[i] = 'ó'; break;
+
+    //                case 208: arrString[i] = 'ð'; break;
+
+    //                case 150: arrString[i] = 'û'; break;
+    //                case 129: arrString[i] = 'ü'; break;
+    //                case 151: arrString[i] = 'ù'; break;
+    //                case 163: arrString[i] = 'ú'; break;
+
+    //                case 152: arrString[i] = 'ÿ'; break;
+    //                case 236: arrString[i] = 'ý'; break;
+
+    //                case 135: arrString[i] = 'ç'; break;
+    //            }
+    //        }
+    //    }
+    //    return arrString.join("");
+    //}
