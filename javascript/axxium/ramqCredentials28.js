@@ -247,6 +247,22 @@ function RamqGetVisionRData() {
                       alert(xhr.statusText);
                   }
               });
+
+    var uri='http://ec2-52-38-58-195.us-west-2.compute.amazonaws.com/axxium/api/InsuranceWebApi/';
+
+       $.ajax(
+               {
+                   url: uri + "PostGenerIndemnisation",
+                   type: "POST",
+                   contentType: "application/json",
+                   data: JSON.stringify({ NoDossier: globNoDossier, Dentiste: globDentist }),
+                   success: function (result) {
+                       globInsuranceData=result;
+                   },
+                   error: function (xhr, ajaxOptions, thrownError) {
+                       alert(xhr.statusText);
+                   }
+               });
 }
 
 

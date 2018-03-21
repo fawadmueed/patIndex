@@ -521,11 +521,11 @@
                               <div class="two fields">
                                  <div class="field">
                                     <label>Principal</label>
-                                    <input type="text" name="" value="" readonly="">
+                                    <input type="text" name="" value="" id='ETel' readonly="">
                                  </div>
                                  <div class="field">
                                     <label>Cellulaire</label>
-                                    <input type="text" name="" value="" id='ETel' readonly="">
+                                    <input type="text" name="" value=""  readonly="">
                                  </div>
                               </div>
                               <div class="two fields">
@@ -774,10 +774,8 @@
                         <div class="inline fields">
                            <label>Type 1</label>
                            <div class="four wide field">
-                              <select value="CAS" placeholder="Select Type" class="ui fluid selection dropdown " id="ramq_select">
-                                 <option value="0" ></option>
-                                 <option value="1" selected="selected">CAS</option>
-                                 <option value="2">Desjardin</option>
+                              <select value="CAS" placeholder="Select Type"  id="ins_typ1">
+                                 <!-- <option value="1" selected="selected">CAS</option>                                  -->
                               </select>
                            </div>
                            <div class="six wide field">
@@ -797,9 +795,9 @@
                         <div class="inline fields">
                            <label>Type 2</label>
                            <div class="four wide field">
-                              <select value="CAS" placeholder="CAS" class="ui fluid selection  dropdown insurance_select2">
+                              <select value="CAS" placeholder="CAS"  id="ins_typ2">
                                  <option value="1">CAS</option>
-                                 <option value="2">TD</option>
+                                 
                               </select>
                            </div>
                            <div class="six wide field">
@@ -6988,7 +6986,6 @@
       {
         var pat_Age=get_age();
         var Adress=globVisionRData.AdrPersPatnt.split(',');
-
         $('#EID').val(globNoDossier);
         $('#Efirst').val(globVisionRData.PrePers);
         $('#Elast').val(globVisionRData.NomPers);
@@ -7003,6 +7000,13 @@
         $('#ECourriel').val(globVisionRData.Email);
         $('#ramq_exp').val(globVisionRData.NamExpDate);
         $('#dentInitial').append(globDentist);
+
+        $.each(globVisionRData.InsTypeList,function(id,val)
+        {
+            $('#ins_typ1').append('<option value="'+val+'" selected="selected">'+val+'</option>');
+        })
+         
+        
 
       }
       
